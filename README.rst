@@ -44,7 +44,7 @@ Widget keyword options:
 * Standard options
 
     cursor: cursor to display when the pointer is in the widget
-    
+
     font: font of the calendar, can be a string such as "Arial 20 bold" or a Tkinter Font instance
 
 
@@ -59,32 +59,31 @@ Widget keyword options:
     selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
     background: border and month/year name background color
-    
+
     foreground: border and month/year name foreground color
 
     selectbackground: selected day background color
-    
+
     selectforeground: selected day foreground color
 
     normalbackground: normal week days background color
-    
+
     normalforeground: normal week days foreground color
 
     othermonthforeground: foreground color for days belonging to the previous/next month
 
     weekendbackground: week-end days background color
-    
+
     weekendforeground: week-end days foreground color
 
     headersbackground: day names and week numbers background color
-    
+
     headersforeground: day names and week numbers foreground color
 
 
 * Virtual Events
 
-    A `<<CalendarSelected>>` event is generated each time the selected day changes.
-
+    A `<<CalendarSelected>>` event is generated each time the user selects a day with the mouse.
 
 Changelog
 ---------

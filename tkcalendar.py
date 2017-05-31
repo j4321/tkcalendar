@@ -81,8 +81,8 @@ class Calendar(ttk.Frame):
 
             VIRTUAL EVENTS
 
-                A <<CalendarSelected>> event is generated each time the
-                selected day changes.
+                A <<CalendarSelected>> event is generated each time the user
+                selects a day with the mouse.
         """
 
         curs = kw.pop("cursor", "")
@@ -499,7 +499,6 @@ class Calendar(ttk.Frame):
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
-                self.event_generate("<<CalendarSelected>>")
 
     ### other methods
     def keys(self):
