@@ -41,24 +41,21 @@ Syntax:
 
 Widget keyword options:
 
-* STANDARD OPTIONS
+* Standard options
 
     cursor: cursor to display when the pointer is in the widget
-    font: font of the calendar, can be a string such as "Arial 20 bold" or
-          a Tkinter Font instance
+    font: font of the calendar, can be a string such as "Arial 20 bold" or a Tkinter Font instance
 
 
-* WIDGET-SPECIFIC OPTIONS
+* Widget-Specific Options
 
     year, month: initially displayed month, default is current month
 
-    day: initially selected day, if month or year is given but not day, no
-         initial selection, otherwise, default is today
+    day: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
     locale: locale to use, e.g. "fr_FR" for a French calendar
 
-    selectmode: "none" or "day" (default) define whether the user
-                can change the selected day with a mouse click
+    selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
     background: border and month/year name background color
     foreground: border and month/year name foreground color
@@ -69,8 +66,7 @@ Widget keyword options:
     normalbackground: normal week days background color
     normalforeground: normal week days foreground color
 
-    othermonthforeground: foreground color for days belonging to
-                          the previous/next month
+    othermonthforeground: foreground color for days belonging to the previous/next month
 
     weekendbackground: week-end days background color
     weekendforeground: week-end days foreground color
@@ -79,10 +75,9 @@ Widget keyword options:
     headersforeground: day names and week numbers foreground color
 
 
-* VIRTUAL EVENTS
+* Virtual Events
 
-    A `<<CalendarSelected>>` event is generated each time the
-    selected day changes.
+    A `<<CalendarSelected>>` event is generated each time the selected day changes.
 
 
 Changelog
