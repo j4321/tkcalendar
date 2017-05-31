@@ -35,8 +35,9 @@ Documentation
 
 Syntax:
 
-    ::
-        Calendar(master=None, **kw)
+::
+
+    Calendar(master=None, **kw)
 
 Widget keyword options:
 
