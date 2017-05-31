@@ -57,21 +57,26 @@ class Calendar(ttk.Frame):
                             can change the selected day with a mouse click
 
                 background: border and month/year name background color
+
                 foreground: border and month/year name foreground color
 
                 selectbackground: selected day background color
+
                 selectforeground: selected day foreground color
 
                 normalbackground: normal week days background color
+
                 normalforeground: normal week days foreground color
 
                 othermonthforeground: foreground color for days belonging to
                                       the previous/next month
 
                 weekendbackground: week-end days background color
+
                 weekendforeground: week-end days foreground color
 
                 headersbackground: day names and week numbers background color
+
                 headersforeground: day names and week numbers foreground color
 
             VIRTUAL EVENTS
