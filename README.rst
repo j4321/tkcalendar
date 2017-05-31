@@ -95,7 +95,8 @@ Changelog
 Example
 =======
 
-::
+.. code:: python
+
     try:
         from tkinter import Tk, Button
     except ImportError:
