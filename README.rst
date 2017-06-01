@@ -52,33 +52,35 @@ Widget keyword options:
 
     year, month: initially displayed month, default is current month
 
-    day: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
+                day: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
-    locale: locale to use, e.g. "fr_FR" for a French calendar
+                locale: locale to use, e.g. "fr_FR" for a French calendar
 
-    selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
+                selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
-    background: border and month/year name background color
+                background: calendar border and month/year name background color
 
-    foreground: border and month/year name foreground color
+                foreground: month/year name foreground color
 
-    selectbackground: selected day background color
+                bordercolor: day border color
 
-    selectforeground: selected day foreground color
+                selectbackground: selected day background color
 
-    normalbackground: normal week days background color
+                selectforeground: selected day foreground color
 
-    normalforeground: normal week days foreground color
+                normalbackground: normal week days background color
 
-    othermonthforeground: foreground color for days belonging to the previous/next month
+                normalforeground: normal week days foreground color
 
-    weekendbackground: week-end days background color
+                othermonthforeground: foreground color for days belonging to the previous/next month
 
-    weekendforeground: week-end days foreground color
+                weekendbackground: week-end days background color
 
-    headersbackground: day names and week numbers background color
+                weekendforeground: week-end days foreground color
 
-    headersforeground: day names and week numbers foreground color
+                headersbackground: day names and week numbers background color
+
+                headersforeground: day names and week numbers foreground color
 
 
 * Virtual Events

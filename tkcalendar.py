@@ -56,9 +56,11 @@ class Calendar(ttk.Frame):
                 selectmode: "none" or "day" (default) define whether the user
                             can change the selected day with a mouse click
 
-                background: border and month/year name background color
+                background: calendar border and month/year name background color
 
-                foreground: border and month/year name foreground color
+                foreground: month/year name foreground color
+
+                bordercolor: day border color
 
                 selectbackground: selected day background color
 
@@ -138,6 +140,7 @@ class Calendar(ttk.Frame):
         hd_fg = kw.get("headersforeground", "black")
         bg = kw.get('background', '#424242')
         fg = kw.get('foreground', 'white')
+        bc = kw.get('bordercolor', hd_bg)
         om_fg = kw.get('othermonthforeground', 'gray')
         we_bg = kw.get('weekendbackground', 'gray80')
         we_fg = kw.get('weekendforeground', '#424242')
@@ -148,6 +151,7 @@ class Calendar(ttk.Frame):
                                  'normalforeground': cal_fg,
                                  'background': bg,
                                  'foreground': fg,
+                                 'bordercolor': bc,
                                  'othermonthforeground': om_fg,
                                  'weekendbackground': we_bg,
                                  'weekendforeground': we_fg,
@@ -155,7 +159,7 @@ class Calendar(ttk.Frame):
                                  'headersforeground': hd_fg})
 
         self.style.configure('Calendar.main.TFrame', background=bg)
-        self.style.configure('Calendar.cal.TFrame', background=cal_bg)
+        self.style.configure('Calendar.cal.TFrame', background=bc)
         self.style.configure('Calendar.main.TLabel', background=bg, foreground=fg)
         self.style.configure('Calendar.headers.TLabel', background=hd_bg,
                              foreground=hd_fg)
@@ -220,13 +224,15 @@ class Calendar(ttk.Frame):
 
         ttk.Label(cal, style='Calendar.headers.TLabel').grid(row=0, column=0,
                                                              sticky="eswn")
+        padx = [0 for i in range(7)]
+#        padx[-1] = (0, 1)
         for i, d in enumerate(self._cal.formatweekheader(3).split()):
             cal.columnconfigure(i + 1, weight=1)
             ttk.Label(cal,
                       font=self._font,
                       style='Calendar.headers.TLabel',
                       anchor="center",
-                      text=d, width=4).grid(row=0, column=i + 1,
+                      text=d, width=4).grid(row=0, column=i + 1, padx=padx[i],
                                             sticky="ew", pady=(0,1))
         self._week_nbs = []
         self._calendar = []
@@ -245,10 +251,11 @@ class Calendar(ttk.Frame):
                 label.grid(row=i, column=j, padx=(0,1), pady=(0,1), sticky="nsew")
                 if selectmode == "day":
                     label.bind("<1>", self._on_click)
+#        self._week_nbs[-1].grid_configure(pady=(0,1))
 
         ### *-- pack main elements
         header.pack(fill="x", padx=2, pady=2)
-        cal.pack(fill="both", expand=True, padx=2, pady=2)
+        cal.pack(fill="both", expand=True, padx=(2, 1), pady=2)
 
         self._display_calendar()
 
@@ -290,6 +297,8 @@ class Calendar(ttk.Frame):
                 self.style.configure('Calendar.normal_om.TLabel', background=value)
             elif item == "normalforeground":
                 self.style.configure('Calendar.normal.TLabel', foreground=value)
+            elif item == "bordercolor":
+                self.style.configure('Calendar.cal.TFrame', background=value)
             elif item == "othermonthforeground":
                 self.style.configure('Calendar.normal_om.TLabel', foreground=value)
                 self.style.configure('Calendar.we_om.TLabel', foreground=value)
@@ -538,9 +547,10 @@ if __name__ =="__main__":
         print(cal.selection_get())
 
     root = tk.Tk()
-
+    s = ttk.Style(root)
+    s.theme_use('clam')
     cal = Calendar(root, locale="fr_FR.UTF-8",
-                   font="Arial 12",
+                   font="Arial 10", selectmode='none',
                    cursor="hand1", year=2018, month=2, day=5)
     cal.pack(fill="both", expand=True)
     ttk.Button(root, text="ok", command=print_sel).pack()
