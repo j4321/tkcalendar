@@ -224,15 +224,14 @@ class Calendar(ttk.Frame):
 
         ttk.Label(cal, style='Calendar.headers.TLabel').grid(row=0, column=0,
                                                              sticky="eswn")
-        padx = [0 for i in range(7)]
-#        padx[-1] = (0, 1)
+
         for i, d in enumerate(self._cal.formatweekheader(3).split()):
             cal.columnconfigure(i + 1, weight=1)
             ttk.Label(cal,
                       font=self._font,
                       style='Calendar.headers.TLabel',
                       anchor="center",
-                      text=d, width=4).grid(row=0, column=i + 1, padx=padx[i],
+                      text=d, width=4).grid(row=0, column=i + 1,
                                             sticky="ew", pady=(0,1))
         self._week_nbs = []
         self._calendar = []
@@ -251,7 +250,6 @@ class Calendar(ttk.Frame):
                 label.grid(row=i, column=j, padx=(0,1), pady=(0,1), sticky="nsew")
                 if selectmode == "day":
                     label.bind("<1>", self._on_click)
-#        self._week_nbs[-1].grid_configure(pady=(0,1))
 
         ### *-- pack main elements
         header.pack(fill="x", padx=2, pady=2)
