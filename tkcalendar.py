@@ -89,8 +89,11 @@ class Calendar(ttk.Frame):
 
         curs = kw.pop("cursor", "")
         font = kw.pop("font", "")
-        ttk.Frame.__init__(self, master, style='Calendar.main.TFrame',
-                           class_="Calendar", cursor=curs)
+        classname = kw.pop('class_', "Calendar")
+        ttk.Frame.__init__(self, master, class_=classname, cursor=curs)
+        self._style_prefixe = '%s.%s' % (self.winfo_name(), self.winfo_class())
+        ttk.Frame.configure(self, style=self._style_prefixe + '.main.TFrame')
+
         self._font = Font(self, font)
         prop = self._font.actual()
         prop["size"] += 1
@@ -129,8 +132,8 @@ class Calendar(ttk.Frame):
         arrow_layout = lambda dir: (
             [('Button.focus', {'children': [('Button.%sarrow' % dir, None)]})]
         )
-        self.style.layout('Calendar.L.TButton', arrow_layout('left'))
-        self.style.layout('Calendar.R.TButton', arrow_layout('right'))
+        self.style.layout(self._style_prefixe + '.L.TButton', arrow_layout('left'))
+        self.style.layout(self._style_prefixe + '.R.TButton', arrow_layout('right'))
         active_bg = self.style.lookup('TEntry', 'selectbackground', ('focus',))
         sel_bg = kw.get('selectbackground', active_bg)
         sel_fg = kw.get('selectforeground', 'white')
@@ -158,59 +161,59 @@ class Calendar(ttk.Frame):
                                  'headersbackground': hd_bg,
                                  'headersforeground': hd_fg})
 
-        self.style.configure('Calendar.main.TFrame', background=bg)
-        self.style.configure('Calendar.cal.TFrame', background=bc)
-        self.style.configure('Calendar.main.TLabel', background=bg, foreground=fg)
-        self.style.configure('Calendar.headers.TLabel', background=hd_bg,
+        self.style.configure(self._style_prefixe + '.main.TFrame', background=bg)
+        self.style.configure(self._style_prefixe + '.cal.TFrame', background=bc)
+        self.style.configure(self._style_prefixe + '.main.TLabel', background=bg, foreground=fg)
+        self.style.configure(self._style_prefixe + '.headers.TLabel', background=hd_bg,
                              foreground=hd_fg)
-        self.style.configure('Calendar.normal.TLabel', background=cal_bg,
+        self.style.configure(self._style_prefixe + '.normal.TLabel', background=cal_bg,
                              foreground=cal_fg)
-        self.style.configure('Calendar.normal_om.TLabel', background=cal_bg,
+        self.style.configure(self._style_prefixe + '.normal_om.TLabel', background=cal_bg,
                              foreground=om_fg)
-        self.style.configure('Calendar.we_om.TLabel', background=we_bg,
+        self.style.configure(self._style_prefixe + '.we_om.TLabel', background=we_bg,
                              foreground=om_fg)
-        self.style.configure('Calendar.sel.TLabel', background=sel_bg,
+        self.style.configure(self._style_prefixe + '.sel.TLabel', background=sel_bg,
                              foreground=sel_fg)
-        self.style.configure('Calendar.we.TLabel', background=we_bg,
+        self.style.configure(self._style_prefixe + '.we.TLabel', background=we_bg,
                              foreground=we_fg)
         size = max(self._header_font.actual()["size"], 10)
-        self.style.configure('Calendar.R.TButton', background=bg,
+        self.style.configure(self._style_prefixe + '.R.TButton', background=bg,
                              arrowcolor=fg, arrowsize=size, bordercolor=bg,
                              relief="flat", lightcolor=bg, darkcolor=bg)
-        self.style.configure('Calendar.L.TButton', background=bg,
+        self.style.configure(self._style_prefixe + '.L.TButton', background=bg,
                              arrowsize=size, arrowcolor=fg, bordercolor=bg,
                              relief="flat", lightcolor=bg, darkcolor=bg)
 
-        self.style.map('Calendar.R.TButton', background=[('active', active_bg)],
+        self.style.map(self._style_prefixe + '.R.TButton', background=[('active', active_bg)],
                        bordercolor=[('active', active_bg)],
                        darkcolor=[('active', active_bg)],
                        lightcolor=[('active', active_bg)])
-        self.style.map('Calendar.L.TButton', background=[('active', active_bg)],
+        self.style.map(self._style_prefixe + '.L.TButton', background=[('active', active_bg)],
                        bordercolor=[('active', active_bg)],
                        darkcolor=[('active', active_bg)],
                        lightcolor=[('active', active_bg)])
 
         ### init calendar
         ### *-- header: month - year
-        header = ttk.Frame(self, style='Calendar.main.TFrame')
+        header = ttk.Frame(self, style=self._style_prefixe + '.main.TFrame')
 
-        f_month = ttk.Frame(header, style='Calendar.main.TFrame')
-        l_month = ttk.Button(f_month, style='Calendar.L.TButton',
+        f_month = ttk.Frame(header, style=self._style_prefixe + '.main.TFrame')
+        l_month = ttk.Button(f_month, style=self._style_prefixe + '.L.TButton',
                          command=self._prev_month)
         self._header_month = ttk.Label(f_month, width=10, anchor='center',
-                                       style='Calendar.main.TLabel', font=self._header_font)
-        r_month = ttk.Button(f_month, style='Calendar.R.TButton',
+                                       style=self._style_prefixe + '.main.TLabel', font=self._header_font)
+        r_month = ttk.Button(f_month, style=self._style_prefixe + '.R.TButton',
                          command=self._next_month)
         l_month.pack(side='left', fill="y")
         self._header_month.pack(side='left', padx=4)
         r_month.pack(side='left', fill="y")
 
-        f_year = ttk.Frame(header, style='Calendar.main.TFrame')
-        l_year = ttk.Button(f_year, style='Calendar.L.TButton',
+        f_year = ttk.Frame(header, style=self._style_prefixe + '.main.TFrame')
+        l_year = ttk.Button(f_year, style=self._style_prefixe + '.L.TButton',
                        command=self._prev_year)
         self._header_year = ttk.Label(f_year, width=4, anchor='center',
-                                      style='Calendar.main.TLabel', font=self._header_font)
-        r_year = ttk.Button(f_year, style='Calendar.R.TButton',
+                                      style=self._style_prefixe + '.main.TLabel', font=self._header_font)
+        r_year = ttk.Button(f_year, style=self._style_prefixe + '.R.TButton',
                        command=self._next_year)
         l_year.pack(side='left', fill="y")
         self._header_year.pack(side='left', padx=4)
@@ -220,16 +223,16 @@ class Calendar(ttk.Frame):
         f_year.pack(side='right')
 
         ### *-- calendar
-        cal = ttk.Frame(self, style='Calendar.cal.TFrame')
+        cal = ttk.Frame(self, style=self._style_prefixe + '.cal.TFrame')
 
-        ttk.Label(cal, style='Calendar.headers.TLabel').grid(row=0, column=0,
+        ttk.Label(cal, style=self._style_prefixe + '.headers.TLabel').grid(row=0, column=0,
                                                              sticky="eswn")
 
         for i, d in enumerate(self._cal.formatweekheader(3).split()):
             cal.columnconfigure(i + 1, weight=1)
             ttk.Label(cal,
                       font=self._font,
-                      style='Calendar.headers.TLabel',
+                      style=self._style_prefixe + '.headers.TLabel',
                       anchor="center",
                       text=d, width=4).grid(row=0, column=i + 1,
                                             sticky="ew", pady=(0,1))
@@ -237,14 +240,14 @@ class Calendar(ttk.Frame):
         self._calendar = []
         for i in range(1,7):
             cal.rowconfigure(i, weight=1)
-            wlabel = ttk.Label(cal, style='Calendar.headers.TLabel',
+            wlabel = ttk.Label(cal, style=self._style_prefixe + '.headers.TLabel',
                                font=self._font, padding=2,
                                anchor="e", width=2)
             self._week_nbs.append(wlabel)
             wlabel.grid(row=i, column=0, sticky="esnw", padx=(0, 1))
             self._calendar.append([])
             for j in range(1,8):
-                label = ttk.Label(cal, style='Calendar.normal.TLabel',
+                label = ttk.Label(cal, style=self._style_prefixe + '.normal.TLabel',
                                   font=self._font, anchor="center")
                 self._calendar[-1].append(label)
                 label.grid(row=i, column=j, padx=(0,1), pady=(0,1), sticky="nsew")
@@ -253,7 +256,7 @@ class Calendar(ttk.Frame):
 
         ### *-- pack main elements
         header.pack(fill="x", padx=2, pady=2)
-        cal.pack(fill="both", expand=True, padx=(2, 1), pady=2)
+        cal.pack(fill="both", expand=True, padx=(2, 1), pady=(2, 1))
 
         self._display_calendar()
 
@@ -287,45 +290,45 @@ class Calendar(ttk.Frame):
                 prop["size"] += 1
                 self._header_font.configure(**prop)
                 size = max(prop["size"], 10)
-                self.style.configure('Calendar.R.TButton', arrowsize=size)
-                self.style.configure('Calendar.L.TButton', arrowsize=size)
+                self.style.configure(self._style_prefixe + '.R.TButton', arrowsize=size)
+                self.style.configure(self._style_prefixe + '.L.TButton', arrowsize=size)
             elif item == "normalbackground":
-                self.style.configure('Calendar.cal.TFrame', background=value)
-                self.style.configure('Calendar.normal.TLabel', background=value)
-                self.style.configure('Calendar.normal_om.TLabel', background=value)
+                self.style.configure(self._style_prefixe + '.cal.TFrame', background=value)
+                self.style.configure(self._style_prefixe + '.normal.TLabel', background=value)
+                self.style.configure(self._style_prefixe + '.normal_om.TLabel', background=value)
             elif item == "normalforeground":
-                self.style.configure('Calendar.normal.TLabel', foreground=value)
+                self.style.configure(self._style_prefixe + '.normal.TLabel', foreground=value)
             elif item == "bordercolor":
-                self.style.configure('Calendar.cal.TFrame', background=value)
+                self.style.configure(self._style_prefixe + '.cal.TFrame', background=value)
             elif item == "othermonthforeground":
-                self.style.configure('Calendar.normal_om.TLabel', foreground=value)
-                self.style.configure('Calendar.we_om.TLabel', foreground=value)
+                self.style.configure(self._style_prefixe + '.normal_om.TLabel', foreground=value)
+                self.style.configure(self._style_prefixe + '.we_om.TLabel', foreground=value)
             elif item == "selectbackground":
-                self.style.configure('Calendar.sel.TLabel', background=value)
+                self.style.configure(self._style_prefixe + '.sel.TLabel', background=value)
             elif item == "selectforeground":
-                self.style.configure('Calendar.sel.TLabel', foreground=value)
+                self.style.configure(self._style_prefixe + '.sel.TLabel', foreground=value)
             elif item == "weekendbackground":
-                self.style.configure('Calendar.we.TLabel', background=value)
-                self.style.configure('Calendar.we_om.TLabel', background=value)
+                self.style.configure(self._style_prefixe + '.we.TLabel', background=value)
+                self.style.configure(self._style_prefixe + '.we_om.TLabel', background=value)
             elif item == "weekendforeground":
-                self.style.configure('Calendar.we.TLabel', foreground=value)
+                self.style.configure(self._style_prefixe + '.we.TLabel', foreground=value)
             elif item == "headersbackground":
-                self.style.configure('Calendar.headers.TLabel', background=value)
+                self.style.configure(self._style_prefixe + '.headers.TLabel', background=value)
             elif item == "headersforeground":
-                self.style.configure('Calendar.headers.TLabel', foreground=value)
+                self.style.configure(self._style_prefixe + '.headers.TLabel', foreground=value)
             elif item == "background":
-                self.style.configure('Calendar.main.TFrame', background=value)
-                self.style.configure('Calendar.main.TLabel', background=value)
-                self.style.configure('Calendar.R.TButton', background=value,
+                self.style.configure(self._style_prefixe + '.main.TFrame', background=value)
+                self.style.configure(self._style_prefixe + '.main.TLabel', background=value)
+                self.style.configure(self._style_prefixe + '.R.TButton', background=value,
                                      bordercolor=value,
                                      lightcolor=value, darkcolor=value)
-                self.style.configure('Calendar.L.TButton', background=value,
+                self.style.configure(self._style_prefixe + '.L.TButton', background=value,
                                      bordercolor=value,
                                      lightcolor=value, darkcolor=value)
             elif item == "foreground":
-                self.style.configure('Calendar.R.TButton', arrowcolor=value)
-                self.style.configure('Calendar.L.TButton', arrowcolor=value)
-                self.style.configure('Calendar.main.TLabel', foreground=value)
+                self.style.configure(self._style_prefixe + '.R.TButton', arrowcolor=value)
+                self.style.configure(self._style_prefixe + '.L.TButton', arrowcolor=value)
+                self.style.configure(self._style_prefixe + '.main.TLabel', foreground=value)
             elif item == "cursor":
                 ttk.TFrame.configure(self, cursor=value)
             self._properties[item] = value
@@ -340,60 +343,30 @@ class Calendar(ttk.Frame):
         self._header_year.configure(text=str(year))
 
         # update calendar shown dates
-        cal = self._cal.monthdayscalendar(year, month)
+        cal = self._cal.monthdatescalendar(year, month)
 
         if len(cal) < 6:
-            cal.append([0 for i in range(7)])
+            m = month + 1
+            y = year
+            if m == 13:
+                m = 1
+                y += 1
+            cal.append(self._cal.monthdatescalendar(y, m)[1])
+        week_days = {i: '.normal' for i in range(7)}
+        week_days[5] = '.we'
+        week_days[6] = '.we'
+        prev_m = (month - 2) % 12 + 1
+        months = {month: '.TLabel', m: '_om.TLabel', prev_m: '_om.TLabel'}
+
         week_nb = self._date.isocalendar()[1]
 
         for i_week in range(6):
             self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % 52 + 1))
-            for i_day in range(5):
-                txt = str(cal[i_week][i_day])
+            for i_day in range(7):
+                style = self._style_prefixe + week_days[i_day] + months[cal[i_week][i_day].month]
+                txt = str(cal[i_week][i_day].day)
                 self._calendar[i_week][i_day].configure(text=txt,
-                                                        style='Calendar.normal.TLabel')
-            for i_day in range(5,7):
-                txt = str(cal[i_week][i_day])
-                self._calendar[i_week][i_day].configure(text=txt,
-                                                        style='Calendar.we.TLabel')
-        index_prev = cal[0].index(1)
-        for i in range(min(index_prev,5)):
-            date = self._date - self.timedelta(days=(index_prev - i))
-            self._calendar[0][i].configure(text=str(date.day),
-                                           style='Calendar.normal_om.TLabel')
-        for i in range(min(index_prev,5), index_prev):
-            date = self._date - self.timedelta(days=(index_prev - i))
-            self._calendar[0][i].configure(text=str(date.day),
-                                           style='Calendar.we_om.TLabel')
-        index_next = cal[-1].index(0)
-        d = 1
-        if index_next == 0 and 0 in cal[-2]:
-            index_next = cal[-2].index(0)
-            for i in range(index_next, 5):
-                self._calendar[-2][i].configure(text=str(d),
-                                                style='Calendar.normal_om.TLabel')
-                d += 1
-            for i in range(max(index_next, 5), 7):
-                self._calendar[-2][i].configure(text=str(d),
-                                                style='Calendar.we_om.TLabel')
-                d += 1
-            for i in range(5):
-                self._calendar[-1][i].configure(text=str(d),
-                                                style='Calendar.normal_om.TLabel')
-                d += 1
-            for i in range(5, 7):
-                self._calendar[-1][i].configure(text=str(d),
-                                                style='Calendar.we_om.TLabel')
-                d += 1
-        else:
-            for i in range(index_next, 5):
-                self._calendar[-1][i].configure(text=str(d),
-                                                style='Calendar.normal_om.TLabel')
-                d += 1
-            for i in range(max(index_next, 5), 7):
-                self._calendar[-1][i].configure(text=str(d),
-                                                style='Calendar.we_om.TLabel')
-                d += 1
+                                                        style=style)
         self._display_selection()
 
     def _display_selection(self):
@@ -405,7 +378,7 @@ class Calendar(ttk.Frame):
                w -= self._date.isocalendar()[1]
                w %= 52
                if 0 <= w and w < 6:
-                   self._calendar[w][d - 1].configure(style="Calendar.sel.TLabel")
+                   self._calendar[w][d - 1].configure(style=self._style_prefixe + ".sel.TLabel")
 
     def _remove_selection(self):
         """ Remove highlight of selected day. """
@@ -418,14 +391,14 @@ class Calendar(ttk.Frame):
                if w >=0 and w < 6:
                    if month == self._date.month:
                        if d < 6:
-                           self._calendar[w][d - 1].configure(style="Calendar.normal.TLabel")
+                           self._calendar[w][d - 1].configure(style=self._style_prefixe + ".normal.TLabel")
                        else:
-                           self._calendar[w][d - 1].configure(style="Calendar.we.TLabel")
+                           self._calendar[w][d - 1].configure(style=self._style_prefixe + ".we.TLabel")
                    else:
                        if d < 6:
-                           self._calendar[w][d - 1].configure(style="Calendar.normal_om.TLabel")
+                           self._calendar[w][d - 1].configure(style=self._style_prefixe + ".normal_om.TLabel")
                        else:
-                           self._calendar[w][d - 1].configure(style="Calendar.we_om.TLabel")
+                           self._calendar[w][d - 1].configure(style=self._style_prefixe + ".we_om.TLabel")
 
     ### callbacks
     def _next_month(self):
@@ -462,7 +435,7 @@ class Calendar(ttk.Frame):
         label = event.widget
         day = label.cget("text")
         style = label.cget("style")
-        if style in ["Calendar.normal_om.TLabel", "Calendar.we_om.TLabel"]:
+        if style in [self._style_prefixe + ".normal_om.TLabel", self._style_prefixe + ".we_om.TLabel"]:
             if label in self._calendar[0]:
                 self._prev_month()
             else:
@@ -548,7 +521,7 @@ if __name__ =="__main__":
     s = ttk.Style(root)
     s.theme_use('clam')
     cal = Calendar(root, locale="fr_FR.UTF-8",
-                   font="Arial 10", selectmode='none',
+                   font="Arial 14", selectmode='none',
                    cursor="hand1", year=2018, month=2, day=5)
     cal.pack(fill="both", expand=True)
     ttk.Button(root, text="ok", command=print_sel).pack()
