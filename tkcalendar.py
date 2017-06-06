@@ -345,12 +345,12 @@ class Calendar(ttk.Frame):
         # update calendar shown dates
         cal = self._cal.monthdatescalendar(year, month)
 
+        m = month + 1
+        y = year
+        if m == 13:
+            m = 1
+            y += 1
         if len(cal) < 6:
-            m = month + 1
-            y = year
-            if m == 13:
-                m = 1
-                y += 1
             cal.append(self._cal.monthdatescalendar(y, m)[1])
         week_days = {i: '.normal' for i in range(7)}
         week_days[5] = '.we'
