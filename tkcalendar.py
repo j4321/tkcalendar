@@ -171,7 +171,8 @@ class Calendar(ttk.Frame):
                    'headersbackground',
                    'headersforeground']
 
-        for option in kw:
+        keys = list(kw.keys())
+        for option in keys:
             if not option in options:
                 del(kw[option])
 
@@ -617,6 +618,7 @@ class DateEntry(ttk.Entry):
                 'invalidcommand': '',
                 'justify': 'left',
                 'show': '',
+                'cursor': 'xterm',
                 'style': '',
                 'state': 'normal',
                 'takefocus': 'ttk::takefocus',
@@ -653,6 +655,7 @@ class DateEntry(ttk.Entry):
         locale.setlocale(locale.LC_ALL, loc)
 
         ttk.Entry.__init__(self, master, **self.entry_kw)
+        self._down_arrow_bbox = [0 , 0, 0, 0]
 
         self.style = ttk.Style(self)
         self._setup_style()
@@ -672,6 +675,8 @@ class DateEntry(ttk.Entry):
         ### bindings
         self.bind('<<ThemeChanged>>',
                   lambda e: self.after(10, self._setup_style))
+        self.bind('<Configure>', self._on_configure)
+        self.bind('<Map>', self._on_configure)
         master = self.master
         while master.winfo_class() not in ['Tk', 'Toplevel']:
             master = master.master
@@ -691,24 +696,46 @@ class DateEntry(ttk.Entry):
 
     def _setup_style(self, event=None):
         self.style.layout('DateEntry', self.style.layout('TCombobox'))
+        fieldbg = self.style.map('TCombobox', 'fieldbackground')
+        self.style.map('DateEntry', fieldbackground=fieldbg)
+
+    def _on_configure(self, event):
+        if self.winfo_ismapped():
+            self.update_idletasks()
+            h = self.winfo_height()
+            w = self.winfo_width()
+            y = h//2
+            x = 0
+            while self.identify(x, y) != 'downarrow':
+                x += 1
+            self._down_arrow_bbox = [x, 0, w, h]
 
     def _on_motion(self, event):
-        elt = self.identify(event.x, event.y)
-        if elt == 'downarrow':
-            self.state(['active'])
-        else:
-            self.state(['!active'])
+        x, y = event.x, event.y
+        x1, y1, x2, y2 = self._down_arrow_bbox
+        if not 'disabled' in self.state():
+            if x >= x1 and x <= x2 and y >= y1 and y<= y2:
+                self.state(['active'])
+                self.configure(cursor='arrow')
+            else:
+                self.state(['!active'])
+                if not 'readonly' in self.state():
+                    self.configure(cursor='xterm')
 
     def _on_b1_press(self, event):
-        elt = self.identify(event.x, event.y)
-        if elt == 'downarrow':
-            self.state(['pressed'])
+        x, y = event.x, event.y
+        x1, y1, x2, y2 = self._down_arrow_bbox
+        if ((not 'disabled' in self.state()) and
+            x >= x1 and x <= x2 and y >= y1 and y<= y2):
+            self.state(['pressed', 'active'])
             self.drop_down()
 
     def _on_b1_release(self, event):
-        elt = self.identify(event.x, event.y)
-        if elt == 'downarrow':
-            self.state(['!pressed'])
+        x, y = event.x, event.y
+        x1, y1, x2, y2 = self._down_arrow_bbox
+        if ((not 'disabled' in self.state()) and
+            x >= x1 and x <= x2 and y >= y1 and y<= y2):
+            self.state(['!pressed', 'active'])
 
     def _on_move(self, event):
         if self._calendar.winfo_ismapped():
@@ -716,7 +743,9 @@ class DateEntry(ttk.Entry):
 
     def _on_focus_out_cal(self, event):
         x, y = event.x, event.y
-        if type(x) != int or type(y) != int or self.identify(x, y) != 'downarrow':
+        x1, y1, x2, y2 = self._down_arrow_bbox
+        if (type(x) != int or type(y) != int or
+            not (x >= x1 and x <= x2 and y >= y1 and y<= y2)):
             self._calendar.withdraw()
 
     def _validate_date(self, P):
@@ -731,11 +760,19 @@ class DateEntry(ttk.Entry):
     def _select(self, event=None):
         date = self._calendar.selection_get()
         if date is not None:
+            if 'readonly' in self.state():
+                readonly = True
+                self.state(('!readonly',))
+            else:
+                readonly=False
             self.delete(0, 'end')
             self.insert(0, date.strftime('%x'))
             self.event_generate('<<DateEntrySelected>>')
+            if readonly:
+                self.state(('readonly',))
         self._calendar.withdraw()
-        self.focus_set()
+        if not 'readonly' in self.state():
+            self.focus_set()
 
     def drop_down(self):
         if self._calendar.winfo_ismapped():
@@ -748,6 +785,15 @@ class DateEntry(ttk.Entry):
             self._calendar.deiconify()
             self._calendar.focus_set()
             self._calendar.selection_set(date.date())
+
+    def state(self, *args):
+        if args:
+            states = args[0]
+            if 'disabled' in states or 'readonly' in states:
+                self.configure(cursor='arrow')
+            elif '!disabled' in states or '!readonly' in states:
+                self.configure(cursor='xterm')
+        return ttk.Entry.state(self, *args)
 
     def keys(self):
         keys = list(self.entry_kw)
@@ -775,8 +821,21 @@ class DateEntry(ttk.Entry):
     def config(self, **kw):
         self.configure(**kw)
 
+    def set_date(self, date):
+        try:
+            txt = date.strftime('%x')
+        except AttributeError:
+            txt = str(date)
+        self.delete(0, 'end')
+        self.insert(0, txt)
+
+    def get_date(self):
+        date = self.get()
+        return self._calendar.strptime(date, '%x')
 
 
+
+#%%%
 if __name__ =="__main__":
 
     def example1():
@@ -797,8 +856,12 @@ if __name__ =="__main__":
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
         cal = DateEntry(top, width=12, background='darkblue',
-                               foreground='white', borderwidth=2)
-        cal.pack(padx=10, pady=10)
+                        foreground='white', borderwidth=2)
+        cal2 = DateEntry(top, width=12, background='darkblue',
+                        foreground='white', borderwidth=2)
+        cal.pack(side='left', padx=10, pady=10)
+        cal2.pack(side='left', padx=10, pady=10)
+        cal2.state(['readonly'])
 
     root = tk.Tk()
     s = ttk.Style(root)
