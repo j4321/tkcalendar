@@ -676,7 +676,7 @@ class DateEntry(ttk.Entry):
         self.bind('<<ThemeChanged>>',
                   lambda e: self.after(10, self._setup_style))
         self.bind('<Configure>', self._on_configure)
-        self.bind('<Map>', self._on_configure)
+        self.bind('<Map>', self._first_map)
         master = self.master
         while master.winfo_class() not in ['Tk', 'Toplevel']:
             master = master.master
@@ -698,6 +698,11 @@ class DateEntry(ttk.Entry):
         self.style.layout('DateEntry', self.style.layout('TCombobox'))
         fieldbg = self.style.map('TCombobox', 'fieldbackground')
         self.style.map('DateEntry', fieldbackground=fieldbg)
+
+    def _first_map(self, event):
+        self._on_configure(event)
+        self.unbind('<Map>')
+
 
     def _on_configure(self, event):
         if self.winfo_ismapped():
@@ -859,7 +864,7 @@ if __name__ =="__main__":
                         foreground='white', borderwidth=2)
         cal2 = DateEntry(top, width=12, background='darkblue',
                         foreground='white', borderwidth=2)
-        cal.pack(side='left', padx=10, pady=10)
+        cal.pack(side='left', padx=10, pady=10, fill='x', expand=True)
         cal2.pack(side='left', padx=10, pady=10)
         cal2.state(['readonly'])
 
