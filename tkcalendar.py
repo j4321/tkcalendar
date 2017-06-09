@@ -269,19 +269,20 @@ class Calendar(ttk.Frame):
         self._setup_style()
         self._display_calendar()
 
-    def __getitem__(self, item):
+    def __getitem__(self, key):
+        """ Return the resource value for a KEY given as string. """
         try:
-            return self._properties[item]
+            return self._properties[key]
         except KeyError:
-            raise AttributeError("Calendar object has no attribute %s." % item)
+            raise AttributeError("Calendar object has no attribute %s." % key)
 
-    def __setitem__(self, item, value):
-        if not item in self._properties:
-            raise AttributeError("Calendar object has no attribute %s." % item)
-        elif item == "locale":
+    def __setitem__(self, key, value):
+        if not key in self._properties:
+            raise AttributeError("Calendar object has no attribute %s." % key)
+        elif key == "locale":
             raise AttributeError("This attribute cannot be modified.")
         else:
-            if item == "selectmode":
+            if key == "selectmode":
                 if value == "none":
                     for week in self._calendar:
                         for day in week:
@@ -292,13 +293,13 @@ class Calendar(ttk.Frame):
                             day.bind("<1>", self._on_click)
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
-            elif item == 'borderwidth':
+            elif key == 'borderwidth':
                 try:
                     bd = int(value)
                     self._cal_frame.pack_configure(padx=bd, pady=bd)
                 except ValueError:
                     raise tk.TclError('expected integer for the borderwidth option.')
-            elif item == "font":
+            elif key == "font":
                 font = Font(self, value)
                 prop = font.actual()
                 self._font.configure(**prop)
@@ -307,36 +308,36 @@ class Calendar(ttk.Frame):
                 size = max(prop["size"], 10)
                 self.style.configure(self._style_prefixe + '.R.TButton', arrowsize=size)
                 self.style.configure(self._style_prefixe + '.L.TButton', arrowsize=size)
-            elif item == "normalbackground":
+            elif key == "normalbackground":
                 self.style.configure(self._style_prefixe + '.cal.TFrame', background=value)
                 self.style.configure(self._style_prefixe + '.normal.TLabel', background=value)
                 self.style.configure(self._style_prefixe + '.normal_om.TLabel', background=value)
-            elif item == "normalforeground":
+            elif key == "normalforeground":
                 self.style.configure(self._style_prefixe + '.normal.TLabel', foreground=value)
-            elif item == "bordercolor":
+            elif key == "bordercolor":
                 self.style.configure(self._style_prefixe + '.cal.TFrame', background=value)
-            elif item == "othermonthforeground":
+            elif key == "othermonthforeground":
                 self.style.configure(self._style_prefixe + '.normal_om.TLabel', foreground=value)
-            elif item == "othermonthbackground":
+            elif key == "othermonthbackground":
                 self.style.configure(self._style_prefixe + '.normal_om.TLabel', background=value)
-            elif item == "othermonthweforeground":
+            elif key == "othermonthweforeground":
                 self.style.configure(self._style_prefixe + '.we_om.TLabel', foreground=value)
-            elif item == "othermonthwebackground":
+            elif key == "othermonthwebackground":
                 self.style.configure(self._style_prefixe + '.we_om.TLabel', background=value)
-            elif item == "selectbackground":
+            elif key == "selectbackground":
                 self.style.configure(self._style_prefixe + '.sel.TLabel', background=value)
-            elif item == "selectforeground":
+            elif key == "selectforeground":
                 self.style.configure(self._style_prefixe + '.sel.TLabel', foreground=value)
-            elif item == "weekendbackground":
+            elif key == "weekendbackground":
                 self.style.configure(self._style_prefixe + '.we.TLabel', background=value)
                 self.style.configure(self._style_prefixe + '.we_om.TLabel', background=value)
-            elif item == "weekendforeground":
+            elif key == "weekendforeground":
                 self.style.configure(self._style_prefixe + '.we.TLabel', foreground=value)
-            elif item == "headersbackground":
+            elif key == "headersbackground":
                 self.style.configure(self._style_prefixe + '.headers.TLabel', background=value)
-            elif item == "headersforeground":
+            elif key == "headersforeground":
                 self.style.configure(self._style_prefixe + '.headers.TLabel', foreground=value)
-            elif item == "background":
+            elif key == "background":
                 self.style.configure(self._style_prefixe + '.main.TFrame', background=value)
                 self.style.configure(self._style_prefixe + '.main.TLabel', background=value)
                 self.style.configure(self._style_prefixe + '.R.TButton', background=value,
@@ -345,15 +346,16 @@ class Calendar(ttk.Frame):
                 self.style.configure(self._style_prefixe + '.L.TButton', background=value,
                                      bordercolor=value,
                                      lightcolor=value, darkcolor=value)
-            elif item == "foreground":
+            elif key == "foreground":
                 self.style.configure(self._style_prefixe + '.R.TButton', arrowcolor=value)
                 self.style.configure(self._style_prefixe + '.L.TButton', arrowcolor=value)
                 self.style.configure(self._style_prefixe + '.main.TLabel', foreground=value)
-            elif item == "cursor":
+            elif key == "cursor":
                 ttk.TFrame.configure(self, cursor=value)
-            self._properties[item] = value
+            self._properties[key] = value
 
     def _setup_style(self, event=None):
+        """ Configure style. """
         arrow_layout = lambda dir: (
             [('Button.focus', {'children': [('Button.%sarrow' % dir, None)]})]
         )
@@ -604,17 +606,35 @@ class ToplevelCalendar(Calendar):
         self.pack()
 
     def withdraw(self):
+        """
+            Withdraw this widget from the screen such that it is unmapped
+            and forgotten by the window manager. Re-draw it with deiconify.
+        """
         self.top.withdraw()
 
     def deiconify(self):
+        """
+            Deiconify this widget. If it was never mapped it will not be mapped.
+            On Windows it will raise this widget and give it the focus.
+        """
         self.top.deiconify()
 
     def geometry(self, *args):
-        self.top.geometry(*args)
+        """
+            Set geometry to NEWGEOMETRY of the form =widthxheight+x+y.
+            Return current value if None is given.
+        """
+        return self.top.geometry(*args)
+
+    def destroy(self):
+        """ Destroy this and all descendants widgets. """
+        Calendar.destroy(self)
+        self.top.destroy()
 
 
 class DateEntry(ttk.Entry):
     """ Date selection entry with drop-down calendar. """
+
     entry_kw = {'exportselection': 1,
                 'invalidcommand': '',
                 'justify': 'left',
@@ -628,6 +648,7 @@ class DateEntry(ttk.Entry):
                 'validatecommand': '',
                 'width': 20,
                 'xscrollcommand': ''}
+
     def __init__(self, master=None, **kw):
         """
             Create an entry with a drop-down calendar to select a date.
@@ -643,7 +664,7 @@ class DateEntry(ttk.Entry):
                 A <<DateEntrySelected>> event is generated each time
                 the user selects a date.
         """
-        ### sort keywords between entry options and calendar options
+        # sort keywords between entry options and calendar options
         kw['selectmode'] = 'day'
 
         for key in self.entry_kw:
@@ -651,60 +672,72 @@ class DateEntry(ttk.Entry):
                 self.entry_kw[key] = kw.pop(key)
         self.entry_kw['font'] = kw.get('font', None)
 
-        ### set locale to have the right date format
+        #set locale to have the right date format
         loc = kw.get('locale', None)
         locale.setlocale(locale.LC_ALL, loc)
 
         ttk.Entry.__init__(self, master, **self.entry_kw)
-        self._down_arrow_bbox = [0 , 0, 0, 0]
+        # down arrow button bbox (to detect if it was clicked upon)
+        self._down_arrow_bbox = [0, 0, 0, 0]
 
-        self.style = ttk.Style(self)
-        self._setup_style()
-
+        # drop-down calendar
         self._calendar = ToplevelCalendar(self, **kw)
 
+        # style
+        self.style = ttk.Style(self)
+        self._setup_style()
+        self.configure(style='DateEntry')
+
+        # add validation to Entry so that only date in the locale '%x' format
+        # are accepted
         validatecmd = self.register(self._validate_date)
         self.configure(validate='focusout',
                        validatecommand=(validatecmd, '%P'))
-        ttk.Entry.configure(self, style='DateEntry')
 
+        # initially selected date
         self._date = self._calendar.selection_get()
         if self._date is None:
             self._date = self._calendar.date.today()
         self.insert(0, self._date.strftime('%x'))
 
         ### bindings
+        # reconfigure style if theme changed
         self.bind('<<ThemeChanged>>',
                   lambda e: self.after(10, self._setup_style))
-        self.bind('<Configure>', self._on_configure)
-        self.bind('<Map>', self._first_map)
+        # determine new downarrow button bbox
+        self.bind('<Configure>', self._determine_bbox)
+        self.bind('<Map>', self._determine_bbox)
+        # hide drop-down calendar when window is moved
         master = self.master
         while master.winfo_class() not in ['Tk', 'Toplevel']:
             master = master.master
         master.bind('<Configure>', self._on_move, True)
+        # handle appearence to make the entry behave like a Combobox but with
+        # a drop-down calendar instead of a drop-down list
         self.bind('<Leave>', lambda e: self.state(['!active']))
         self.bind('<Motion>', self._on_motion)
         self.bind('<ButtonPress-1>', self._on_b1_press)
         self.bind('<ButtonRelease-1>', self._on_b1_release)
+        # update entry content when date is selected in the Calendar
         self._calendar.bind('<<CalendarSelected>>', self._select)
+        # hide calendar if it looses focus
         self._calendar.bind('<FocusOut>', self._on_focus_out_cal)
 
-    def __getitem__(self, item):
-        return self.cget(item)
+    def __getitem__(self, key):
+        """ Return the resource value for a KEY given as string. """
+        return self.cget(key)
 
-    def __setitem__(self, item, value):
-        self.configure(**{item: value})
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
 
     def _setup_style(self, event=None):
+        """ Style configuration. """
         self.style.layout('DateEntry', self.style.layout('TCombobox'))
         fieldbg = self.style.map('TCombobox', 'fieldbackground')
         self.style.map('DateEntry', fieldbackground=fieldbg)
 
-    def _first_map(self, event):
-        self._on_configure(event)
-        self.unbind('<Map>')
-
-    def _on_configure(self, event=None):
+    def _determine_bbox(self, event=None):
+        """ Determine downarrow button bbox. """
         if self.winfo_ismapped():
             self.update_idletasks()
             h = self.winfo_height()
@@ -717,9 +750,11 @@ class DateEntry(ttk.Entry):
                 if x < w:
                     self._down_arrow_bbox = [x, 0, w, h]
             else:
-                self.after(10, self._on_configure)
+                self.after(10, self._determine_bbox)
 
     def _on_motion(self, event):
+        """ Set widget state depending on mouse position to mimic Combobox
+            behavior. """
         x, y = event.x, event.y
         x1, y1, x2, y2 = self._down_arrow_bbox
         if not 'disabled' in self.state():
@@ -732,6 +767,8 @@ class DateEntry(ttk.Entry):
                     self.configure(cursor='xterm')
 
     def _on_b1_press(self, event):
+        """ Trigger self.drop_down on downarrow button press and set widget
+            state to ['pressed', 'active']. """
         x, y = event.x, event.y
         x1, y1, x2, y2 = self._down_arrow_bbox
         if ((not 'disabled' in self.state()) and
@@ -740,6 +777,8 @@ class DateEntry(ttk.Entry):
             self.drop_down()
 
     def _on_b1_release(self, event):
+        """ Remove 'pressed' from widget's states when the downarrow button
+            is released."""
         x, y = event.x, event.y
         x1, y1, x2, y2 = self._down_arrow_bbox
         if ((not 'disabled' in self.state()) and
@@ -747,9 +786,11 @@ class DateEntry(ttk.Entry):
             self.state(['!pressed', 'active'])
 
     def _on_move(self, event):
+        """ Withdraw drop-down calendar if window is moved. """
         self._calendar.withdraw()
 
     def _on_focus_out_cal(self, event):
+        """ Withdraw drop-down calendar when it looses focus. """
         if self.focus_get() is not None:
             if self.focus_get() == self:
                 x, y = event.x, event.y
@@ -761,6 +802,7 @@ class DateEntry(ttk.Entry):
                 self._calendar.withdraw()
 
     def _validate_date(self, P):
+        """ Date entry validation: only dates in locale '%x' format are accepted. """
         try:
             self._date = self._calendar.strptime(P, '%x')
             return True
@@ -770,6 +812,7 @@ class DateEntry(ttk.Entry):
             return False
 
     def _select(self, event=None):
+        """ Display the selected date in the entry and hide the calendar. """
         date = self._calendar.selection_get()
         if date is not None:
             if 'readonly' in self.state():
@@ -787,6 +830,7 @@ class DateEntry(ttk.Entry):
             self.focus_set()
 
     def drop_down(self):
+        """ Display or withdraw the drop-down calendar depending on its current state."""
         if self._calendar.winfo_ismapped():
             self._calendar.withdraw()
         else:
@@ -799,7 +843,16 @@ class DateEntry(ttk.Entry):
             self._calendar.selection_set(date.date())
 
     def state(self, *args):
+        """
+            Modify or inquire widget state.
+
+            Widget state is returned if statespec is None, otherwise it is
+            set according to the statespec flags and then a new state spec
+            is returned indicating which flags were changed. statespec is
+            expected to be a sequence.
+        """
         if args:
+            # change cursor depending on state to mimic Combobox behavior
             states = args[0]
             if 'disabled' in states or 'readonly' in states:
                 self.configure(cursor='arrow')
@@ -808,17 +861,26 @@ class DateEntry(ttk.Entry):
         return ttk.Entry.state(self, *args)
 
     def keys(self):
+        """ Return a list of all resource names of this widget. """
         keys = list(self.entry_kw)
         keys.extend(self._calendar.keys())
         return keys
 
     def cget(self, key):
+        """ Return the resource value for a KEY given as string. """
         if key in self.entry_kw:
             return ttk.Entry.cget(self, key)
         else:
             return self._calendar.cget(key)
 
     def configure(self, **kw):
+        """
+            Configure resources of a widget.
+
+            The values for resources are specified as keyword
+            arguments. To get an overview about
+            the allowed keyword arguments call the method keys.
+        """
         entry_kw = {}
         keys = list(kw.keys())
         for key in keys:
@@ -831,23 +893,39 @@ class DateEntry(ttk.Entry):
         self._calendar.configure(**kw)
 
     def config(self, **kw):
+        """
+            Configure resources of a widget.
+
+            The values for resources are specified as keyword
+            arguments. To get an overview about
+            the allowed keyword arguments call the method keys.
+        """
         self.configure(**kw)
 
     def set_date(self, date):
+        """
+            Set the value of the dateentry to date.
+            date can be a datetime.date, a datetime.datetime or a string
+            in locale '%x' format.
+        """
         try:
             txt = date.strftime('%x')
         except AttributeError:
             txt = str(date)
+            try:
+                self._calendar.strptime(txt, '%x')
+            except Exception as e:
+                raise type(e)("%r is not a valid date." % date)
         self.delete(0, 'end')
         self.insert(0, txt)
 
     def get_date(self):
+        """ Return the content of the dateentry as a datetime.datetime instance."""
         date = self.get()
         return self._calendar.strptime(date, '%x')
 
 
 
-#%%%
 if __name__ =="__main__":
 
     def example1():
