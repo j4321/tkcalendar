@@ -594,6 +594,7 @@ class Calendar(ttk.Frame):
 class ToplevelCalendar(Calendar):
     """ Embed the calendar in a Toplevel with overrideredirect set to True
         to create a date selection drop-down. """
+
     def __init__(self, master=None, **kw):
         self.top = tk.Toplevel(master)
         self.top.withdraw()
@@ -680,7 +681,7 @@ class DateEntry(ttk.Entry):
         master = self.master
         while master.winfo_class() not in ['Tk', 'Toplevel']:
             master = master.master
-        master.bind('<Configure>', self._on_move)
+        master.bind('<Configure>', self._on_move, True)
         self.bind('<Leave>', lambda e: self.state(['!active']))
         self.bind('<Motion>', self._on_motion)
         self.bind('<ButtonPress-1>', self._on_b1_press)
@@ -703,17 +704,20 @@ class DateEntry(ttk.Entry):
         self._on_configure(event)
         self.unbind('<Map>')
 
-
-    def _on_configure(self, event):
+    def _on_configure(self, event=None):
         if self.winfo_ismapped():
             self.update_idletasks()
             h = self.winfo_height()
             w = self.winfo_width()
             y = h//2
             x = 0
-            while self.identify(x, y) != 'downarrow':
-                x += 1
-            self._down_arrow_bbox = [x, 0, w, h]
+            if self.identify(x, y):
+                while x < w and self.identify(x, y) != 'downarrow':
+                    x += 1
+                if x < w:
+                    self._down_arrow_bbox = [x, 0, w, h]
+            else:
+                self.after(10, self._on_configure)
 
     def _on_motion(self, event):
         x, y = event.x, event.y
@@ -743,15 +747,18 @@ class DateEntry(ttk.Entry):
             self.state(['!pressed', 'active'])
 
     def _on_move(self, event):
-        if self._calendar.winfo_ismapped():
-            self._calendar.withdraw()
+        self._calendar.withdraw()
 
     def _on_focus_out_cal(self, event):
-        x, y = event.x, event.y
-        x1, y1, x2, y2 = self._down_arrow_bbox
-        if (type(x) != int or type(y) != int or
-            not (x >= x1 and x <= x2 and y >= y1 and y<= y2)):
-            self._calendar.withdraw()
+        if self.focus_get() is not None:
+            if self.focus_get() == self:
+                x, y = event.x, event.y
+                x1, y1, x2, y2 = self._down_arrow_bbox
+                if (type(x) != int or type(y) != int or
+                    not (x >= x1 and x <= x2 and y >= y1 and y<= y2)):
+                    self._calendar.withdraw()
+            else:
+                self._calendar.withdraw()
 
     def _validate_date(self, P):
         try:
@@ -857,16 +864,13 @@ if __name__ =="__main__":
 
     def example2():
         top = tk.Toplevel(root)
+        top.grab_set()
 
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
         cal = DateEntry(top, width=12, background='darkblue',
                         foreground='white', borderwidth=2)
-        cal2 = DateEntry(top, width=12, background='darkblue',
-                        foreground='white', borderwidth=2)
-        cal.pack(side='left', padx=10, pady=10, fill='x', expand=True)
-        cal2.pack(side='left', padx=10, pady=10)
-        cal2.state(['readonly'])
+        cal.pack(padx=10, pady=10)
 
     root = tk.Tk()
     s = ttk.Style(root)
