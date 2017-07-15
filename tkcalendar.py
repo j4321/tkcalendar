@@ -23,6 +23,7 @@ tkcalendar module providing Calendar and DateEntry widgets
 import calendar
 import locale
 import warnings
+from sys import platform
 try:
     import tkinter as tk
     from tkinter import ttk
@@ -521,8 +522,8 @@ class Calendar(ttk.Frame):
     # ---  selection handling
     def selection_get(self):
         """
-            Return currently selected date (datetime.date instance).
-            Always return None if selectmode is "none".
+        Return currently selected date (datetime.date instance).
+        Always return None if selectmode is "none".
         """
         if self._properties.get("selectmode") == "day":
             return self._sel_date
@@ -531,11 +532,11 @@ class Calendar(ttk.Frame):
 
     def selection_set(self, date):
         """
-            Set the selection to date. date can be either a datetime.date
-            instance or a string corresponding to the date format "%x"
-            in the Calendar locale.
+        Set the selection to date. date can be either a datetime.date
+        instance or a string corresponding to the date format "%x"
+        in the Calendar locale.
 
-            Do nothing if selectmode is "none".
+        Do nothing if selectmode is "none".
         """
         if self._properties.get("selectmode") == "day":
             if date is None:
@@ -561,35 +562,39 @@ class Calendar(ttk.Frame):
 
     def configure(self, **kw):
         """
-            Configure resources of a widget.
+        Configure resources of a widget.
 
-            The values for resources are specified as keyword
-            arguments. To get an overview about
-            the allowed keyword arguments call the method keys.
+        The values for resources are specified as keyword
+        arguments. To get an overview about
+        the allowed keyword arguments call the method keys.
         """
         for item, value in kw.items():
             self[item] = value
 
     def config(self, **kw):
         """
-            Configure resources of a widget.
+        Configure resources of a widget.
 
-            The values for resources are specified as keyword
-            arguments. To get an overview about
-            the allowed keyword arguments call the method keys.
+        The values for resources are specified as keyword
+        arguments. To get an overview about
+        the allowed keyword arguments call the method keys.
         """
         for item, value in kw.items():
             self[item] = value
 
 
 class ToplevelCalendar(Calendar):
-    """Embed the calendar in a Toplevel with overrideredirect set to True
-        to create a date selection drop-down."""
+    """
+    Embed the calendar in a Toplevel with overrideredirect set to True
+    to create a date selection drop-down.
+    """
 
     def __init__(self, master=None, **kw):
+        """Create Calendar embedded in a Toplevel."""
         self.top = tk.Toplevel(master)
         self.top.withdraw()
-        self.top.attributes('-type', 'DROPDOWN_MENU')
+        if platform is "linux":
+            self.top.attributes('-type', 'DROPDOWN_MENU')
         self.top.overrideredirect(True)
         Calendar.__init__(self, self.top, **kw)
         self.pack()
