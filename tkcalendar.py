@@ -532,8 +532,8 @@ class Calendar(ttk.Frame):
     ### selection handling
     def selection_get(self):
         """
-            Return currently selected date (datetime.date instance).
-            Always return None if selectmode is "none".
+        Return currently selected date (datetime.date instance).
+        Always return None if selectmode is "none".
         """
         if self._properties.get("selectmode") == "day":
             return self._sel_date
@@ -542,11 +542,13 @@ class Calendar(ttk.Frame):
 
     def selection_set(self, date):
         """
-            Set the selection to date. date can be either a datetime.date
-            instance or a string corresponding to the date format "%x"
-            in the Calendar locale.
+        Set the selection to date.
 
-            Do nothing if selectmode is "none".
+        date can be either a datetime.date
+        instance or a string corresponding to the date format "%x"
+        in the Calendar locale.
+
+        Do nothing if selectmode is "none".
         """
         if self._properties.get("selectmode") == "day":
             if date is None:
