@@ -590,32 +590,6 @@ class Calendar(ttk.Frame):
         """
         for item, value in kw.items():
             self[item] = value
-#%%
-
-class ToplevelCalendar(Calendar):
-    """
-    Embed the calendar in a Toplevel with overrideredirect set to True
-    to create a date selection drop-down.
-    """
-
-    def __init__(self, master=None, **kw):
-        """Create Calendar embedded in a Toplevel."""
-        self.top = tk.Toplevel(master)
-        self.top.withdraw()
-        if platform is "linux":
-            self.top.attributes('-type', 'DROPDOWN_MENU')
-        self.top.overrideredirect(True)
-        Calendar.__init__(self, self.top, **kw)
-        self.pack()
-        # Expose some of the toplevel functions
-        self.withdraw = self.top.withdraw
-        self.deiconify = self.top.deiconify
-        self.geometry = self.top.geometry
-
-    def destroy(self):
-        """Destroy this and all descendants widgets."""
-        Calendar.destroy(self)
-        self.top.destroy()
 
 
 class DateEntry(ttk.Entry):
@@ -668,7 +642,13 @@ class DateEntry(ttk.Entry):
         self._down_arrow_bbox = [0, 0, 0, 0]
 
         # drop-down calendar
-        self._calendar = ToplevelCalendar(self, **kw)
+        self._top_cal = tk.Toplevel(self)
+        self._top_cal.withdraw()
+        if platform is "linux":
+            self._top_cal.attributes('-type', 'DROPDOWN_MENU')
+        self._top_cal.overrideredirect(True)
+        self._calendar = Calendar(self._top_cal, **kw)
+        self._calendar.pack()
 
         # style
         self.style = ttk.Style(self)
@@ -771,7 +751,7 @@ class DateEntry(ttk.Entry):
 
     def _on_move(self, event):
         """Withdraw drop-down calendar if window is moved."""
-        self._calendar.withdraw()
+        self._top_cal.withdraw()
 
     def _on_focus_out_cal(self, event):
         """Withdraw drop-down calendar when it looses focus."""
@@ -781,9 +761,9 @@ class DateEntry(ttk.Entry):
                 x1, y1, x2, y2 = self._down_arrow_bbox
                 if (type(x) != int or type(y) != int or
                         not (x >= x1 and x <= x2 and y >= y1 and y <= y2)):
-                    self._calendar.withdraw()
+                    self._top_cal.withdraw()
             else:
-                self._calendar.withdraw()
+                self._top_cal.withdraw()
 
     def _validate_date(self, P):
         """Date entry validation: only dates in locale '%x' format are accepted."""
@@ -809,20 +789,20 @@ class DateEntry(ttk.Entry):
             self.event_generate('<<DateEntrySelected>>')
             if readonly:
                 self.state(('readonly',))
-        self._calendar.withdraw()
+        self._top_cal.withdraw()
         if 'readonly' not in self.state():
             self.focus_set()
 
     def drop_down(self):
         """Display or withdraw the drop-down calendar depending on its current state."""
         if self._calendar.winfo_ismapped():
-            self._calendar.withdraw()
+            self._top_cal.withdraw()
         else:
             date = self._calendar.strptime(self.get(), '%x')
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
-            self._calendar.geometry('+%i+%i' % (x, y))
-            self._calendar.deiconify()
+            self._top_cal.geometry('+%i+%i' % (x, y))
+            self._top_cal.deiconify()
             self._calendar.focus_set()
             self._calendar.selection_set(date.date())
 
