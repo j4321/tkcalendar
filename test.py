@@ -77,7 +77,7 @@ class TestCalendar(BaseWidgetTest):
         self.window.update()
         widget.destroy()
 
-        widget = Calendar(self.window, selectmode='none', locale="fr_FR.UTF-8",
+        widget = Calendar(self.window, selectmode='none', locale="en_US.UTF-8",
                           year=2015, month=1, background="black",
                           foreground="white", key="a")
         widget.pack()
@@ -106,7 +106,6 @@ class TestCalendar(BaseWidgetTest):
         self.assertIsNone(widget.selection_get())
         widget.selection_set(datetime(2015, 12, 31))
         self.assertEqual(widget.selection_get(), datetime(2015, 12, 31))
-        widget._on_click(TestEvent(widget=list(widget._cal_frame.children.values())[20]))
 
     def test_calendar_get_set(self):
         widget = Calendar(self.window, foreground="red")
