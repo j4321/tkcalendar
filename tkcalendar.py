@@ -422,7 +422,14 @@ class Calendar(ttk.Frame):
             m = 1
             y += 1
         if len(cal) < 6:
-            cal.append(self._cal.monthdatescalendar(y, m)[1])
+            if cal[-1][-1].month == month:
+                i = 0
+            else:
+                i = 1
+            cal.append(self._cal.monthdatescalendar(y, m)[i])
+            if len(cal) < 6:
+                cal.append(self._cal.monthdatescalendar(y, m)[i + 1])
+
         week_days = {i: '.normal' for i in range(7)}
         week_days[5] = '.we'
         week_days[6] = '.we'
@@ -477,9 +484,9 @@ class Calendar(ttk.Frame):
         year, month = self._date.year, self._date.month
         self._date = self._date + \
             self.timedelta(days=calendar.monthrange(year, month)[1])
-        if month == 12:
-            # don't increment year
-            self._date = self._date.replace(year=year)
+#        if month == 12:
+#            # don't increment year
+#            self._date = self._date.replace(year=year)
         self._display_calendar()
 
     def _prev_month(self):
@@ -583,7 +590,7 @@ class Calendar(ttk.Frame):
         """
         for item, value in kw.items():
             self[item] = value
-
+#%%
 
 class ToplevelCalendar(Calendar):
     """

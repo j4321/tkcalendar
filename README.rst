@@ -15,13 +15,18 @@ Requirements
 
 Installation
 ------------
-- Ubuntu:
 
-::
+- Ubuntu: use the PPA `ppa:j-4321-i/ppa`
 
-    $ dpkg -i python(3)-tkcalendar_x.y.z-1_all.deb
+    ::
 
-- Archlinux: the package is available on `AUR <https://aur.archlinux.org/packages/python-tkcalendar>`__
+        $ sudo add-apt-repository ppa:j-4321-i/ppa
+        $ sudo apt-get update
+        $ sudo apt-get install python(3)-tkcalendar
+
+- Archlinux:
+
+    The package is available on `AUR <https://aur.archlinux.org/packages/python-tkcalendar>`__
 
 - With pip:
 
@@ -126,9 +131,11 @@ Documentation
 Changelog
 ---------
 
-- tkcalendar 1.0.0
+- tkcalendar 1.1.1
 
-    * Initial version
+    * Fix display of the first days of the next month (closes #1)
+
+    * Increment year when going from december to january
 
 - tkcalendar 1.1.0
 
@@ -145,6 +152,11 @@ Changelog
         + othermonthweforeground: foreground color for week-end days belonging to the previous/next month
 
         + othermonthwebackground: background color for week-end days belonging to the previous/next month
+
+
+- tkcalendar 1.0.0
+
+    * Initial version
 
 
 Example
