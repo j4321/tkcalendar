@@ -102,7 +102,7 @@ class Calendar(ttk.Frame):
         except ValueError:
             raise tk.TclError('expected integer for the borderwidth option.')
 
-        # ---  date
+        # --- date
         today = self.date.today()
 
         if (("month" in kw) or ("year" in kw)) and ("day" not in kw):
@@ -116,12 +116,12 @@ class Calendar(ttk.Frame):
             self._sel_date = self.date(year, month, day)  # selected day
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
 
-        # ---  selectmode
+        # --- selectmode
         selectmode = kw.pop("selectmode", "day")
         if selectmode not in ("none", "day"):
             warnings.warn("%r is not a valid value for 'selectmode' option, 'day' was chosen instead." % selectmode)
             selectmode = 'day'
-        # ---  locale
+        # --- locale
         locale = kw.pop("locale", None)
 
         if locale is None:
@@ -129,11 +129,11 @@ class Calendar(ttk.Frame):
         else:
             self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
 
-        # ---  style
+        # --- style
         self.style = ttk.Style(self)
         active_bg = self.style.lookup('TEntry', 'selectbackground', ('focus',))
 
-        # ---  properties
+        # --- properties
         options = ['cursor',
                    'font',
                    'borderwidth',
@@ -182,8 +182,8 @@ class Calendar(ttk.Frame):
                             'headersforeground': 'black'}
         self._properties.update(kw)
 
-        # ---  init calendar
-        # ---  *-- header: month - year
+        # --- init calendar
+        # --- *-- header: month - year
         header = ttk.Frame(self, style=self._style_prefixe + '.main.TFrame')
 
         f_month = ttk.Frame(header,
@@ -214,7 +214,7 @@ class Calendar(ttk.Frame):
         f_month.pack(side='left', fill='x')
         f_year.pack(side='right')
 
-        # ---  *-- calendar
+        # --- *-- calendar
         self._cal_frame = ttk.Frame(self,
                                     style=self._style_prefixe + '.cal.TFrame')
 
@@ -249,11 +249,11 @@ class Calendar(ttk.Frame):
                 if selectmode == "day":
                     label.bind("<1>", self._on_click)
 
-        # ---  *-- pack main elements
+        # --- *-- pack main elements
         header.pack(fill="x", padx=2, pady=2)
         self._cal_frame.pack(fill="both", expand=True, padx=bd, pady=bd)
 
-        # ---  bindings
+        # --- bindings
         self.bind('<<ThemeChanged>>', self._setup_style)
 
         self._setup_style()
@@ -478,7 +478,7 @@ class Calendar(ttk.Frame):
                         else:
                             self._calendar[w][d - 1].configure(style=self._style_prefixe + ".we_om.TLabel")
 
-    # ---  callbacks
+    # --- callbacks
     def _next_month(self):
         """Display the next month."""
         year, month = self._date.year, self._date.month
@@ -507,7 +507,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
 
-    # ---  bindings
+    # --- bindings
     def _on_click(self, event):
         """Select the day on which the user clicked."""
         label = event.widget
@@ -526,7 +526,7 @@ class Calendar(ttk.Frame):
             self._display_selection()
             self.event_generate("<<CalendarSelected>>")
 
-    # ---  selection handling
+    # --- selection handling
     def selection_get(self):
         """
         Return currently selected date (datetime.date instance).
@@ -552,7 +552,7 @@ class Calendar(ttk.Frame):
                 self._remove_selection()
                 self._sel_date = None
             else:
-                if type(date) == self.date:
+                if isinstance(date, self.date):
                     self._sel_date = date
                 else:
                     self._sel_date = self.strptime(date, "%x")
@@ -560,7 +560,7 @@ class Calendar(ttk.Frame):
                 self._display_calendar()
                 self._display_selection()
 
-    # ---  other methods
+    # --- other methods
     def keys(self):
         """Return a list of all resource names of this widget."""
         return list(self._properties.keys())
@@ -633,7 +633,7 @@ class DateEntry(ttk.Entry):
                 self.entry_kw[key] = kw.pop(key)
         self.entry_kw['font'] = kw.get('font', None)
 
-        #set locale to have the right date format
+        # set locale to have the right date format
         loc = kw.get('locale', None)
         locale.setlocale(locale.LC_ALL, loc)
 
@@ -667,7 +667,7 @@ class DateEntry(ttk.Entry):
             self._date = self._calendar.date.today()
         self.insert(0, self._date.strftime('%x'))
 
-        # ---  bindings
+        # --- bindings
         # reconfigure style if theme changed
         self.bind('<<ThemeChanged>>',
                   lambda e: self.after(10, self._setup_style))
