@@ -102,7 +102,7 @@ class Calendar(ttk.Frame):
         except ValueError:
             raise tk.TclError('expected integer for the borderwidth option.')
 
-        # ---  date
+        # --- date
         today = self.date.today()
 
         if (("month" in kw) or ("year" in kw)) and ("day" not in kw):
@@ -116,12 +116,12 @@ class Calendar(ttk.Frame):
             self._sel_date = self.date(year, month, day)  # selected day
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
 
-        # ---  selectmode
+        # --- selectmode
         selectmode = kw.pop("selectmode", "day")
         if selectmode not in ("none", "day"):
             warnings.warn("%r is not a valid value for 'selectmode' option, 'day' was chosen instead." % selectmode)
             selectmode = 'day'
-        # ---  locale
+        # --- locale
         locale = kw.pop("locale", None)
 
         if locale is None:
@@ -129,11 +129,11 @@ class Calendar(ttk.Frame):
         else:
             self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
 
-        # ---  style
+        # --- style
         self.style = ttk.Style(self)
         active_bg = self.style.lookup('TEntry', 'selectbackground', ('focus',))
 
-        # ---  properties
+        # --- properties
         options = ['cursor',
                    'font',
                    'borderwidth',
@@ -182,8 +182,8 @@ class Calendar(ttk.Frame):
                             'headersforeground': 'black'}
         self._properties.update(kw)
 
-        # ---  init calendar
-        # ---  *-- header: month - year
+        # --- init calendar
+        # --- *-- header: month - year
         header = ttk.Frame(self, style=self._style_prefixe + '.main.TFrame')
 
         f_month = ttk.Frame(header,
@@ -214,7 +214,7 @@ class Calendar(ttk.Frame):
         f_month.pack(side='left', fill='x')
         f_year.pack(side='right')
 
-        # ---  *-- calendar
+        # --- *-- calendar
         self._cal_frame = ttk.Frame(self,
                                     style=self._style_prefixe + '.cal.TFrame')
 
@@ -249,11 +249,11 @@ class Calendar(ttk.Frame):
                 if selectmode == "day":
                     label.bind("<1>", self._on_click)
 
-        # ---  *-- pack main elements
+        # --- *-- pack main elements
         header.pack(fill="x", padx=2, pady=2)
         self._cal_frame.pack(fill="both", expand=True, padx=bd, pady=bd)
 
-        # ---  bindings
+        # --- bindings
         self.bind('<<ThemeChanged>>', self._setup_style)
 
         self._setup_style()
@@ -422,7 +422,14 @@ class Calendar(ttk.Frame):
             m = 1
             y += 1
         if len(cal) < 6:
-            cal.append(self._cal.monthdatescalendar(y, m)[1])
+            if cal[-1][-1].month == month:
+                i = 0
+            else:
+                i = 1
+            cal.append(self._cal.monthdatescalendar(y, m)[i])
+            if len(cal) < 6:
+                cal.append(self._cal.monthdatescalendar(y, m)[i + 1])
+
         week_days = {i: '.normal' for i in range(7)}
         week_days[5] = '.we'
         week_days[6] = '.we'
@@ -471,15 +478,15 @@ class Calendar(ttk.Frame):
                         else:
                             self._calendar[w][d - 1].configure(style=self._style_prefixe + ".we_om.TLabel")
 
-    # ---  callbacks
+    # --- callbacks
     def _next_month(self):
         """Display the next month."""
         year, month = self._date.year, self._date.month
         self._date = self._date + \
             self.timedelta(days=calendar.monthrange(year, month)[1])
-        if month == 12:
-            # don't increment year
-            self._date = self._date.replace(year=year)
+#        if month == 12:
+#            # don't increment year
+#            self._date = self._date.replace(year=year)
         self._display_calendar()
 
     def _prev_month(self):
@@ -500,7 +507,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
 
-    # ---  bindings
+    # --- bindings
     def _on_click(self, event):
         """Select the day on which the user clicked."""
         label = event.widget
@@ -519,7 +526,7 @@ class Calendar(ttk.Frame):
             self._display_selection()
             self.event_generate("<<CalendarSelected>>")
 
-    # ---  selection handling
+    # --- selection handling
     def selection_get(self):
         """
         Return currently selected date (datetime.date instance).
@@ -545,7 +552,7 @@ class Calendar(ttk.Frame):
                 self._remove_selection()
                 self._sel_date = None
             else:
-                if type(date) == self.date:
+                if isinstance(date, self.date):
                     self._sel_date = date
                 else:
                     self._sel_date = self.strptime(date, "%x")
@@ -553,7 +560,7 @@ class Calendar(ttk.Frame):
                 self._display_calendar()
                 self._display_selection()
 
-    # ---  other methods
+    # --- other methods
     def keys(self):
         """Return a list of all resource names of this widget."""
         return list(self._properties.keys())
@@ -583,32 +590,6 @@ class Calendar(ttk.Frame):
         """
         for item, value in kw.items():
             self[item] = value
-
-
-class ToplevelCalendar(Calendar):
-    """
-    Embed the calendar in a Toplevel with overrideredirect set to True
-    to create a date selection drop-down.
-    """
-
-    def __init__(self, master=None, **kw):
-        """Create Calendar embedded in a Toplevel."""
-        self.top = tk.Toplevel(master)
-        self.top.withdraw()
-        if platform is "linux":
-            self.top.attributes('-type', 'DROPDOWN_MENU')
-        self.top.overrideredirect(True)
-        Calendar.__init__(self, self.top, **kw)
-        self.pack()
-        # Expose some of the toplevel functions
-        self.withdraw = self.top.withdraw
-        self.deiconify = self.top.deiconify
-        self.geometry = self.top.geometry
-
-    def destroy(self):
-        """Destroy this and all descendants widgets."""
-        Calendar.destroy(self)
-        self.top.destroy()
 
 
 class DateEntry(ttk.Entry):
@@ -652,7 +633,7 @@ class DateEntry(ttk.Entry):
                 self.entry_kw[key] = kw.pop(key)
         self.entry_kw['font'] = kw.get('font', None)
 
-        #set locale to have the right date format
+        # set locale to have the right date format
         loc = kw.get('locale', None)
         locale.setlocale(locale.LC_ALL, loc)
 
@@ -661,7 +642,13 @@ class DateEntry(ttk.Entry):
         self._down_arrow_bbox = [0, 0, 0, 0]
 
         # drop-down calendar
-        self._calendar = ToplevelCalendar(self, **kw)
+        self._top_cal = tk.Toplevel(self)
+        self._top_cal.withdraw()
+        if platform is "linux":
+            self._top_cal.attributes('-type', 'DROPDOWN_MENU')
+        self._top_cal.overrideredirect(True)
+        self._calendar = Calendar(self._top_cal, **kw)
+        self._calendar.pack()
 
         # style
         self.style = ttk.Style(self)
@@ -680,7 +667,7 @@ class DateEntry(ttk.Entry):
             self._date = self._calendar.date.today()
         self.insert(0, self._date.strftime('%x'))
 
-        # ---  bindings
+        # --- bindings
         # reconfigure style if theme changed
         self.bind('<<ThemeChanged>>',
                   lambda e: self.after(10, self._setup_style))
@@ -764,7 +751,7 @@ class DateEntry(ttk.Entry):
 
     def _on_move(self, event):
         """Withdraw drop-down calendar if window is moved."""
-        self._calendar.withdraw()
+        self._top_cal.withdraw()
 
     def _on_focus_out_cal(self, event):
         """Withdraw drop-down calendar when it looses focus."""
@@ -774,9 +761,9 @@ class DateEntry(ttk.Entry):
                 x1, y1, x2, y2 = self._down_arrow_bbox
                 if (type(x) != int or type(y) != int or
                         not (x >= x1 and x <= x2 and y >= y1 and y <= y2)):
-                    self._calendar.withdraw()
+                    self._top_cal.withdraw()
             else:
-                self._calendar.withdraw()
+                self._top_cal.withdraw()
 
     def _validate_date(self, P):
         """Date entry validation: only dates in locale '%x' format are accepted."""
@@ -802,20 +789,20 @@ class DateEntry(ttk.Entry):
             self.event_generate('<<DateEntrySelected>>')
             if readonly:
                 self.state(('readonly',))
-        self._calendar.withdraw()
+        self._top_cal.withdraw()
         if 'readonly' not in self.state():
             self.focus_set()
 
     def drop_down(self):
         """Display or withdraw the drop-down calendar depending on its current state."""
         if self._calendar.winfo_ismapped():
-            self._calendar.withdraw()
+            self._top_cal.withdraw()
         else:
             date = self._calendar.strptime(self.get(), '%x')
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
-            self._calendar.geometry('+%i+%i' % (x, y))
-            self._calendar.deiconify()
+            self._top_cal.geometry('+%i+%i' % (x, y))
+            self._top_cal.deiconify()
             self._calendar.focus_set()
             self._calendar.selection_set(date.date())
 
