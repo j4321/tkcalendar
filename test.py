@@ -78,8 +78,7 @@ class TestCalendar(BaseWidgetTest):
         self.window.update()
         widget.destroy()
 
-        loc = ".".join(locale.getdefaultlocale())
-        widget = Calendar(self.window, selectmode='none', locale=loc,
+        widget = Calendar(self.window, selectmode='none',
                           year=2015, month=1, background="black",
                           foreground="white", key="a")
         widget.pack()
