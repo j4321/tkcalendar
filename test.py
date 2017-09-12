@@ -23,6 +23,7 @@ Test
 import unittest
 from tkcalendar import Calendar, DateEntry
 from datetime import datetime
+import locale
 try:
     import Tkinter as tk
     import ttk
@@ -77,7 +78,8 @@ class TestCalendar(BaseWidgetTest):
         self.window.update()
         widget.destroy()
 
-        widget = Calendar(self.window, selectmode='none', locale="en_US.UTF-8",
+        loc = ".".join(locale.getdefaultlocale())
+        widget = Calendar(self.window, selectmode='none', locale=loc,
                           year=2015, month=1, background="black",
                           foreground="white", key="a")
         widget.pack()
