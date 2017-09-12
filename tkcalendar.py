@@ -22,7 +22,6 @@ tkcalendar module providing Calendar and DateEntry widgets
 
 import calendar
 import locale
-import warnings
 from sys import platform
 try:
     import tkinter as tk
@@ -100,7 +99,7 @@ class Calendar(ttk.Frame):
         try:
             bd = int(kw.pop('borderwidth', 2))
         except ValueError:
-            raise tk.TclError('expected integer for the borderwidth option.')
+            raise ValueError('expected integer for the borderwidth option.')
 
         # --- date
         today = self.date.today()
@@ -119,8 +118,7 @@ class Calendar(ttk.Frame):
         # --- selectmode
         selectmode = kw.pop("selectmode", "day")
         if selectmode not in ("none", "day"):
-            warnings.warn("%r is not a valid value for 'selectmode' option, 'day' was chosen instead." % selectmode)
-            selectmode = 'day'
+            raise ValueError("'selectmode' option should be 'none' or 'day'.")
         # --- locale
         locale = kw.pop("locale", None)
 
@@ -288,7 +286,7 @@ class Calendar(ttk.Frame):
                     bd = int(value)
                     self._cal_frame.pack_configure(padx=bd, pady=bd)
                 except ValueError:
-                    raise tk.TclError('expected integer for the borderwidth option.')
+                    raise ValueError('expected integer for the borderwidth option.')
             elif key is "font":
                 font = Font(self, value)
                 prop = font.actual()
@@ -341,7 +339,7 @@ class Calendar(ttk.Frame):
                 self.style.configure(self._style_prefixe + '.L.TButton', arrowcolor=value)
                 self.style.configure(self._style_prefixe + '.main.TLabel', foreground=value)
             elif key is "cursor":
-                ttk.TFrame.configure(self, cursor=value)
+                ttk.Frame.configure(self, cursor=value)
             self._properties[key] = value
 
     def _setup_style(self, event=None):
@@ -555,7 +553,10 @@ class Calendar(ttk.Frame):
                 if isinstance(date, self.date):
                     self._sel_date = date
                 else:
-                    self._sel_date = self.strptime(date, "%x")
+                    try:
+                        self._sel_date = self.strptime(date, "%x")
+                    except Exception as e:
+                        raise type(e)("%r is not a valid date." % date)
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
@@ -829,7 +830,7 @@ class DateEntry(ttk.Entry):
         """Return a list of all resource names of this widget."""
         keys = list(self.entry_kw)
         keys.extend(self._calendar.keys())
-        return keys
+        return list(set(keys))
 
     def cget(self, key):
         """Return the resource value for a KEY given as string."""
@@ -887,6 +888,7 @@ class DateEntry(ttk.Entry):
 
     def get_date(self):
         """Return the content of the dateentry as a datetime.datetime instance."""
+        self._validate_date()
         date = self.get()
         return self._calendar.strptime(date, '%x')
 
@@ -914,7 +916,6 @@ if __name__ == "__main__":
         cal = DateEntry(top, width=12, background='darkblue',
                         foreground='white', borderwidth=2)
         cal.pack(padx=10, pady=10)
-        ttk.Entry(top).pack()
 
     root = tk.Tk()
     s = ttk.Style(root)

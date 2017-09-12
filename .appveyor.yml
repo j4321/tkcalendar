@@ -1,0 +1,14 @@
+environment:
+  matrix:
+    - PYTHON: "C:\\PYTHON27"
+    - PYTHON: "C:\\PYTHON34"
+    - PYTHON: "C:\\PYTHON35"
+    - PYTHON: "C:\\PYTHON36"
+install:
+  - "%PYTHON%\\python.exe -m pip install codecov coverage nose pillow"
+build: off
+test_script:
+  - "%PYTHON%\\python.exe -m pip install ."
+  - "%PYTHON%\\python.exe -m nose --with-coverage"
+after_test:
+  - "%PYTHON%\\Scripts\\codecov.exe"
