@@ -131,13 +131,13 @@ Documentation
 Changelog
 ---------
 
-- tkcalendar 1.1.1
-
-    * Fix display of the first days of the next month (closes #1)
-
-    * Increment year when going from december to january
-
 - tkcalendar 1.1.0
+
+    * Bug fix:
+
+        + Fix display of the first days of the next month
+
+        + Increment year when going from december to january
 
     * New widget:
 
