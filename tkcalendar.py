@@ -659,7 +659,7 @@ class DateEntry(ttk.Entry):
         # are accepted
         validatecmd = self.register(self._validate_date)
         self.configure(validate='focusout',
-                       validatecommand=(validatecmd, '%P'))
+                       validatecommand=validatecmd)
 
         # initially selected date
         self._date = self._calendar.selection_get()
@@ -765,10 +765,10 @@ class DateEntry(ttk.Entry):
             else:
                 self._top_cal.withdraw()
 
-    def _validate_date(self, P):
+    def _validate_date(self):
         """Date entry validation: only dates in locale '%x' format are accepted."""
         try:
-            self._date = self._calendar.strptime(P, '%x')
+            self._date = self._calendar.strptime(self.get(), '%x')
             return True
         except ValueError:
             self.delete(0, 'end')
@@ -798,6 +798,7 @@ class DateEntry(ttk.Entry):
         if self._calendar.winfo_ismapped():
             self._top_cal.withdraw()
         else:
+            self._validate_date()
             date = self._calendar.strptime(self.get(), '%x')
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
@@ -913,6 +914,7 @@ if __name__ == "__main__":
         cal = DateEntry(top, width=12, background='darkblue',
                         foreground='white', borderwidth=2)
         cal.pack(padx=10, pady=10)
+        ttk.Entry(top).pack()
 
     root = tk.Tk()
     s = ttk.Style(root)

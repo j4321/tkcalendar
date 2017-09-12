@@ -131,6 +131,10 @@ Documentation
 Changelog
 ---------
 
+- tkcalendar 1.1.1
+
+    * Fix bug when content of DateEntry is not a valid date
+
 - tkcalendar 1.1.0
 
     * Bug fix:
