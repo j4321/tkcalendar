@@ -31,14 +31,11 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 
-import sys
-
 locale.setlocale(locale.LC_ALL, '')
 
 
 class BaseWidgetTest(unittest.TestCase):
     def setUp(self):
-        sys.stdout = open('/tmp/tmp.log', 'a')
         self.window = tk.Toplevel()
         self.window.update()
 
