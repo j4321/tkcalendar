@@ -33,6 +33,16 @@ except ImportError:
     from tkFont import Font
 
 
+def _unbind(widget, seq, funcid):
+    """Unbind callback to funcid on seq (workaround fixing bug in widget.unbind)."""
+    bindings = {x.split()[1][3:]: x for x in widget.bind(seq).splitlines() if x.strip()}
+    try:
+        del bindings[funcid]
+    except KeyError:
+        raise tk.TclError('Binding "%s" not defined.' % funcid)
+    widget.bind(seq, '\n'.join(list(bindings.values())))
+
+
 class Calendar(ttk.Frame):
     """Calendar widget."""
     date = calendar.datetime.date
@@ -88,7 +98,7 @@ class Calendar(ttk.Frame):
         classname = kw.pop('class_', "Calendar")
         name = kw.pop('name', None)
         ttk.Frame.__init__(self, master, class_=classname, cursor=curs, name=name)
-        self._style_prefixe = '%s.%s' % (self.winfo_name(), self.winfo_class())
+        self._style_prefixe = str(self)
         ttk.Frame.configure(self, style=self._style_prefixe + '.main.TFrame')
 
         self._font = Font(self, font)
@@ -120,7 +130,7 @@ class Calendar(ttk.Frame):
         if selectmode not in ("none", "day"):
             raise ValueError("'selectmode' option should be 'none' or 'day'.")
         # --- locale
-        locale = kw.pop("locale", None)
+        locale = kw.pop("locale", '')
 
         if locale is None:
             self._cal = calendar.TextCalendar(calendar.MONDAY)
@@ -244,7 +254,7 @@ class Calendar(ttk.Frame):
                                   font=self._font, anchor="center")
                 self._calendar[-1].append(label)
                 label.grid(row=i, column=j, padx=(0, 1), pady=(0, 1), sticky="nsew")
-                if selectmode == "day":
+                if selectmode is "day":
                     label.bind("<1>", self._on_click)
 
         # --- *-- pack main elements
@@ -530,7 +540,7 @@ class Calendar(ttk.Frame):
         Return currently selected date (datetime.date instance).
         Always return None if selectmode is "none".
         """
-        if self._properties.get("selectmode") == "day":
+        if self._properties.get("selectmode") is "day":
             return self._sel_date
         else:
             return None
@@ -545,7 +555,7 @@ class Calendar(ttk.Frame):
 
         Do nothing if selectmode is "none".
         """
-        if self._properties.get("selectmode") == "day":
+        if self._properties.get("selectmode") is "day":
             if date is None:
                 self._remove_selection()
                 self._sel_date = None
@@ -628,24 +638,24 @@ class DateEntry(ttk.Entry):
         """
         # sort keywords between entry options and calendar options
         kw['selectmode'] = 'day'
+        entry_kw = {}
 
         for key in self.entry_kw:
-            if key in kw:
-                self.entry_kw[key] = kw.pop(key)
-        self.entry_kw['font'] = kw.get('font', None)
+            entry_kw[key] = kw.pop(key, self.entry_kw[key])
+        entry_kw['font'] = kw.get('font', None)
 
         # set locale to have the right date format
-        loc = kw.get('locale', None)
+        loc = kw.get('locale', '')
         locale.setlocale(locale.LC_ALL, loc)
 
-        ttk.Entry.__init__(self, master, **self.entry_kw)
+        ttk.Entry.__init__(self, master, **entry_kw)
         # down arrow button bbox (to detect if it was clicked upon)
         self._down_arrow_bbox = [0, 0, 0, 0]
 
         # drop-down calendar
         self._top_cal = tk.Toplevel(self)
         self._top_cal.withdraw()
-        if platform is "linux":
+        if platform == "linux":
             self._top_cal.attributes('-type', 'DROPDOWN_MENU')
         self._top_cal.overrideredirect(True)
         self._calendar = Calendar(self._top_cal, **kw)
@@ -679,7 +689,8 @@ class DateEntry(ttk.Entry):
         master = self.master
         while master.winfo_class() not in ['Tk', 'Toplevel']:
             master = master.master
-        master.bind('<Configure>', self._on_move, True)
+        funcid = master.bind('<Configure>', self._on_move, True)
+        self.bind('<Destroy>', lambda e: _unbind(master, '<Configure>', funcid))
         # handle appearence to make the entry behave like a Combobox but with
         # a drop-down calendar instead of a drop-down list
         self.bind('<Leave>', lambda e: self.state(['!active']))

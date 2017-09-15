@@ -131,6 +131,11 @@ Documentation
 Changelog
 ---------
 
+- tkcalendar 1.1.2
+
+    * Fix bug after destroying a DateEntry
+    * Fix bug in style and font
+
 - tkcalendar 1.1.1
 
     * Fix bug when content of DateEntry is not a valid date

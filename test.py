@@ -31,9 +31,14 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 
+import sys
+
+locale.setlocale(locale.LC_ALL, '')
+
 
 class BaseWidgetTest(unittest.TestCase):
     def setUp(self):
+        sys.stdout = open('/tmp/tmp.log', 'a')
         self.window = tk.Toplevel()
         self.window.update()
 
@@ -78,7 +83,7 @@ class TestCalendar(BaseWidgetTest):
         self.window.update()
         widget.destroy()
 
-        widget = Calendar(self.window, selectmode='none',
+        widget = Calendar(self.window, selectmode='none', locale=None,
                           year=2015, month=1, background="black",
                           foreground="white", key="a")
         widget.pack()
@@ -99,7 +104,7 @@ class TestCalendar(BaseWidgetTest):
         widget._prev_year()
         widget._next_year()
         widget._remove_selection()
-        widget.selection_set("12/31/18")
+        widget.selection_set(datetime(2018, 12, 31).strftime('%x'))
         self.assertEqual(widget.selection_get(), datetime(2018, 12, 31))
         with self.assertRaises(ValueError):
             widget.selection_set("ab")
@@ -107,6 +112,12 @@ class TestCalendar(BaseWidgetTest):
         self.assertIsNone(widget.selection_get())
         widget.selection_set(datetime(2015, 12, 31))
         self.assertEqual(widget.selection_get(), datetime(2015, 12, 31))
+
+        widget.config(selectmode='none')
+        self.assertIsNone(widget.selection_get())
+
+        l = ttk.Label(widget, text="12")
+        widget._on_click(TestEvent(widget=l))
 
     def test_calendar_get_set(self):
         widget = Calendar(self.window, foreground="red")
@@ -182,7 +193,7 @@ class TestDateEntry(BaseWidgetTest):
 
     def test_dateentry_get_set(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
-                           foreground='white', borderwidth=2)
+                           foreground='white', borderwidth=2, font='Arial 9')
         widget.pack()
         self.window.update()
 
@@ -219,7 +230,7 @@ class TestDateEntry(BaseWidgetTest):
         widget.pack()
         self.window.update()
 
-        widget.set_date("12/31/18")
+        widget.set_date(datetime(2018, 12, 31).strftime('%x'))
         self.assertEqual(widget.get_date(), datetime(2018, 12, 31))
         with self.assertRaises(ValueError):
             widget.set_date("ab")
@@ -234,6 +245,7 @@ class TestDateEntry(BaseWidgetTest):
 
         widget._on_motion(TestEvent(x=10, y=20))
         widget._on_b1_press(TestEvent(x=10, y=20))
+        widget._on_b1_press(TestEvent(x=widget.winfo_width() - 2, y=2))
         widget._on_b1_release(TestEvent(x=10, y=20))
         widget._on_focus_out_cal(TestEvent(x=10, y=20))
 
@@ -241,7 +253,16 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
         self.assertIn("disabled", widget.state())
 
-        widget._select()
         widget.drop_down()
+        self.window.update()
+        widget._select()
+        self.window.update()
+        widget.drop_down()
+        self.window.update()
+        widget.drop_down()
+        self.window.update()
 
-
+        widget.configure(state='readonly')
+        self.window.update()
+        widget._select()
+        self.assertIn('readonly', widget.state())
