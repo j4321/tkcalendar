@@ -687,7 +687,7 @@ class DateEntry(ttk.Entry):
         self.bind('<Map>', self._determine_bbox)
         # hide drop-down calendar when window is moved
         master = self.master
-        while master.winfo_class() not in ['Tk', 'Toplevel']:
+        while not (isinstance(master, tk.Toplevel) or isinstance(master, tk.Tk)):
             master = master.master
         funcid = master.bind('<Configure>', self._on_move, True)
         self.bind('<Destroy>', lambda e: _unbind(master, '<Configure>', funcid))
