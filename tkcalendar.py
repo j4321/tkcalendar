@@ -675,7 +675,11 @@ class DateEntry(ttk.Entry):
         # initially selected date
         self._date = self._calendar.selection_get()
         if self._date is None:
-            self._date = self._calendar.date.today()
+            today = self._calendar.date.today()
+            year = kw.get('year', today.year)
+            month = kw.get('month', today.month)
+            day = kw.get('day', today.day)
+            self._date = self._calendar.date(year, month, day)
         self.insert(0, self._date.strftime('%x'))
 
         # --- bindings
@@ -925,7 +929,7 @@ if __name__ == "__main__":
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
         cal = DateEntry(top, width=12, background='darkblue',
-                        foreground='white', borderwidth=2)
+                        foreground='white', borderwidth=2, year=2010)
         cal.pack(padx=10, pady=10)
 
     root = tk.Tk()
