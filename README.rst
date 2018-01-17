@@ -131,6 +131,11 @@ Documentation
 Changelog
 ---------
 
+- tkcalendar 1.1.3
+
+    * Make DateEntry support initialisation with partial dates (e.g. just year=2010)
+    * Improve handling of wrong year-month-day combinations
+
 - tkcalendar 1.1.2
 
     * Fix bug after destroying a DateEntry

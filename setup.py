@@ -9,7 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='tkcalendar',
-      version='1.1.2',
+      version='1.1.3',
       description='Calendar and DateEntry widgets for Tkinter',
       long_description=long_description,
       url='https://github.com/j4321/tkcalendar',
