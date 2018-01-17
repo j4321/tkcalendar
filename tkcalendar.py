@@ -122,7 +122,11 @@ class Calendar(ttk.Frame):
             day = kw.pop('day', today.day)
             month = kw.pop("month", today.month)
             year = kw.pop('year', today.year)
-            self._sel_date = self.date(year, month, day)  # selected day
+            try:
+                self._sel_date = self.date(year, month, day)  # selected day
+            except ValueError:
+                self._sel_date = None
+
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
 
         # --- selectmode
@@ -679,7 +683,10 @@ class DateEntry(ttk.Entry):
             year = kw.get('year', today.year)
             month = kw.get('month', today.month)
             day = kw.get('day', today.day)
-            self._date = self._calendar.date(year, month, day)
+            try:
+                self._date = self._calendar.date(year, month, day)
+            except ValueError:
+                self._date = today
         self.insert(0, self._date.strftime('%x'))
 
         # --- bindings
