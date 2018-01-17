@@ -22,7 +22,7 @@ Test
 
 import unittest
 from tkcalendar import Calendar, DateEntry
-from datetime import datetime
+from datetime import datetime, date
 import locale
 try:
     import Tkinter as tk
@@ -66,7 +66,21 @@ class TestCalendar(BaseWidgetTest):
                           cursor="hand1", year=2018, month=2, day=5)
         widget.pack()
         self.window.update()
+        self.assertEqual(widget.selection_get(), date(2018, 2, 5))
         widget.destroy()
+
+        widget = Calendar(self.window, year=2011, month=2, day=35)
+        widget.pack()
+        self.window.update()
+        self.assertIsNone(widget.selection_get())
+        self.assertEqual(widget._date, date(2011, 2, 1))
+        widget.destroy()
+
+        with self.assertRaises(ValueError):
+            widget = Calendar(self.window, month=23)
+            widget.pack()
+            self.window.update()
+            widget.destroy()
 
         with self.assertRaises(ValueError):
             widget = Calendar(self.window, borderwidth="e")
@@ -85,6 +99,8 @@ class TestCalendar(BaseWidgetTest):
                           foreground="white", key="a")
         widget.pack()
         self.window.update()
+        self.assertIsNone(widget.selection_get())
+        self.assertEqual(widget._date, date(2015, 1, 1))
         widget.destroy()
 
         with self.assertRaises(ValueError):
@@ -187,6 +203,11 @@ class TestDateEntry(BaseWidgetTest):
                            foreground='white', borderwidth=2)
         widget.pack()
         self.window.update()
+        widget.destroy()
+        widget = DateEntry(self.window, year=2012)
+        widget.pack()
+        self.window.update()
+        widget.destroy()
 
     def test_dateentry_get_set(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
@@ -216,6 +237,10 @@ class TestDateEntry(BaseWidgetTest):
         widget["borderwidth"] = 5
         self.window.update()
         self.assertEqual(widget["borderwidth"], 5)
+
+        widget.config(font="Arial 20 bold")
+        self.window.update()
+        self.assertEqual(widget["font"], "Arial 20 bold")
 
         widget.config(style="my.TEntry")
         self.window.update()

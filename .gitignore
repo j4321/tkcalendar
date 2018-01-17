@@ -4,3 +4,4 @@ __pycache__
 tkcalendar.egg-info
 htmlcov
 .coverage
+*.pyc
