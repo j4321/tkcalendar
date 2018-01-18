@@ -10,8 +10,8 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3
 install:
-  - sudo apt-get install python-tk python3-tk 
-  - python -m pip install coverage codecov pillow
+  - sudo apt-get install python-tk python3-tk
+  - python -m pip install coverage codecov pillow pynput
 script:
   - python -m pip install .
   - python -m nose

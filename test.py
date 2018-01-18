@@ -30,6 +30,7 @@ try:
 except ImportError:
     import tkinter as tk
     from tkinter import ttk
+from pynput.mouse import Controller, Button
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -208,6 +209,22 @@ class TestDateEntry(BaseWidgetTest):
         widget.pack()
         self.window.update()
         widget.destroy()
+
+    def test_dateentry_drop_down(self):
+        """Check whether drop down opens on click."""
+        widget = DateEntry(self.window)
+        widget.pack()
+        self.window.update()
+        x, y = widget.winfo_rootx(), widget.winfo_rooty()
+        w = widget.winfo_width()
+        mouse_controller = Controller()
+        mouse_controller.position = (x + w - 2, y + 2)
+        self.window.update()
+        mouse_controller.press(Button.left)
+        self.window.update()
+        mouse_controller.release(Button.left)
+        self.window.update()
+        self.assertTrue(widget._top_cal.winfo_ismapped())
 
     def test_dateentry_get_set(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
