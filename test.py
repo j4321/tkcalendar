@@ -212,6 +212,8 @@ class TestDateEntry(BaseWidgetTest):
 
     def test_dateentry_drop_down(self):
         """Check whether drop down opens on click."""
+        style = ttk.Style(self.window)
+        style.theme_use('clam')
         widget = DateEntry(self.window)
         widget.pack()
         self.window.update()
