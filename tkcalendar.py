@@ -33,16 +33,6 @@ except ImportError:
     from tkFont import Font
 
 
-def _unbind(widget, seq, funcid):
-    """Unbind callback to funcid on seq (workaround fixing bug in widget.unbind)."""
-    bindings = {x.split()[1][3:]: x for x in widget.bind(seq).splitlines() if x.strip()}
-    try:
-        del bindings[funcid]
-    except KeyError:
-        raise tk.TclError('Binding "%s" not defined.' % funcid)
-    widget.bind(seq, '\n'.join(list(bindings.values())))
-
-
 class Calendar(ttk.Frame):
     """Calendar widget."""
     date = calendar.datetime.date
@@ -696,12 +686,6 @@ class DateEntry(ttk.Entry):
         # determine new downarrow button bbox
         self.bind('<Configure>', self._determine_bbox)
         self.bind('<Map>', self._determine_bbox)
-        # hide drop-down calendar when window is moved
-        master = self.master
-        while not (isinstance(master, tk.Toplevel) or isinstance(master, tk.Tk)):
-            master = master.master
-        funcid = master.bind('<Configure>', self._on_move, True)
-        self.bind('<Destroy>', lambda e: _unbind(master, '<Configure>', funcid))
         # handle appearence to make the entry behave like a Combobox but with
         # a drop-down calendar instead of a drop-down list
         self.bind('<Leave>', lambda e: self.state(['!active']))
@@ -772,10 +756,6 @@ class DateEntry(ttk.Entry):
                 x >= x1 and x <= x2 and y >= y1 and y <= y2):
             self.state(['!pressed', 'active'])
 
-    def _on_move(self, event):
-        """Withdraw drop-down calendar if window is moved."""
-        self._top_cal.withdraw()
-
     def _on_focus_out_cal(self, event):
         """Withdraw drop-down calendar when it looses focus."""
         if self.focus_get() is not None:
@@ -785,6 +765,17 @@ class DateEntry(ttk.Entry):
                 if (type(x) != int or type(y) != int or
                         not (x >= x1 and x <= x2 and y >= y1 and y <= y2)):
                     self._top_cal.withdraw()
+            else:
+                self._top_cal.withdraw()
+        else:
+            x, y = self._top_cal.winfo_pointerxy()
+            xc = self._top_cal.winfo_rootx()
+            yc = self._top_cal.winfo_rooty()
+            w = self._top_cal.winfo_width()
+            h = self._top_cal.winfo_height()
+            if xc <= x <= xc + w and yc <= y <= yc + h:
+                # re-focus calendar so that <FocusOut> will be triggered next time
+                self._calendar.focus_force()
             else:
                 self._top_cal.withdraw()
 
