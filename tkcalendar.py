@@ -124,7 +124,7 @@ class Calendar(ttk.Frame):
         if selectmode not in ("none", "day"):
             raise ValueError("'selectmode' option should be 'none' or 'day'.")
         # --- locale
-        locale = kw.pop("locale", '')
+        locale = kw.pop("locale", None)
 
         if locale is None:
             self._cal = calendar.TextCalendar(calendar.MONDAY)
@@ -646,6 +646,8 @@ class DateEntry(ttk.Entry):
         # down arrow button bbox (to detect if it was clicked upon)
         self._down_arrow_bbox = [0, 0, 0, 0]
 
+        self._determine_bbox_after_id = ''
+
         # drop-down calendar
         self._top_cal = tk.Toplevel(self)
         self._top_cal.withdraw()
@@ -691,7 +693,6 @@ class DateEntry(ttk.Entry):
         self.bind('<Leave>', lambda e: self.state(['!active']))
         self.bind('<Motion>', self._on_motion)
         self.bind('<ButtonPress-1>', self._on_b1_press)
-        self.bind('<ButtonRelease-1>', self._on_b1_release)
         # update entry content when date is selected in the Calendar
         self._calendar.bind('<<CalendarSelected>>', self._select)
         # hide calendar if it looses focus
@@ -709,9 +710,12 @@ class DateEntry(ttk.Entry):
         self.style.layout('DateEntry', self.style.layout('TCombobox'))
         fieldbg = self.style.map('TCombobox', 'fieldbackground')
         self.style.map('DateEntry', fieldbackground=fieldbg)
+        self.after_cancel(self._determine_bbox_after_id)
+        self._determine_bbox_after_id = self.after(10, self._determine_bbox)
 
     def _determine_bbox(self, event=None):
         """Determine downarrow button bbox."""
+        self.after_cancel(self._determine_bbox_after_id)
         if self.winfo_ismapped():
             self.update_idletasks()
             h = self.winfo_height()
@@ -719,12 +723,12 @@ class DateEntry(ttk.Entry):
             y = h // 2
             x = 0
             if self.identify(x, y):
-                while x < w and self.identify(x, y) != 'downarrow':
+                while x < w and 'downarrow' not in self.identify(x, y):
                     x += 1
                 if x < w:
                     self._down_arrow_bbox = [x, 0, w, h]
             else:
-                self.after(10, self._determine_bbox)
+                self._determine_bbox_after_id = self.after(10, self._determine_bbox)
 
     def _on_motion(self, event):
         """Set widget state depending on mouse position to mimic Combobox behavior."""
@@ -745,16 +749,8 @@ class DateEntry(ttk.Entry):
         x1, y1, x2, y2 = self._down_arrow_bbox
         if (('disabled' not in self.state()) and
                 x >= x1 and x <= x2 and y >= y1 and y <= y2):
-            self.state(['pressed', 'active'])
+            self.state(['pressed'])
             self.drop_down()
-
-    def _on_b1_release(self, event):
-        """Remove 'pressed' from widget's states when the downarrow button is released."""
-        x, y = event.x, event.y
-        x1, y1, x2, y2 = self._down_arrow_bbox
-        if (('disabled' not in self.state()) and
-                x >= x1 and x <= x2 and y >= y1 and y <= y2):
-            self.state(['!pressed', 'active'])
 
     def _on_focus_out_cal(self, event):
         """Withdraw drop-down calendar when it looses focus."""
@@ -765,8 +761,10 @@ class DateEntry(ttk.Entry):
                 if (type(x) != int or type(y) != int or
                         not (x >= x1 and x <= x2 and y >= y1 and y <= y2)):
                     self._top_cal.withdraw()
+                    self.state(['!pressed'])
             else:
                 self._top_cal.withdraw()
+                self.state(['!pressed'])
         else:
             x, y = self._top_cal.winfo_pointerxy()
             xc = self._top_cal.winfo_rootx()
@@ -775,9 +773,10 @@ class DateEntry(ttk.Entry):
             h = self._top_cal.winfo_height()
             if xc <= x <= xc + w and yc <= y <= yc + h:
                 # re-focus calendar so that <FocusOut> will be triggered next time
-                self._calendar.focus_force()
+                self._calendar.focus_set()
             else:
                 self._top_cal.withdraw()
+                self.state(['!pressed'])
 
     def _validate_date(self):
         """Date entry validation: only dates in locale '%x' format are accepted."""
@@ -806,6 +805,10 @@ class DateEntry(ttk.Entry):
         self._top_cal.withdraw()
         if 'readonly' not in self.state():
             self.focus_set()
+
+    def destroy(self):
+        self.after_cancel(self._determine_bbox_after_id)
+        ttk.Entry.destroy(self)
 
     def drop_down(self):
         """Display or withdraw the drop-down calendar depending on its current state."""
@@ -913,9 +916,9 @@ if __name__ == "__main__":
             print(cal.selection_get())
 
         top = tk.Toplevel(root)
+        top.grab_set()
 
-        cal = Calendar(top,
-                       font="Arial 14", selectmode='day',
+        cal = Calendar(top, font="Arial 14", selectmode='day',
                        cursor="hand1", year=2018, month=2, day=5)
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="ok", command=print_sel).pack()
@@ -931,8 +934,6 @@ if __name__ == "__main__":
         cal.pack(padx=10, pady=10)
 
     root = tk.Tk()
-    s = ttk.Style(root)
-    s.theme_use('clam')
 
     ttk.Button(root, text='Calendar', command=example1).pack(padx=10, pady=10)
     ttk.Button(root, text='DateEntry', command=example2).pack(padx=10, pady=10)

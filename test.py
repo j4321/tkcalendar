@@ -212,8 +212,8 @@ class TestDateEntry(BaseWidgetTest):
 
     def test_dateentry_drop_down(self):
         """Check whether drop down opens on click."""
-        style = ttk.Style(self.window)
-        style.theme_use('clam')
+        #style = ttk.Style(self.window)
+        #style.theme_use('clam')
         widget = DateEntry(self.window)
         widget.pack()
         self.window.update()
@@ -287,7 +287,6 @@ class TestDateEntry(BaseWidgetTest):
         widget._on_motion(TestEvent(x=10, y=20))
         widget._on_b1_press(TestEvent(x=10, y=20))
         widget._on_b1_press(TestEvent(x=widget.winfo_width() - 2, y=2))
-        widget._on_b1_release(TestEvent(x=10, y=20))
         widget._on_focus_out_cal(TestEvent(x=10, y=20))
 
         widget.state(("disabled",))
