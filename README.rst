@@ -131,6 +131,10 @@ Documentation
 Changelog
 ---------
 
+- tkcalendar 1.1.4
+
+    * Fix error in january due to week 53
+
 - tkcalendar 1.1.3
 
     * Make DateEntry support initialisation with partial dates (e.g. just year=2010)
