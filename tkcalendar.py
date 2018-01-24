@@ -439,9 +439,9 @@ class Calendar(ttk.Frame):
         months = {month: '.TLabel', m: '_om.TLabel', prev_m: '_om.TLabel'}
 
         week_nb = self._date.isocalendar()[1]
-
+        modulo = max(week_nb, 52)
         for i_week in range(6):
-            self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % 52 + 1))
+            self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % modulo + 1))
             for i_day in range(7):
                 style = self._style_prefixe + week_days[i_day] + months[cal[i_week][i_day].month]
                 txt = str(cal[i_week][i_day].day)
@@ -455,8 +455,9 @@ class Calendar(ttk.Frame):
             year = self._sel_date.year
             if year == self._date.year:
                 _, w, d = self._sel_date.isocalendar()
-                w -= self._date.isocalendar()[1]
-                w %= 52
+                wn = self._date.isocalendar()[1]
+                w -= wn
+                w %= max(52, wn)
                 if 0 <= w and w < 6:
                     self._calendar[w][d - 1].configure(style=self._style_prefixe + ".sel.TLabel")
 
@@ -466,8 +467,9 @@ class Calendar(ttk.Frame):
             year, month = self._sel_date.year, self._sel_date.month
             if year == self._date.year:
                 _, w, d = self._sel_date.isocalendar()
-                w -= self._date.isocalendar()[1]
-                w %= 52
+                wn = self._date.isocalendar()[1]
+                w -= wn
+                w %= max(52, wn)
                 if w >= 0 and w < 6:
                     if month == self._date.month:
                         if d < 6:
@@ -916,7 +918,7 @@ if __name__ == "__main__":
 
         cal = Calendar(top,
                        font="Arial 14", selectmode='day',
-                       cursor="hand1", year=2018, month=2, day=5)
+                       cursor="hand1", year=2010, month=1, day=5)
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="ok", command=print_sel).pack()
 
@@ -931,8 +933,6 @@ if __name__ == "__main__":
         cal.pack(padx=10, pady=10)
 
     root = tk.Tk()
-    s = ttk.Style(root)
-    s.theme_use('clam')
 
     ttk.Button(root, text='Calendar', command=example1).pack(padx=10, pady=10)
     ttk.Button(root, text='DateEntry', command=example2).pack(padx=10, pady=10)
