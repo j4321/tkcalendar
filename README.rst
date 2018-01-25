@@ -134,6 +134,7 @@ Changelog
 - tkcalendar 1.1.4
 
     * Fix error in january due to week 53
+    * Fix DateEntry for ttk themes other than 'clam'
 
 - tkcalendar 1.1.3
 
