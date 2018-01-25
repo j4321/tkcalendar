@@ -775,7 +775,7 @@ class DateEntry(ttk.Entry):
             h = self._top_cal.winfo_height()
             if xc <= x <= xc + w and yc <= y <= yc + h:
                 # re-focus calendar so that <FocusOut> will be triggered next time
-                self._calendar.focus_set()
+                self._calendar.focus_force()
             else:
                 self._top_cal.withdraw()
                 self.state(['!pressed'])
