@@ -106,10 +106,7 @@ class Calendar(ttk.Frame):
         today = self.date.today()
 
         try:
-            self._textvariable = kw.pop("textvariable")
-#            if ( self._datevariable is not None ):
-#              if not ( isinstance( self._datevariable, tkinter.Variable     ) ):
-#                raise TypeError( "tkinter.Variable type expected, {} given.".format( type( self._datevariable ) ) )
+            self._textvariable = kw.pop("textvariable",'')
         except KeyError:
             self._textvariable = None
 
@@ -123,13 +120,12 @@ class Calendar(ttk.Frame):
             year = kw.pop('year', today.year)
             try:
                 self._sel_date = self.date(year, month, day)  # selected day
+                if self._textvariable is not None:
+                    self._textvariable.set(self._sel_date.strftime("%x"))
             except ValueError:
                 self._sel_date = None
 
-        self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
-        
-        if self._textvariable is not None:
-          self._textvariable.set(self._sel_date.strftime("%x"))
+        self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar       
 
         # --- selectmode
         selectmode = kw.pop("selectmode", "day")
@@ -576,6 +572,7 @@ class Calendar(ttk.Frame):
                 else:
                     try:
                         self._sel_date = self.strptime(date, "%x")
+                        self._textvariable.set(self._sel_date.strftime("%x"))
                     except Exception as e:
                         raise type(e)("%r is not a valid date." % date)
                 self._date = self._sel_date.replace(day=1)
@@ -583,12 +580,13 @@ class Calendar(ttk.Frame):
                 self._display_selection()
 
     def get_date(self):
-        return self._sel_date.strftime("%x")
+        if self._set_date is not None:
+            return self._sel_date.strftime("%x")
+        return ""
 
     def set_date(self, value):
         if ( value is not None ):
             self.selection_set(self, value)
-            self._textvariable.set(self._sel_date.strftime("%x"))
 
     # --- other methods
     def keys(self):
