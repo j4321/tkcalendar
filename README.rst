@@ -66,6 +66,8 @@ Documentation
 
         selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
+        textvariable: StringVar that will contain the currently selected date as str
+
         background: calendar border and month/year name background color
 
         foreground: month/year name foreground color
@@ -130,6 +132,10 @@ Documentation
 
 Changelog
 ---------
+
+- tkcalendar 1.2.0
+
+    * Add textvariable option
 
 - tkcalendar 1.1.5
 

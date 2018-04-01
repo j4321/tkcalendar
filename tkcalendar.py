@@ -59,7 +59,7 @@ class Calendar(ttk.Frame):
                      raise 'locale.Error: unsupported locale setting')
             selectmode: "none" or "day" (default) define whether the user
                         can change the selected day with a mouse click
-            textvariable: StringVar containing the currently selected date as str
+            textvariable: StringVar that will contain the currently selected date as str
             background: calendar border and month/year name background color
             foreground: month/year name foreground color
             bordercolor: day border color
