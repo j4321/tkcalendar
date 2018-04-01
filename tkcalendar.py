@@ -2,6 +2,7 @@
 """
 tkcalendar - Calendar and DateEntry widgets for Tkinter
 Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018 Neal Probert (https://github.com/nprobert)
 
 tkcalendar is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
