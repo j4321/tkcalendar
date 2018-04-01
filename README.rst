@@ -131,6 +131,10 @@ Documentation
 Changelog
 ---------
 
+- tkcalendar 1.1.5
+
+    * Fix endless triggering of `<<ThemeChanged>>` event in `DateEntry`
+
 - tkcalendar 1.1.4
 
     * Fix error in january due to week 53
