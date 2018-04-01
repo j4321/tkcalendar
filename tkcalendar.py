@@ -2,6 +2,7 @@
 """
 tkcalendar - Calendar and DateEntry widgets for Tkinter
 Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2018 Neal Probert (https://github.com/nprobert)
 
 tkcalendar is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,6 +39,7 @@ class Calendar(ttk.Frame):
     date = calendar.datetime.date
     timedelta = calendar.datetime.timedelta
     strptime = calendar.datetime.datetime.strptime
+    strftime = calendar.datetime.datetime.strftime
 
     def __init__(self, master=None, **kw):
         """
@@ -57,6 +59,7 @@ class Calendar(ttk.Frame):
                      raise 'locale.Error: unsupported locale setting')
             selectmode: "none" or "day" (default) define whether the user
                         can change the selected day with a mouse click
+            textvariable: StringVar that will contain the currently selected date as str
             background: calendar border and month/year name background color
             foreground: month/year name foreground color
             bordercolor: day border color
@@ -91,6 +94,8 @@ class Calendar(ttk.Frame):
         self._style_prefixe = str(self)
         ttk.Frame.configure(self, style=self._style_prefixe + '.main.TFrame')
 
+        self._textvariable = kw.pop("textvariable", None)
+
         self._font = Font(self, font)
         prop = self._font.actual()
         prop["size"] += 1
@@ -114,6 +119,8 @@ class Calendar(ttk.Frame):
             year = kw.pop('year', today.year)
             try:
                 self._sel_date = self.date(year, month, day)  # selected day
+                if self._textvariable is not None:
+                    self._textvariable.set(self._sel_date.strftime("%x"))
             except ValueError:
                 self._sel_date = None
 
@@ -140,6 +147,7 @@ class Calendar(ttk.Frame):
                    'font',
                    'borderwidth',
                    'selectmode',
+                   'textvariable',
                    'locale',
                    'selectbackground',
                    'selectforeground',
@@ -167,6 +175,7 @@ class Calendar(ttk.Frame):
                             "borderwidth": bd,
                             "locale": locale,
                             "selectmode": selectmode,
+                            'textvariable': self._textvariable,
                             'selectbackground': active_bg,
                             'selectforeground': 'white',
                             'normalbackground': 'white',
@@ -261,6 +270,12 @@ class Calendar(ttk.Frame):
         self._setup_style()
         self._display_calendar()
 
+        if self._textvariable is not None:
+            try:
+                self._textvariable_trace_id = self._textvariable.trace_add('write', self._textvariable_trace)
+            except AttributeError:
+                self._textvariable_trace_id = self._textvariable.trace('w', self._textvariable_trace)
+
     def __getitem__(self, key):
         """Return the resource value for a KEY given as string."""
         try:
@@ -285,6 +300,21 @@ class Calendar(ttk.Frame):
                             day.bind("<1>", self._on_click)
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
+            elif key is 'textvariable':
+                if self._sel_date is not None:
+                    if value is not None:
+                        value.set(self._sel_date.strftime("%x"))
+                    try:
+                        if self._textvariable is not None:
+                            self._textvariable.trace_remove('write', self._textvariable_trace_id)
+                        if value is not None:
+                            self._textvariable_trace_id = value.trace_add('write', self._textvariable_trace)
+                    except AttributeError:
+                        if self._textvariable is not None:
+                            self._textvariable.trace_vdelete('w', self._textvariable_trace_id)
+                        if value is not None:
+                            value.trace('w', self._textvariable_trace)
+                self._textvariable = value
             elif key is 'borderwidth':
                 try:
                     bd = int(value)
@@ -345,6 +375,26 @@ class Calendar(ttk.Frame):
             elif key is "cursor":
                 ttk.Frame.configure(self, cursor=value)
             self._properties[key] = value
+
+    def _textvariable_trace(self, *args):
+        if self._properties.get("selectmode") is "day":
+            date = self._textvariable.get()
+            if not date:
+                self._remove_selection()
+                self._sel_date = None
+            else:
+                try:
+                    self._sel_date = self.strptime(date, "%x")
+                except Exception as e:
+                    if self._sel_date is None:
+                        self._textvariable.set('')
+                    else:
+                        self._textvariable.set(self._sel_date.strftime('%x'))
+                    raise type(e)("%r is not a valid date." % date)
+                else:
+                    self._date = self._sel_date.replace(day=1)
+                    self._display_calendar()
+                    self._display_selection()
 
     def _setup_style(self, event=None):
         """Configure style."""
@@ -528,6 +578,8 @@ class Calendar(ttk.Frame):
             self._remove_selection()
             self._sel_date = self.date(year, month, day)
             self._display_selection()
+            if self._textvariable is not None:
+                self._textvariable.set(self._sel_date.strftime("%x"))
             self.event_generate("<<CalendarSelected>>")
 
     # --- selection handling
@@ -536,6 +588,7 @@ class Calendar(ttk.Frame):
         Return currently selected date (datetime.date instance).
         Always return None if selectmode is "none".
         """
+
         if self._properties.get("selectmode") is "day":
             return self._sel_date
         else:
@@ -555,6 +608,8 @@ class Calendar(ttk.Frame):
             if date is None:
                 self._remove_selection()
                 self._sel_date = None
+                if self._textvariable is not None:
+                    self._textvariable.set('')
             else:
                 if isinstance(date, self.date):
                     self._sel_date = date
@@ -563,9 +618,18 @@ class Calendar(ttk.Frame):
                         self._sel_date = self.strptime(date, "%x")
                     except Exception as e:
                         raise type(e)("%r is not a valid date." % date)
+                if self._textvariable is not None:
+                    self._textvariable.set(self._sel_date.strftime("%x"))
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
+
+    def get_date(self):
+        """Return selected date as string."""
+        if self._sel_date is not None:
+            return self._sel_date.strftime("%x")
+        else:
+            return ""
 
     # --- other methods
     def keys(self):
