@@ -745,7 +745,7 @@ class DateEntry(ttk.Entry):
                 self._date = self._calendar.date(year, month, day)
             except ValueError:
                 self._date = today
-        self.insert(0, self._date.strftime('%x'))
+        self._set_text(self._date.strftime('%x'))
 
         self._theme_change = True
 
@@ -861,27 +861,30 @@ class DateEntry(ttk.Entry):
             self._date = self._calendar.strptime(self.get(), '%x')
             return True
         except ValueError:
-            self.delete(0, 'end')
-            self.insert(0, self._date.strftime('%x'))
+            self._set_text(self._date.strftime('%x'))
             return False
 
     def _select(self, event=None):
         """Display the selected date in the entry and hide the calendar."""
         date = self._calendar.selection_get()
         if date is not None:
-            if 'readonly' in self.state():
-                readonly = True
-                self.state(('!readonly',))
-            else:
-                readonly = False
-            self.delete(0, 'end')
-            self.insert(0, date.strftime('%x'))
+            self._set_text(date.strftime('%x'))
             self.event_generate('<<DateEntrySelected>>')
-            if readonly:
-                self.state(('readonly',))
         self._top_cal.withdraw()
         if 'readonly' not in self.state():
             self.focus_set()
+
+    def _set_text(self, txt):
+        """Insert text in the entry."""
+        if 'readonly' in self.state():
+            readonly = True
+            self.state(('!readonly',))
+        else:
+            readonly = False
+        self.delete(0, 'end')
+        self.insert(0, txt)
+        if readonly:
+            self.state(('readonly',))
 
     def destroy(self):
         self.after_cancel(self._determine_bbox_after_id)
@@ -976,8 +979,7 @@ class DateEntry(ttk.Entry):
                 self._calendar.strptime(txt, '%x')
             except Exception as e:
                 raise type(e)("%r is not a valid date." % date)
-        self.delete(0, 'end')
-        self.insert(0, txt)
+        self._set_text(txt)
 
     def get_date(self):
         """Return the content of the dateentry as a datetime.datetime instance."""
