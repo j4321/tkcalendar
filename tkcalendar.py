@@ -613,7 +613,7 @@ class DateEntry(ttk.Entry):
                 'textvariable': '',
                 'validate': 'none',
                 'validatecommand': '',
-                'width': 20,
+                'width': 12,
                 'xscrollcommand': ''}
 
     def __init__(self, master=None, **kw):
@@ -683,10 +683,12 @@ class DateEntry(ttk.Entry):
                 self._date = today
         self.insert(0, self._date.strftime('%x'))
 
+        self._theme_change = True
+
         # --- bindings
         # reconfigure style if theme changed
         self.bind('<<ThemeChanged>>',
-                  lambda e: self.after(10, self._setup_style))
+                  lambda e: self.after(10, self._on_theme_change))
         # determine new downarrow button bbox
         self.bind('<Configure>', self._determine_bbox)
         self.bind('<Map>', self._determine_bbox)
@@ -744,6 +746,15 @@ class DateEntry(ttk.Entry):
                 self.state(['!active'])
                 if 'readonly' not in self.state():
                     self.configure(cursor='xterm')
+
+    def _on_theme_change(self):
+        if self._theme_change:
+            self._theme_change = False
+            self._setup_style()
+            self.after(50, self._set_theme_change)
+
+    def _set_theme_change(self):
+        self._theme_change = True
 
     def _on_b1_press(self, event):
         """Trigger self.drop_down on downarrow button press and set widget state to ['pressed', 'active']."""
