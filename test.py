@@ -154,7 +154,12 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(datetime(2014, 3, 2), widget.selection_get())
         self.assertEqual(datetime(2014, 3, 2).strftime('%x'), var.get())
         self.assertEqual(datetime(2014, 3, 2).strftime('%x'), widget.get_date())
-        var.set('a')
+        try:
+            var.set('a')
+        except tk.TclError:
+            # some versions of python raise an error because of the exception
+            # raised inside the trace
+            pass
         self.window.update()
         self.assertEqual(datetime(2014, 3, 2), widget.selection_get())
         self.assertEqual(datetime(2014, 3, 2).strftime('%x'), var.get())
