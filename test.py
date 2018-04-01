@@ -133,6 +133,38 @@ class TestCalendar(BaseWidgetTest):
         l = ttk.Label(widget, text="12")
         widget._on_click(TestEvent(widget=l))
 
+    def test_calendar_textvariable(self):
+        var = tk.StringVar(self.window,)
+        widget = Calendar(self.window, selectmode='day', locale=None,
+                          year=2015, month=1, day=3, textvariable=var)
+        widget.pack()
+        self.window.update()
+        self.assertEqual(datetime(2015, 1, 3).strftime('%x'), var.get())
+        self.assertEqual(datetime(2015, 1, 3).strftime('%x'), widget.get_date())
+        widget.selection_set(datetime(2018, 11, 21))
+        self.window.update()
+        self.assertEqual(datetime(2018, 11, 21).strftime('%x'), var.get())
+        self.assertEqual(datetime(2018, 11, 21).strftime('%x'), widget.get_date())
+        widget.selection_set(None)
+        self.window.update()
+        self.assertEqual('', widget.get_date())
+        self.assertEqual('', var.get())
+        var.set(datetime(2014, 3, 2).strftime('%x'))
+        self.window.update()
+        self.assertEqual(datetime(2014, 3, 2), widget.selection_get())
+        self.assertEqual(datetime(2014, 3, 2).strftime('%x'), var.get())
+        self.assertEqual(datetime(2014, 3, 2).strftime('%x'), widget.get_date())
+        var.set('a')
+        self.window.update()
+        self.assertEqual(datetime(2014, 3, 2), widget.selection_get())
+        self.assertEqual(datetime(2014, 3, 2).strftime('%x'), var.get())
+        self.assertEqual(datetime(2014, 3, 2).strftime('%x'), widget.get_date())
+        var.set('')
+        self.window.update()
+        self.assertIsNone(widget.selection_get())
+        self.assertEqual('', var.get())
+        self.assertEqual('', widget.get_date())
+
     def test_calendar_get_set(self):
         widget = Calendar(self.window, foreground="red")
         widget.pack()
@@ -142,6 +174,7 @@ class TestCalendar(BaseWidgetTest):
                    'font',
                    'borderwidth',
                    'selectmode',
+                   'textvariable',
                    'locale',
                    'selectbackground',
                    'selectforeground',
@@ -191,10 +224,10 @@ class TestCalendar(BaseWidgetTest):
             widget.config(locale="en_US.UTF-8")
         with self.assertRaises(AttributeError):
             widget.config(test="test")
-        dic = {op: "yellow" for op in options[5:]}
+        dic = {op: "yellow" for op in options[6:]}
         widget.configure(**dic)
         self.window.update()
-        for op in options[5:]:
+        for op in options[6:]:
             self.assertEqual(widget.cget(op), "yellow")
 
 
