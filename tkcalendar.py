@@ -2,7 +2,9 @@
 """
 tkcalendar - Calendar and DateEntry widgets for Tkinter
 Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
-Copyright 2018 Neal Probert (https://github.com/nprobert)
+with contributions from:
+  - Neal Probert (https://github.com/nprobert)
+  - arahorn28 (https://github.com/arahorn28)
 
 tkcalendar is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 tkcalendar module providing Calendar and DateEntry widgets
 """
+# TODO: disabled mode for calendar
 
 import calendar
 import locale
