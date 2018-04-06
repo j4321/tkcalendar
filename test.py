@@ -119,19 +119,21 @@ class TestCalendar(BaseWidgetTest):
         widget._next_year()
         widget._remove_selection()
         widget.selection_set(datetime(2018, 12, 31).strftime('%x'))
-        self.assertEqual(widget.selection_get(), datetime(2018, 12, 31))
+        self.assertEqual(widget.selection_get(), date(2018, 12, 31))
         with self.assertRaises(ValueError):
             widget.selection_set("ab")
         widget.selection_set(None)
         self.assertIsNone(widget.selection_get())
-        widget.selection_set(datetime(2015, 12, 31))
-        self.assertEqual(widget.selection_get(), datetime(2015, 12, 31))
+        widget.selection_set(date(2015, 12, 31))
+        self.assertEqual(widget.selection_get(), date(2015, 12, 31))
 
         widget.config(selectmode='none')
         self.assertIsNone(widget.selection_get())
-
+        widget.config(selectmode='day')
         l = ttk.Label(widget, text="12")
         widget._on_click(TestEvent(widget=l))
+        self.window.update()
+        self.assertEqual(widget.selection_get(), date(2015, 12, 12))
 
     def test_calendar_textvariable(self):
         var = tk.StringVar(self.window,)
@@ -178,11 +180,14 @@ class TestCalendar(BaseWidgetTest):
         options = ['cursor',
                    'font',
                    'borderwidth',
+                   'state',
                    'selectmode',
                    'textvariable',
                    'locale',
                    'selectbackground',
                    'selectforeground',
+                   'disabledselectbackground',
+                   'disabledselectforeground',
                    'normalbackground',
                    'normalforeground',
                    'background',
@@ -225,14 +230,17 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget["selectmode"], "day")
         with self.assertRaises(ValueError):
             widget.config(selectmode="a")
+        self.assertEqual(widget.cget('state'), tk.NORMAL)
+        with self.assertRaises(ValueError):
+            widget.config(state="test")
         with self.assertRaises(AttributeError):
             widget.config(locale="en_US.UTF-8")
         with self.assertRaises(AttributeError):
             widget.config(test="test")
-        dic = {op: "yellow" for op in options[6:]}
+        dic = {op: "yellow" for op in options[7:]}
         widget.configure(**dic)
         self.window.update()
-        for op in options[6:]:
+        for op in options[7:]:
             self.assertEqual(widget.cget(op), "yellow")
 
 
@@ -250,8 +258,6 @@ class TestDateEntry(BaseWidgetTest):
 
     def test_dateentry_drop_down(self):
         """Check whether drop down opens on click."""
-        #style = ttk.Style(self.window)
-        #style.theme_use('clam')
         widget = DateEntry(self.window)
         widget.pack()
         self.window.update()
@@ -310,17 +316,17 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
 
         widget.set_date(datetime(2018, 12, 31).strftime('%x'))
-        self.assertEqual(widget.get_date(), datetime(2018, 12, 31))
+        self.assertEqual(widget.get_date(), date(2018, 12, 31))
         with self.assertRaises(ValueError):
             widget.set_date("ab")
         widget.set_date(datetime(2015, 12, 31))
-        self.assertEqual(widget.get_date(), datetime(2015, 12, 31))
+        self.assertEqual(widget.get_date(), date(2015, 12, 31))
         self.assertEqual(widget.get(), datetime(2015, 12, 31).strftime("%x"))
 
         widget.delete(0, "end")
         widget.insert(0, "abc")
         self.window.focus_force()
-        self.assertEqual(widget.get_date(), datetime(2015, 12, 31))
+        self.assertEqual(widget.get_date(), date(2015, 12, 31))
 
         widget._on_motion(TestEvent(x=10, y=20))
         widget._on_b1_press(TestEvent(x=10, y=20))

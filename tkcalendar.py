@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 tkcalendar module providing Calendar and DateEntry widgets
 """
-# TODO: disabled mode for calendar
+
 
 import calendar
 import locale
@@ -653,7 +653,7 @@ class Calendar(ttk.Frame):
                     self._sel_date = date
                 else:
                     try:
-                        self._sel_date = self.strptime(date, "%x")
+                        self._sel_date = self.strptime(date, "%x").date()
                     except Exception as e:
                         raise type(e)("%r is not a valid date." % date)
                 if self._textvariable is not None:
@@ -896,7 +896,7 @@ class DateEntry(ttk.Entry):
     def _validate_date(self):
         """Date entry validation: only dates in locale '%x' format are accepted."""
         try:
-            self._date = self._calendar.strptime(self.get(), '%x')
+            self._date = self._calendar.strptime(self.get(), '%x').date()
             return True
         except ValueError:
             self._set_text(self._date.strftime('%x'))
@@ -1020,10 +1020,10 @@ class DateEntry(ttk.Entry):
         self._set_text(txt)
 
     def get_date(self):
-        """Return the content of the dateentry as a datetime.datetime instance."""
+        """Return the content of the dateentry as a datetime.date instance."""
         self._validate_date()
         date = self.get()
-        return self._calendar.strptime(date, '%x')
+        return self._calendar.strptime(date, '%x').date()
 
 
 if __name__ == "__main__":
@@ -1035,7 +1035,7 @@ if __name__ == "__main__":
         top = tk.Toplevel(root)
         top.grab_set()
 
-        cal = Calendar(top, font="Arial 14", selectmode='day', state='disabled',
+        cal = Calendar(top, font="Arial 14", selectmode='day',
                        cursor="hand1", year=2018, month=2, day=5)
 
         cal.pack(fill="both", expand=True)

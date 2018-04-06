@@ -56,6 +56,8 @@ Documentation
 
         borderwidth: width of the border around the calendar (integer)
 
+        state: normal or disabled (unresponsive widget)
+
     * Widget-Specific Options
 
         year, month: initially displayed month, default is current month
@@ -77,6 +79,10 @@ Documentation
         selectbackground: selected day background color
 
         selectforeground: selected day foreground color
+
+        disabledselectbackground: selected day background color in disabled state
+
+        disabledselectforeground: selected day foreground color in disabled state
 
         normalbackground: normal week days background color
 
@@ -135,7 +141,9 @@ Changelog
 
 - tkcalendar 1.2.0
 
-    * Add textvariable option
+    * Add textvariable option to Calendar
+    * Add state ('normal' or 'disabled') option to Calendar
+    * Fix DateEntry behavior in readonly mode
 
 - tkcalendar 1.1.5
 
