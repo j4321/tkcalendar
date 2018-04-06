@@ -129,8 +129,17 @@ class TestCalendar(BaseWidgetTest):
 
         widget.config(selectmode='none')
         self.assertIsNone(widget.selection_get())
+        l = ttk.Label(widget, text="12")
+        widget._on_click(TestEvent(widget=l))
+        self.assertIsNone(widget.selection_get())
+        self.window.update()
         widget.config(selectmode='day')
         l = ttk.Label(widget, text="12")
+        widget._on_click(TestEvent(widget=l))
+        self.window.update()
+        self.assertEqual(widget.selection_get(), date(2015, 12, 12))
+        widget.config(state='disabled')
+        l = ttk.Label(widget, text="14")
         widget._on_click(TestEvent(widget=l))
         self.window.update()
         self.assertEqual(widget.selection_get(), date(2015, 12, 12))
@@ -200,7 +209,9 @@ class TestCalendar(BaseWidgetTest):
                    'weekendbackground',
                    'weekendforeground',
                    'headersbackground',
-                   'headersforeground']
+                   'headersforeground',
+                   'disableddaybackground',
+                   'disableddayforeground']
         self.assertEqual(sorted(widget.keys()), sorted(options))
 
         with self.assertRaises(AttributeError):

@@ -76,33 +76,47 @@ Documentation
 
         bordercolor: day border color
 
-        selectbackground: selected day background color
+        background: background color of calendar border and month/year name
 
-        selectforeground: selected day foreground color
+        foreground: foreground color of month/year name
 
-        disabledselectbackground: selected day background color in disabled state
+        bordercolor: day border color
 
-        disabledselectforeground: selected day foreground color in disabled state
+        selectbackground: background color of selected day
 
-        normalbackground: normal week days background color
+        selectforeground: foreground color of selected day
 
-        normalforeground: normal week days foreground color
+        disabledselectbackground: background color of selected day in disabled state
 
-        othermonthforeground: foreground color for normal week days belonging to the previous/next month
+        disabledselectforeground: foreground color of selected day in disabled state
 
-        othermonthbackground: background color for normal week days belonging to the previous/next month
+        normalbackground: background color of normal week days
 
-        othermonthweforeground: foreground color for week-end days belonging to the previous/next month
+        normalforeground: foreground color of normal week days
 
-        othermonthwebackground: background color for week-end days belonging to the previous/next month
+        othermonthforeground: foreground color of normal week days
+                              belonging to the previous/next month
 
-        weekendbackground: week-end days background color
+        othermonthbackground: background color of normal week days
+                              belonging to the previous/next month
 
-        weekendforeground: week-end days foreground color
+        othermonthweforeground: foreground color of week-end days
+                                belonging to the previous/next month
 
-        headersbackground: day names and week numbers background color
+        othermonthwebackground: background color of week-end days
+                                belonging to the previous/next month
 
-        headersforeground: day names and week numbers foreground color
+        weekendbackground: background color of week-end days
+
+        weekendforeground: foreground color of week-end days
+
+        headersbackground: background color of day names and week numbers
+
+        headersforeground: foreground color of day names and week numbers
+
+        disableddaybackground: background color of days in disabled state
+
+        disableddayforeground: foreground color of days in disabled state
 
 
     * Virtual Events
@@ -143,6 +157,9 @@ Changelog
 
     * Add textvariable option to Calendar
     * Add state ('normal' or 'disabled') option to Calendar
+    * Add options disabledselectbackground, disabledselectforeground,
+      disableddaybackground and disableddayforeground to configure colors
+      when Calendar is disabled
     * Fix DateEntry behavior in readonly mode
 
 - tkcalendar 1.1.5
