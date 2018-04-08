@@ -161,6 +161,7 @@ Changelog
       disableddaybackground and disableddayforeground to configure colors
       when Calendar is disabled
     * Fix DateEntry behavior in readonly mode
+    * Make Calendar.selection_get always return a datetime.date 
 
 - tkcalendar 1.1.5
 
