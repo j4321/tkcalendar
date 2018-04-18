@@ -835,12 +835,20 @@ class DateEntry(ttk.Entry):
         self.style.layout('DateEntry', self.style.layout('TCombobox'))
         fieldbg = self.style.map('TCombobox', 'fieldbackground')
         self.style.map('DateEntry', fieldbackground=fieldbg)
-        self.after_cancel(self._determine_bbox_after_id)
+        try:
+            self.after_cancel(self._determine_bbox_after_id)
+        except ValueError:
+            # nothing to cancel
+            pass
         self._determine_bbox_after_id = self.after(10, self._determine_bbox)
 
     def _determine_bbox(self, event=None):
         """Determine downarrow button bbox."""
-        self.after_cancel(self._determine_bbox_after_id)
+        try:
+            self.after_cancel(self._determine_bbox_after_id)
+        except ValueError:
+            # nothing to cancel
+            pass
         if self.winfo_ismapped():
             self.update_idletasks()
             h = self.winfo_height()
@@ -944,7 +952,11 @@ class DateEntry(ttk.Entry):
             self.state(('readonly',))
 
     def destroy(self):
-        self.after_cancel(self._determine_bbox_after_id)
+        try:
+            self.after_cancel(self._determine_bbox_after_id)
+        except ValueError:
+            # nothing to cancel
+            pass
         ttk.Entry.destroy(self)
 
     def drop_down(self):
