@@ -153,6 +153,9 @@ Documentation
 Changelog
 ---------
 
+- tkcalendar 1.2.1
+    * Fix `ValueError` in `DateEntry` with Python 3.6.5
+
 - tkcalendar 1.2.0
 
     * Add textvariable option to Calendar
@@ -161,7 +164,7 @@ Changelog
       disableddaybackground and disableddayforeground to configure colors
       when Calendar is disabled
     * Fix DateEntry behavior in readonly mode
-    * Make Calendar.selection_get always return a datetime.date 
+    * Make Calendar.selection_get always return a datetime.date
 
 - tkcalendar 1.1.5
 
