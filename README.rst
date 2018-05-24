@@ -60,7 +60,9 @@ Calendar widget
 
     * Widget-Specific Options
 
-        **year*, month: initially displayed month, default is current month
+        **year**:  initially displayed year, default is current year
+        
+        **month**: initially displayed month, default is current month
 
         **day**: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
