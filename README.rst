@@ -50,69 +50,69 @@ Documentation
 
     * Standard options
 
-        cursor: cursor to display when the pointer is in the widget
+        *cursor*: cursor to display when the pointer is in the widget
 
-        font: font of the calendar, can be a string such as "Arial 20 bold" or a Tkinter Font instance
+        *font*: font of the calendar, can be a string such as "Arial 20 bold" or a Tkinter Font instance
 
-        borderwidth: width of the border around the calendar (integer)
+        *borderwidth*: width of the border around the calendar (integer)
 
-        state: normal or disabled (unresponsive widget)
+        *state*: normal or disabled (unresponsive widget)
 
     * Widget-Specific Options
 
-        year, month: initially displayed month, default is current month
+        *year*, month: initially displayed month, default is current month
 
-        day: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
+        *day*: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
-        locale: locale to use, e.g. "fr_FR" for a French calendar
+        *locale*: locale to use, e.g. "fr_FR" for a French calendar
 
-        selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
+        *selectmode*: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
-        textvariable: StringVar that will contain the currently selected date as str
+        *textvariable*: StringVar that will contain the currently selected date as str
 
-        background: calendar border and month/year name background color
+        *background*: calendar border and month/year name background color
 
-        foreground: month/year name foreground color
+        *foreground*: month/year name foreground color
 
-        bordercolor: day border color
+        *bordercolor*: day border color
 
-        background: background color of calendar border and month/year name
+        *background*: background color of calendar border and month/year name
 
-        foreground: foreground color of month/year name
+        *foreground*: foreground color of month/year name
 
-        bordercolor: day border color
+        *bordercolor*: day border color
 
-        selectbackground: background color of selected day
+        *selectbackground*: background color of selected day
 
-        selectforeground: foreground color of selected day
+        *selectforeground*: foreground color of selected day
 
-        disabledselectbackground: background color of selected day in disabled state
+        *disabledselectbackground*: background color of selected day in disabled state
 
-        disabledselectforeground: foreground color of selected day in disabled state
+        *disabledselectforeground*: foreground color of selected day in disabled state
 
-        normalbackground: background color of normal week days
+        *normalbackground*: background color of normal week days
 
-        normalforeground: foreground color of normal week days
+        *normalforeground*: foreground color of normal week days
 
-        othermonthforeground: foreground color of normal week days belonging to the previous/next month
+        *othermonthforeground*: foreground color of normal week days belonging to the previous/next month
 
-        othermonthbackground: background color of normal week days belonging to the previous/next month
+        *othermonthbackground*: background color of normal week days belonging to the previous/next month
 
-        othermonthweforeground: foreground color of week-end days belonging to the previous/next month
+        *othermonthweforeground*: foreground color of week-end days belonging to the previous/next month
 
-        othermonthwebackground: background color of week-end days belonging to the previous/next month
+        *othermonthwebackground*: background color of week-end days belonging to the previous/next month
 
-        weekendbackground: background color of week-end days
+        *weekendbackground*: background color of week-end days
 
-        weekendforeground: foreground color of week-end days
+        *weekendforeground*: foreground color of week-end days
 
-        headersbackground: background color of day names and week numbers
+        *headersbackground*: background color of day names and week numbers
 
-        headersforeground: foreground color of day names and week numbers
+        *headersforeground*: foreground color of day names and week numbers
 
-        disableddaybackground: background color of days in disabled state
+        *disableddaybackground*: background color of days in disabled state
 
-        disableddayforeground: foreground color of days in disabled state
+        *disableddayforeground*: foreground color of days in disabled state
 
 
     * Virtual Events
@@ -133,19 +133,19 @@ Documentation
         
             get_date()
             
-            If selectmode is `"day"`, returns the string corresponding to the selected date in the `Calendar` locale, otherwise returns `""`.
+        If selectmode is 'day', returns the string corresponding to the selected date in the ``Calendar`` locale, otherwise returns ``""``.
         
         ::    
         
             selection_get()
             
-            If selectmode is `"day"`, returns the selected date as a `datetime.date` instance, otherwise returns `None`.
+        If selectmode is 'day', returns the selected date as a ``datetime.date`` instance, otherwise returns ``None``.
             
         ::
         
             selection_set(self, date):
             
-            If selectmode is `"day"`, sets the selection to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale. Does nothing if selectmode is `"none"`.
+        If selectmode is 'day', sets the selection to *date* where date can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
             
 
 * DateEntry widget
@@ -179,7 +179,7 @@ Documentation
         
         The methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
         
-        The methods of the `Entry` widget (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html)
+        The methods of the ``Entry`` widget (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html)
     
     * Widget-Specific methods:
         
@@ -191,19 +191,20 @@ Documentation
         ::    
             get_date()
             
-            Returns the selected date as a `datetime.date` instance.
+            Returns the selected date as a ``datetime.date`` instance.
             
         ::
             set_date(self, date):
             
-            Sets the value of the DateEntry to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
+            Sets the value of the DateEntry to *date* where date can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
 ---------
 
 - tkcalendar 1.2.1
-    * Fix `ValueError` in `DateEntry` with Python 3.6.5
+
+    * Fix ``ValueError`` in ``DateEntry`` with Python 3.6.5
 
 - tkcalendar 1.2.0
 
@@ -217,7 +218,7 @@ Changelog
 
 - tkcalendar 1.1.5
 
-    * Fix endless triggering of `<<ThemeChanged>>` event in `DateEntry`
+    * Fix endless triggering of ``<<ThemeChanged>>`` event in ``DateEntry``
 
 - tkcalendar 1.1.4
 
