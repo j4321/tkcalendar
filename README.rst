@@ -30,9 +30,9 @@ Installation
 
 - With pip:
 
-::
+    ::
 
-    $ pip install tkcalendar
+        $ pip install tkcalendar
 
 
 Documentation
