@@ -38,7 +38,7 @@ Installation
 Documentation
 -------------
 
-* Calendar widget
+Calendar widget
 
     Syntax:
 
@@ -50,74 +50,74 @@ Documentation
 
     * Standard options
 
-        *cursor*: cursor to display when the pointer is in the widget
+        **cursor**: cursor to display when the pointer is in the widget
 
-        *font*: font of the calendar, can be a string such as "Arial 20 bold" or a Tkinter Font instance
+        **font**: font of the calendar, can be a string such as "Arial 20 bold" or a Tkinter Font instance
 
-        *borderwidth*: width of the border around the calendar (integer)
+        **borderwidth**: width of the border around the calendar (integer)
 
-        *state*: normal or disabled (unresponsive widget)
+        **state**: normal or disabled (unresponsive widget)
 
     * Widget-Specific Options
 
-        *year*, month: initially displayed month, default is current month
+        **year*, month: initially displayed month, default is current month
 
-        *day*: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
+        **day**: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
-        *locale*: locale to use, e.g. "fr_FR" for a French calendar
+        **locale**: locale to use, e.g. "fr_FR" for a French calendar
 
-        *selectmode*: "none" or "day" (default) define whether the user can change the selected day with a mouse click
+        **selectmode**: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
-        *textvariable*: StringVar that will contain the currently selected date as str
+        **textvariable**: StringVar that will contain the currently selected date as str
 
-        *background*: calendar border and month/year name background color
+        **background**: calendar border and month/year name background color
 
-        *foreground*: month/year name foreground color
+        **foreground**: month/year name foreground color
 
-        *bordercolor*: day border color
+        **bordercolor**: day border color
 
-        *background*: background color of calendar border and month/year name
+        **background**: background color of calendar border and month/year name
 
-        *foreground*: foreground color of month/year name
+        **foreground**: foreground color of month/year name
 
-        *bordercolor*: day border color
+        **bordercolor**: day border color
 
-        *selectbackground*: background color of selected day
+        **selectbackground**: background color of selected day
 
-        *selectforeground*: foreground color of selected day
+        **selectforeground**: foreground color of selected day
 
-        *disabledselectbackground*: background color of selected day in disabled state
+        **disabledselectbackground**: background color of selected day in disabled state
 
-        *disabledselectforeground*: foreground color of selected day in disabled state
+        **disabledselectforeground**: foreground color of selected day in disabled state
 
-        *normalbackground*: background color of normal week days
+        **normalbackground**: background color of normal week days
 
-        *normalforeground*: foreground color of normal week days
+        **normalforeground**: foreground color of normal week days
 
-        *othermonthforeground*: foreground color of normal week days belonging to the previous/next month
+        **othermonthforeground**: foreground color of normal week days belonging to the previous/next month
 
-        *othermonthbackground*: background color of normal week days belonging to the previous/next month
+        **othermonthbackground**: background color of normal week days belonging to the previous/next month
 
-        *othermonthweforeground*: foreground color of week-end days belonging to the previous/next month
+        **othermonthweforeground**: foreground color of week-end days belonging to the previous/next month
 
-        *othermonthwebackground*: background color of week-end days belonging to the previous/next month
+        **othermonthwebackground**: background color of week-end days belonging to the previous/next month
 
-        *weekendbackground*: background color of week-end days
+        **weekendbackground**: background color of week-end days
 
-        *weekendforeground*: foreground color of week-end days
+        **weekendforeground**: foreground color of week-end days
 
-        *headersbackground*: background color of day names and week numbers
+        **headersbackground**: background color of day names and week numbers
 
-        *headersforeground*: foreground color of day names and week numbers
+        **headersforeground**: foreground color of day names and week numbers
 
-        *disableddaybackground*: background color of days in disabled state
+        **disableddaybackground**: background color of days in disabled state
 
-        *disableddayforeground*: foreground color of days in disabled state
+        **disableddayforeground**: foreground color of days in disabled state
 
 
     * Virtual Events
 
-        A `<<CalendarSelected>>` event is generated each time the user selects a day with the mouse.
+        A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
 
     Widget methods:
     
@@ -161,9 +161,9 @@ Documentation
 
     Widget keyword options:
 
-    * Keyword options of Calendar to configure the drop-down calendar
+    * Keyword options of ``Calendar`` to configure the drop-down calendar
 
-    * Keyword options of ttk.Entry
+    * Keyword options of ``ttk.Entry``
 
         By default, 'validate' is set to 'focusout' and 'validatecommand' is configured so that each time the widget looses focus, if the content is not a valid date (in locale format '%x'), it is reset to the previous valid date.
 
@@ -171,7 +171,7 @@ Documentation
 
     * Virtual Events
 
-        A <<DateEntrySelected>> event is generated each time the user selects a date.
+        A ``<<DateEntrySelected>>`` event is generated each time the user selects a date.
         
     * Standard methods:
         
@@ -183,28 +183,23 @@ Documentation
     
     * Widget-Specific methods:
         
-        ::
-            drop_down()
-            
-            Displays or withdraws the drop-down calendar depending on its current state.
+        ``drop_down()``
+        Displays or withdraws the drop-down calendar depending on its current state.
         
-        ::    
-            get_date()
+        ``get_date()``
+        Returns the selected date as a ``datetime.date`` instance.
             
-            Returns the selected date as a ``datetime.date`` instance.
-            
-        ::
-            set_date(self, date):
-            
-            Sets the value of the DateEntry to *date* where date can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
+        ``set_date(self, date)``
+        Sets the value of the DateEntry to *date* where date can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
 ---------
 
+
 - tkcalendar 1.2.1
 
-    * Fix ``ValueError`` in ``DateEntry`` with Python 3.6.5
+    * Fix ``ValueError`` in DateEntry with Python 3.6.5
 
 - tkcalendar 1.2.0
 
@@ -218,7 +213,7 @@ Changelog
 
 - tkcalendar 1.1.5
 
-    * Fix endless triggering of ``<<ThemeChanged>>`` event in ``DateEntry``
+    * Fix endless triggering of ``<<ThemeChanged>>`` event in DateEntry
 
 - tkcalendar 1.1.4
 
