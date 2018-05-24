@@ -123,6 +123,32 @@ Documentation
 
         A `<<CalendarSelected>>` event is generated each time the user selects a day with the mouse.
 
+    Widget methods:
+    
+    * Standard methods:
+        
+        The methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
+        
+        The methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
+    
+    * Widget-Specific methods:
+        
+        ::
+            get_date()
+            
+            If selectmode is `"day"`, returns the string corresponding to the selected date in the `Calendar` locale, otherwise returns `""`.
+        
+        ::    
+            selection_get()
+            
+            If selectmode is `"day"`, returns the selected date as a `datetime.date` instance, otherwise returns `None`.
+            
+        ::
+            selection_set(self, date):
+            
+            If selectmode is `"day"`, sets the selection to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"`
+            in the `Calendar` locale. Does nothing if selectmode is `"none"`.
+            
 
 * DateEntry widget
 
@@ -148,6 +174,32 @@ Documentation
     * Virtual Events
 
         A <<DateEntrySelected>> event is generated each time the user selects a date.
+        
+    * Standard methods:
+        
+        The methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
+        
+        The methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
+        
+        The methods of the `Entry` widget (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html)
+    
+    * Widget-Specific methods:
+        
+        ::
+            drop_down()
+            
+            Displays or withdraws the drop-down calendar depending on its current state.
+        
+        ::    
+            get_date()
+            
+            Returns the selected date as a `datetime.date` instance.
+            
+        ::
+            set_date(self, date):
+            
+            Sets the value of the DateEntry to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"`
+            in the `Calendar` locale.
 
 
 Changelog

@@ -1035,7 +1035,7 @@ class DateEntry(ttk.Entry):
 
     def set_date(self, date):
         """
-        Set the value of the dateentry to date.
+        Set the value of the DateEntry to date.
 
         date can be a datetime.date, a datetime.datetime or a string
         in locale '%x' format.
@@ -1051,7 +1051,7 @@ class DateEntry(ttk.Entry):
         self._set_text(txt)
 
     def get_date(self):
-        """Return the content of the dateentry as a datetime.date instance."""
+        """Return the content of the DateEntry as a datetime.date instance."""
         self._validate_date()
         date = self.get()
         return self._calendar.strptime(date, '%x').date()
