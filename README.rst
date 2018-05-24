@@ -131,11 +131,11 @@ Calendar widget
     
     * Widget-Specific methods:
         
-        - ``get_date()`` If selectmode is 'day', returns the string corresponding to the selected date in the ``Calendar`` locale, otherwise returns ``""``.
+        **get_date()**: If selectmode is 'day', returns the string corresponding to the selected date in the ``Calendar`` locale, otherwise returns ``""``.
         
-        - ``selection_get()`` If selectmode is 'day', returns the selected date as a ``datetime.date`` instance, otherwise returns ``None``.
+        **selection_get()**: If selectmode is 'day', returns the selected date as a ``datetime.date`` instance, otherwise returns ``None``.
             
-        - ``selection_set(self, date)`` If selectmode is 'day', sets the selection to *date* where date can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
+        **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where date can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
             
 
 * DateEntry widget
@@ -173,11 +173,11 @@ Calendar widget
     
     * Widget-Specific methods:
         
-        - ``drop_down()`` Displays or withdraws the drop-down calendar depending on its current state.
+        **drop_down()**: Displays or withdraws the drop-down calendar depending on its current state.
         
-        - ``get_date()`` Returns the selected date as a ``datetime.date`` instance.
+        **get_date()**: Returns the selected date as a ``datetime.date`` instance.
             
-        - ``set_date(self, date)`` Sets the value of the DateEntry to *date* where date can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
+        **set_date(self, date)**: Sets the value of the DateEntry to *date* where date can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
