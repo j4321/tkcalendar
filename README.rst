@@ -135,7 +135,7 @@ Calendar widget
         
         **selection_get()**: If selectmode is 'day', returns the selected date as a ``datetime.date`` instance, otherwise returns ``None``.
             
-        **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where date can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
+        **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
             
 
 DateEntry widget
@@ -163,6 +163,8 @@ DateEntry widget
 
         A ``<<DateEntrySelected>>`` event is generated each time the user selects a date.
         
+    Widget methods:
+        
     * Standard methods:
         
         - The methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
@@ -177,7 +179,7 @@ DateEntry widget
         
         **get_date()**: Returns the selected date as a ``datetime.date`` instance.
             
-        **set_date(self, date)**: Sets the value of the DateEntry to *date* where date can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
+        **set_date(self, date)**: Sets the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
