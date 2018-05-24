@@ -138,7 +138,7 @@ Calendar widget
         **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where date can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
             
 
-* DateEntry widget
+DateEntry widget
 
     Date selection entry with drop-down calendar.
 
