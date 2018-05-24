@@ -94,17 +94,13 @@ Documentation
 
         normalforeground: foreground color of normal week days
 
-        othermonthforeground: foreground color of normal week days
-                              belonging to the previous/next month
+        othermonthforeground: foreground color of normal week days belonging to the previous/next month
 
-        othermonthbackground: background color of normal week days
-                              belonging to the previous/next month
+        othermonthbackground: background color of normal week days belonging to the previous/next month
 
-        othermonthweforeground: foreground color of week-end days
-                                belonging to the previous/next month
+        othermonthweforeground: foreground color of week-end days belonging to the previous/next month
 
-        othermonthwebackground: background color of week-end days
-                                belonging to the previous/next month
+        othermonthwebackground: background color of week-end days belonging to the previous/next month
 
         weekendbackground: background color of week-end days
 
@@ -134,20 +130,22 @@ Documentation
     * Widget-Specific methods:
         
         ::
+        
             get_date()
             
             If selectmode is `"day"`, returns the string corresponding to the selected date in the `Calendar` locale, otherwise returns `""`.
         
         ::    
+        
             selection_get()
             
             If selectmode is `"day"`, returns the selected date as a `datetime.date` instance, otherwise returns `None`.
             
         ::
+        
             selection_set(self, date):
             
-            If selectmode is `"day"`, sets the selection to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"`
-            in the `Calendar` locale. Does nothing if selectmode is `"none"`.
+            If selectmode is `"day"`, sets the selection to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale. Does nothing if selectmode is `"none"`.
             
 
 * DateEntry widget
@@ -198,8 +196,7 @@ Documentation
         ::
             set_date(self, date):
             
-            Sets the value of the DateEntry to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"`
-            in the `Calendar` locale.
+            Sets the value of the DateEntry to *date* where date can be either a `datetime.date` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
