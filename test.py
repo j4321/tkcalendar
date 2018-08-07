@@ -62,7 +62,7 @@ class TestEvent:
 class TestCalendar(BaseWidgetTest):
     def test_calendar_init(self):
         if platform != 'linux':
-            raise ValueError("%s" % locale.getdefaultlocale())
+            raise ValueError(str(locale.getdefaultlocale()))
         widget = Calendar(self.window)
         widget.pack()
         self.window.update()
