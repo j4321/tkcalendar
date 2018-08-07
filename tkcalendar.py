@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 tkcalendar module providing Calendar and DateEntry widgets
 """
 # TODO: custom first week day?
-# TODO: check locale in windows
+# TODO: fix locale in windows
 
 
 import calendar

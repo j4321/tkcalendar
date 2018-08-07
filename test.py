@@ -22,7 +22,8 @@ Test
 
 import unittest
 from tkcalendar import Calendar, DateEntry
-from datetime import datetime, date
+from datetime import date
+from babel.dates import format_date, parse_date
 import locale
 try:
     import Tkinter as tk
@@ -118,7 +119,7 @@ class TestCalendar(BaseWidgetTest):
         widget._prev_year()
         widget._next_year()
         widget._remove_selection()
-        widget.selection_set(datetime(2018, 12, 31).strftime('%x'))
+        widget.selection_set(format_date(date(2018, 12, 31), 'short'))
         self.assertEqual(widget.selection_get(), date(2018, 12, 31))
         with self.assertRaises(ValueError):
             widget.selection_set("ab")
@@ -150,21 +151,21 @@ class TestCalendar(BaseWidgetTest):
                           year=2015, month=1, day=3, textvariable=var)
         widget.pack()
         self.window.update()
-        self.assertEqual(date(2015, 1, 3).strftime('%x'), var.get())
-        self.assertEqual(date(2015, 1, 3).strftime('%x'), widget.get_date())
+        self.assertEqual(format_date(date(2015, 1, 3), 'short'), var.get())
+        self.assertEqual(format_date(date(2015, 1, 3), 'short'), widget.get_date())
         widget.selection_set(date(2018, 11, 21))
         self.window.update()
-        self.assertEqual(date(2018, 11, 21).strftime('%x'), var.get())
-        self.assertEqual(date(2018, 11, 21).strftime('%x'), widget.get_date())
+        self.assertEqual(format_date(date(2018, 11, 21), 'short'), var.get())
+        self.assertEqual(format_date(date(2018, 11, 21), 'short'), widget.get_date())
         widget.selection_set(None)
         self.window.update()
         self.assertEqual('', widget.get_date())
         self.assertEqual('', var.get())
-        var.set(datetime(2014, 3, 2).strftime('%x'))
+        var.set(format_date(date(2014, 3, 2), 'short'))
         self.window.update()
         self.assertEqual(date(2014, 3, 2), widget.selection_get())
-        self.assertEqual(date(2014, 3, 2).strftime('%x'), var.get())
-        self.assertEqual(date(2014, 3, 2).strftime('%x'), widget.get_date())
+        self.assertEqual(format_date(date(2014, 3, 2), 'short'), var.get())
+        self.assertEqual(format_date(date(2014, 3, 2), 'short'), widget.get_date())
         try:
             var.set('a')
         except tk.TclError:
@@ -173,8 +174,8 @@ class TestCalendar(BaseWidgetTest):
             pass
         self.window.update()
         self.assertEqual(date(2014, 3, 2), widget.selection_get())
-        self.assertEqual(date(2014, 3, 2).strftime('%x'), var.get())
-        self.assertEqual(date(2014, 3, 2).strftime('%x'), widget.get_date())
+        self.assertEqual(format_date(date(2014, 3, 2), 'short'), var.get())
+        self.assertEqual(format_date(date(2014, 3, 2), 'short'), widget.get_date())
         var.set('')
         self.window.update()
         self.assertIsNone(widget.selection_get())
@@ -326,13 +327,13 @@ class TestDateEntry(BaseWidgetTest):
         widget.pack()
         self.window.update()
 
-        widget.set_date(datetime(2018, 12, 31).strftime('%x'))
+        widget.set_date(format_date(date(2018, 12, 31), 'short'))
         self.assertEqual(widget.get_date(), date(2018, 12, 31))
         with self.assertRaises(ValueError):
             widget.set_date("ab")
-        widget.set_date(datetime(2015, 12, 31))
+        widget.set_date(date(2015, 12, 31))
         self.assertEqual(widget.get_date(), date(2015, 12, 31))
-        self.assertEqual(widget.get(), datetime(2015, 12, 31).strftime("%x"))
+        self.assertEqual(widget.get(), format_date(date(2015, 12, 31), 'short'))
 
         widget.delete(0, "end")
         widget.insert(0, "abc")
