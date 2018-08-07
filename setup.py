@@ -30,4 +30,5 @@ setup(name='tkcalendar',
                    'Programming Language :: Python :: 3.6',
                    'Operating System :: OS Independent'],
       keywords=['tkinter', 'calendar', 'date'],
+      requires=["sys", "locale", "calendar", "tkinter", "babel"],
       py_modules=["tkcalendar"])
