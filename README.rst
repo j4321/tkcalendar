@@ -135,7 +135,7 @@ Calendar widget
 
         **selection_get()**: If selectmode is 'day', returns the selected date as a ``datetime.date`` instance, otherwise returns ``None``.
 
-        **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
+        **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
 
 
 DateEntry widget
@@ -203,7 +203,7 @@ Changelog
       disableddaybackground and disableddayforeground to configure colors
       when Calendar is disabled
     * Fix DateEntry behavior in readonly mode
-    * Make Calendar.selection_get always return a datetime.date
+    * Make Calendar.selection_get always return a ``datetime.date``
 
 - tkcalendar 1.1.5
 
