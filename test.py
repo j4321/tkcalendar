@@ -25,6 +25,7 @@ from tkcalendar import Calendar, DateEntry
 from datetime import date
 from babel.dates import format_date, parse_date
 import locale
+from sys import platform
 try:
     import Tkinter as tk
     import ttk
@@ -60,6 +61,8 @@ class TestEvent:
 
 class TestCalendar(BaseWidgetTest):
     def test_calendar_init(self):
+        if platform != 'linux':
+            raise ValueError("%s" % locale.getdefaultlocale())
         widget = Calendar(self.window)
         widget.pack()
         self.window.update()
