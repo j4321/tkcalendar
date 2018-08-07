@@ -193,6 +193,7 @@ class TestCalendar(BaseWidgetTest):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'showweeknumbers',
                    'selectbackground',
                    'selectforeground',
                    'disabledselectbackground',
