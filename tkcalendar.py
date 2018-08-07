@@ -120,15 +120,15 @@ class Calendar(ttk.Frame):
             raise ValueError('expected integer for the borderwidth option.')
 
         # --- locale
-        locale = kw.pop("locale", '.'.join(getdefaultlocale()))  # to check in windows
+        locale = kw.pop("locale", None)
         # add encoding if missing
-        if len(locale.split('.')) < 2:
+        if locale is not None and len(locale.split('.')) < 2:
             locale = '.'.join((locale, getpreferredencoding()))
 
-#        if locale is None:
-#            self._cal = calendar.TextCalendar(calendar.MONDAY)
-#        else:
-        self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
+        if locale is None:
+            self._cal = calendar.TextCalendar(calendar.MONDAY)
+        else:
+            self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
 
         # --- date
         today = self.date.today()
@@ -144,7 +144,10 @@ class Calendar(ttk.Frame):
             try:
                 self._sel_date = self.date(year, month, day)  # selected day
                 if self._textvariable is not None:
-                    self._textvariable.set(format_date(self._sel_date, 'short', locale))
+                    if locale is not None:
+                        self._textvariable.set(format_date(self._sel_date, 'short', locale))
+                    else:
+                        self._textvariable.set(format_date(self._sel_date, 'short'))
             except ValueError:
                 self._sel_date = None
 
@@ -648,11 +651,19 @@ class Calendar(ttk.Frame):
 
     def format_date(self, date=None):
         """Convert date (datetime.date) to a string in the locale (short format)."""
-        return format_date(date, 'short', self._properties['locale'])
+        locale = self._properties['locale']
+        if locale is None:
+            return format_date(date, 'short')
+        else:
+            return format_date(date, 'short', locale)
 
     def parse_date(self, date):
         """Parse string date in the locale format and return the corresponding datetime.date."""
-        return parse_date(date, self._properties['locale'])
+        locale = self._properties['locale']
+        if locale is None:
+            return parse_date(date)
+        else:
+            return parse_date(date, locale)
 
     # --- selection handling
     def selection_get(self):

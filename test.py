@@ -23,9 +23,7 @@ Test
 import unittest
 from tkcalendar import Calendar, DateEntry
 from datetime import date
-from babel.dates import format_date, parse_date
-import locale
-from sys import platform
+from babel.dates import format_date
 try:
     import Tkinter as tk
     import ttk
@@ -33,8 +31,6 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 from pynput.mouse import Controller, Button
-
-locale.setlocale(locale.LC_ALL, '')
 
 
 class BaseWidgetTest(unittest.TestCase):
@@ -61,8 +57,6 @@ class TestEvent:
 
 class TestCalendar(BaseWidgetTest):
     def test_calendar_init(self):
-        if platform != 'linux':
-            raise ValueError(str(locale.getdefaultlocale()))
         widget = Calendar(self.window)
         widget.pack()
         self.window.update()
