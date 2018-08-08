@@ -32,7 +32,7 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
-from tkcalendar.calendar import Calendar
+from tkcalendar.calendar_ import Calendar
 
 
 class DateEntry(ttk.Entry):

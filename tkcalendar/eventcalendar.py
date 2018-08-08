@@ -29,7 +29,7 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
-from tkcalendar.calendar import Calendar
+from tkcalendar.calendar_ import Calendar
 from tkcalendar.tooltip import TooltipWrapper
 import datetime
 
@@ -44,6 +44,7 @@ class EventCalendar(Calendar):
         self.style = ttk.Style(self)
 
         self.tooltip_wrapper = TooltipWrapper(self)
+        self.bind('<FocusOut>', lambda e: self.tooltip_wrapper.tooltip.withdraw())
 
     def _display_calendar(self):
         """Display the days of the current month (the one in self._date)."""
@@ -89,13 +90,43 @@ class EventCalendar(Calendar):
                 self._calendar[i_week][i_day].configure(text=txt,
                                                         style=style)
                 if cal[i_week][i_day] in self.events:
-                    self._show_event(cal[i_week][i_day], self._calendar[i_week][i_day])
+                    date = cal[i_week][i_day]
+                    label = self._calendar[i_week][i_day]
+                    last = max(self.events[date])
+                    background = self.events[date][last]['background']
+                    foreground = self.events[date][last]['foreground']
+                    self.style.configure('%s.TLabel' % label, background=background,
+                                         foreground=foreground)
+                    label.configure(style='%s.TLabel' % label)
+                    text = '\n'.join(['➢ {}'.format(ev['text']) for ev in self.events[date].values()])
+                    self.tooltip_wrapper.remove_tooltip(label)
+                    self.tooltip_wrapper.add_tooltip(label, text)
 
         self._display_selection()
 
+    def _reset_day(self, date):
+        """Restore usual week day colors."""
+        year, month = date.year, date.month
+        if year == self._date.year:
+            _, w, d = date.isocalendar()
+            wn = self._date.isocalendar()[1]
+            w -= wn
+            w %= max(52, wn)
+            if w >= 0 and w < 6:
+                self.tooltip_wrapper.remove_tooltip(self._calendar[w][d - 1])
+                if month == date.month:
+                    if d < 6:
+                        self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
+                    else:
+                        self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
+                else:
+                    if d < 6:
+                        self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
+                    else:
+                        self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+
     def _remove_selection(self):
         """Remove highlight of selected day."""
-        print(self._sel_date, self.events)
         if self._sel_date is not None:
             if self._sel_date in self.events:
                 self._show_event(self._sel_date)
@@ -118,21 +149,28 @@ class EventCalendar(Calendar):
                             else:
                                 self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
 
-    def _show_event(self, date, label):
-        last = max(self.events[date])
-        background = self.events[date][last]['background']
-        foreground = self.events[date][last]['foreground']
-        self.style.configure('%s.TLabel' % label, background=background,
-                             foreground=foreground)
-        label.configure(style='%s.TLabel' % label)
-        text = '\n'.join(['➢ {}'.format(ev['text']) for ev in self.events[date].values()])
-        self.tooltip_wrapper.remove_tooltip(label)
-        self.tooltip_wrapper.add_tooltip(label, text)
+    def _show_event(self, date):
+        if date.year == self._date.year:
+            _, w, d = date.isocalendar()
+            wn = self._date.isocalendar()[1]
+            w -= wn
+            w %= max(52, wn)
+            if w >= 0 and w < 6:
+                label = self._calendar[w][d - 1]
+                last = max(self.events[date])
+                background = self.events[date][last]['background']
+                foreground = self.events[date][last]['foreground']
+                self.style.configure('%s.TLabel' % label, background=background,
+                                     foreground=foreground)
+                label.configure(style='%s.TLabel' % label)
+                text = '\n'.join(['➢ {}'.format(ev['text']) for ev in self.events[date].values()])
+                self.tooltip_wrapper.remove_tooltip(label)
+                self.tooltip_wrapper.add_tooltip(label, text)
 
     def add_event(self, date, text, background='royal blue', foreground='white'):
         """
         Add event in calendar at given date, with given color and
-        with a tooltip displaying the text.
+        with a tooltip displaying the text. Return event id (for edit and deletion purposes).
         """
         if isinstance(date, datetime.datetime):
             date = date.date()
@@ -142,21 +180,34 @@ class EventCalendar(Calendar):
                                          'foreground': foreground}}
         else:
             self.events[date][ev_id] = {'text': text, 'background': background,
-                                         'foreground': foreground}
-        if date.year == self._date.year:
-            _, w, d = date.isocalendar()
-            wn = self._date.isocalendar()[1]
-            w -= wn
-            w %= max(52, wn)
-            if w >= 0 and w < 6:
-                label = self._calendar[w][d - 1]
-                self._show_event(date, label)
+                                        'foreground': foreground}
+        self._show_event(date)
         self._next_event_id += 1
+        return ev_id
 
     def del_event(self, date, ev_id=None):
-        pass
+        if ev_id is None:
+            del self.events[date]
+            self._reset_day(date)
+        else:
+            del self.events[date][ev_id]
+            if not self.events[date]:
+                del self.events[date]
+                self._reset_day(date)
+            else:
+                self._show_event(date)
 
-    def edit_event(self, date, ev_id):
-        pass
-
+    def edit_event(self, date, ev_id, **kw):
+        try:
+            ev = self.events[date][ev_id]
+        except KeyError:
+            raise KeyError("Event %i on the %s does not exists" % (ev_id, date))
+        else:
+            keys = set(ev.keys())
+            keys.union(set(kw.keys()))
+            if len(keys) > 3:
+                raise KeyError("Invalid keyword option, valid options are text, foreground and background.")
+            else:
+                ev.update(kw)
+                self._show_event(date)
 
