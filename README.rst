@@ -61,16 +61,18 @@ Calendar widget
     * Widget-Specific Options
 
         **year**:  initially displayed year, default is current year
-        
+
         **month**: initially displayed month, default is current month
 
         **day**: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
-        **locale**: locale to use, e.g. "fr_FR" for a French calendar
+        **locale**: locale to use, e.g. "fr_FR.utf-8" for a French calendar
 
         **selectmode**: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
         **textvariable**: StringVar that will contain the currently selected date as str
+
+        **showweeknumbers**: boolean (default is True) to show/hide week numbers
 
         **background**: calendar border and month/year name background color
 
@@ -122,21 +124,21 @@ Calendar widget
         A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
 
     Widget methods:
-    
+
     * Standard methods:
-        
+
         - The methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
-        
+
         - The methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
-    
+
     * Widget-Specific methods:
-        
+
         **get_date()**: If selectmode is 'day', returns the string corresponding to the selected date in the ``Calendar`` locale, otherwise returns ``""``.
-        
+
         **selection_get()**: If selectmode is 'day', returns the selected date as a ``datetime.date`` instance, otherwise returns ``None``.
-            
+
         **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
-            
+
 
 DateEntry widget
 
@@ -162,29 +164,33 @@ DateEntry widget
     * Virtual Events
 
         A ``<<DateEntrySelected>>`` event is generated each time the user selects a date.
-        
+
     Widget methods:
-        
+
     * Standard methods:
-        
+
         - The methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
-        
+
         - The methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
-        
+
         - The methods of the ``Entry`` widget (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html)
-    
+
     * Widget-Specific methods:
-        
+
         **drop_down()**: Displays or withdraws the drop-down calendar depending on its current state.
-        
+
         **get_date()**: Returns the selected date as a ``datetime.date`` instance.
-            
+
         **set_date(self, date)**: Sets the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
 ---------
 
+
+- tkcalendar 1.3.0
+
+    * Add option showwekknumbers to show/hide week numbers
 
 - tkcalendar 1.2.1
 
