@@ -23,7 +23,7 @@ Test
 import unittest
 from tkcalendar import Calendar, DateEntry
 from datetime import date
-from babel.dates import format_date
+import babel.dates
 try:
     import Tkinter as tk
     import ttk
@@ -31,6 +31,11 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 from pynput.mouse import Controller, Button
+from locale import getdefaultlocale
+
+
+def format_date(date, length):
+    return babel.dates.format_date(date, length, locale=getdefaultlocale()[0])
 
 
 class BaseWidgetTest(unittest.TestCase):
