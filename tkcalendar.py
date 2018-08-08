@@ -23,12 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 tkcalendar module providing Calendar and DateEntry widgets
 """
 # TODO: custom first week day?
-# TODO: fix locale in windows
 
 
 import calendar
-from babel.dates import format_date, parse_date
-from locale import getdefaultlocale, getpreferredencoding
+from babel.dates import format_date, parse_date, get_day_names, get_month_names
 from sys import platform
 try:
     import tkinter as tk
@@ -38,6 +36,7 @@ except ImportError:
     import Tkinter as tk
     import ttk
     from tkFont import Font
+from locale import getdefaultlocale
 
 
 class Calendar(ttk.Frame):
@@ -60,7 +59,7 @@ class Calendar(ttk.Frame):
             year, month: initially displayed month, default is current month
             day: initially selected day, if month or year is given but not
                 day, no initial selection, otherwise, default is today
-            locale: locale to use, e.g. 'fr_FR.utf-8'
+            locale: locale to use, e.g. 'fr_FR'
                     (the locale needs to be installed, otherwise it will
                      raise 'locale.Error: unsupported locale setting')
             selectmode: "none" or "day" (default) define whether the user
@@ -120,15 +119,11 @@ class Calendar(ttk.Frame):
             raise ValueError('expected integer for the borderwidth option.')
 
         # --- locale
-        locale = kw.pop("locale", None)
-        # add encoding if missing
-        if locale is not None and len(locale.split('.')) < 2:
-            locale = '.'.join((locale, getpreferredencoding()))
+        locale = kw.pop("locale", getdefaultlocale()[0])
+        self._day_names = get_day_names('abbreviated', locale=locale)
+        self._month_names = get_month_names('wide', locale=locale)
 
-        if locale is None:
-            self._cal = calendar.TextCalendar(calendar.MONDAY)
-        else:
-            self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
+        self._cal = calendar.TextCalendar(calendar.MONDAY)
 
         # --- date
         today = self.date.today()
@@ -267,7 +262,8 @@ class Calendar(ttk.Frame):
                                                                         column=0,
                                                                         sticky="eswn")
 
-        for i, d in enumerate(self._cal.formatweekheader(3).split()):
+        for i in range(7):
+            d = self._day_names[i]
             self._cal_frame.columnconfigure(i + 1, weight=1)
             ttk.Label(self._cal_frame,
                       font=self._font,
@@ -525,7 +521,7 @@ class Calendar(ttk.Frame):
         year, month = self._date.year, self._date.month
 
         # update header text (Month, Year)
-        header = self._cal.formatmonthname(year, month, 0, False)
+        header = self._month_names[month]
         self._header_month.configure(text=header.title())
         self._header_year.configure(text=str(year))
 
@@ -1091,8 +1087,7 @@ if __name__ == "__main__":
         top = tk.Toplevel(root)
 
         cal = Calendar(top, font="Arial 14", selectmode='day',
-                       cursor="hand1", year=2018, month=2, day=5,
-                       locale='it_IT')
+                       cursor="hand1", year=2018, month=2, day=5)
 
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="ok", command=print_sel).pack()
@@ -1102,7 +1097,7 @@ if __name__ == "__main__":
 
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
-        cal = DateEntry(top, width=12, background='darkblue',
+        cal = DateEntry(top, width=12, background='darkblue', locale='de_DE',
                         foreground='white', borderwidth=2, year=2010)
         cal.pack(padx=10, pady=10)
 

@@ -24,7 +24,6 @@ import unittest
 from tkcalendar import Calendar, DateEntry
 from datetime import date
 from babel.dates import format_date
-import locale
 try:
     import Tkinter as tk
     import ttk
@@ -32,8 +31,6 @@ except ImportError:
     import tkinter as tk
     from tkinter import ttk
 from pynput.mouse import Controller, Button
-
-locale.setlocale(locale.LC_ALL, '')
 
 
 class BaseWidgetTest(unittest.TestCase):
