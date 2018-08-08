@@ -20,14 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Tooltip and TooltipWrapper
 """
 
+try:
+    import tkinter as tk
+    from tkinter import ttk
+except ImportError:
+    import Tkinter as tk
+    import ttk
 
-from tkinter import Toplevel
-from tkinter.ttk import Label, Style
 
-
-class Tooltip(Toplevel):
+class Tooltip(tk.Toplevel):
     def __init__(self, parent, **kwargs):
-        Toplevel.__init__(self, parent)
+        tk.Toplevel.__init__(self, parent)
         if 'title' in kwargs:
             self.title(kwargs['title'])
         self.transient(parent)
@@ -37,7 +40,7 @@ class Tooltip(Toplevel):
         self.configure(padx=kwargs.get('padx', 4))
         self.configure(pady=kwargs.get('pady', 4))
 
-        self.style = Style(self)
+        self.style = ttk.Style(self)
         bg = kwargs.get('background', 'black')
         self.configure(background=bg)
         self.style.configure('tooltip.TLabel',
@@ -46,9 +49,9 @@ class Tooltip(Toplevel):
                              font='TkDefaultFont 9 bold')
 
         self.im = kwargs.get('image', None)
-        self.label = Label(self, text=kwargs.get('text', ''), image=self.im,
-                           style='tooltip.TLabel',
-                           compound=kwargs.get('compound', 'left'))
+        self.label = ttk.Label(self, text=kwargs.get('text', ''), image=self.im,
+                               style='tooltip.TLabel',
+                               compound=kwargs.get('compound', 'left'))
         self.label.pack()
 
     def __setitem__(self, key, value):
@@ -66,7 +69,7 @@ class Tooltip(Toplevel):
             self.style.configure('tooltip.TLabel', foreground=fg)
         if 'alpha' in kwargs:
             self.attributes('-alpha', kwargs.pop('alpha'))
-        Toplevel.configure(self, **kwargs)
+        tk.Toplevel.configure(self, **kwargs)
 
 
 class TooltipWrapper:
