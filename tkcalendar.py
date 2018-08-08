@@ -62,6 +62,7 @@ class Calendar(ttk.Frame):
             locale: locale to use, e.g. 'fr_FR'
             selectmode: "none" or "day" (default) define whether the user
                         can change the selected day with a mouse click
+            showweeknumbers: boolean (default is True) to show/hide week numbers
             textvariable: StringVar that will contain the currently selected date as str
             background: background color of calendar border and month/year name
             foreground: foreground color of month/year name
@@ -150,6 +151,15 @@ class Calendar(ttk.Frame):
         selectmode = kw.pop("selectmode", "day")
         if selectmode not in ("none", "day"):
             raise ValueError("'selectmode' option should be 'none' or 'day'.")
+        # --- show week numbers
+        showweeknumbers = kw.pop('showweeknumbers', True)
+        # --- locale
+        locale = kw.pop("locale", None)
+
+        if locale is None:
+            self._cal = calendar.TextCalendar(calendar.MONDAY)
+        else:
+            self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
 
         # --- style
         self.style = ttk.Style(self)
@@ -166,6 +176,7 @@ class Calendar(ttk.Frame):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'showweeknumbers',
                    'selectbackground',
                    'selectforeground',
                    'disabledselectbackground',
@@ -198,6 +209,7 @@ class Calendar(ttk.Frame):
                             "locale": locale,
                             "selectmode": selectmode,
                             'textvariable': self._textvariable,
+                            'showweeknumbers': showweeknumbers,
                             'selectbackground': active_bg,
                             'selectforeground': 'white',
                             'disabledselectbackground': dis_active_bg,
@@ -278,6 +290,8 @@ class Calendar(ttk.Frame):
                                anchor="e", width=2)
             self._week_nbs.append(wlabel)
             wlabel.grid(row=i, column=0, sticky="esnw", padx=(0, 1))
+            if not showweeknumbers:
+                wlabel.grid_remove()
             self._calendar.append([])
             for j in range(1, 8):
                 label = ttk.Label(self._cal_frame, style='normal.%s.TLabel' % self._style_prefixe,
@@ -344,6 +358,13 @@ class Calendar(ttk.Frame):
                         if value is not None:
                             value.trace('w', self._textvariable_trace)
                 self._textvariable = value
+            elif key is 'showweeknumbers':
+                if value:
+                    for wlabel in self._week_nbs:
+                        wlabel.grid()
+                else:
+                    for wlabel in self._week_nbs:
+                        wlabel.grid_remove()
             elif key is 'borderwidth':
                 try:
                     bd = int(value)

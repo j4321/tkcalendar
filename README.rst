@@ -72,6 +72,8 @@ Calendar widget
 
         **textvariable**: StringVar that will contain the currently selected date as str
 
+        **showweeknumbers**: boolean (default is True) to show/hide week numbers
+
         **background**: calendar border and month/year name background color
 
         **foreground**: month/year name foreground color
@@ -189,6 +191,7 @@ Changelog
 - tkcalendar 1.3.0
 
     * No longer set locale globally to avoid conflicts between several instances
+    * Add option showwekknumbers to show/hide week numbers
 
 - tkcalendar 1.2.1
 
@@ -269,15 +272,15 @@ Example
 
     from tkcalendar import Calendar, DateEntry
 
-    def example1():
+        def example1():
         def print_sel():
             print(cal.selection_get())
 
         top = tk.Toplevel(root)
 
-        cal = Calendar(top,
-                       font="Arial 14", selectmode='day',
+        cal = Calendar(top, font="Arial 14", selectmode='day',
                        cursor="hand1", year=2018, month=2, day=5)
+
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="ok", command=print_sel).pack()
 
@@ -286,14 +289,11 @@ Example
 
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
-        cal = DateEntry(top, width=12, background='darkblue',
-                        foreground='white', borderwidth=2)
+        cal = DateEntry(top, width=12, background='darkblue', locale='fr_FR',
+                        foreground='white', borderwidth=2, year=2010)
         cal.pack(padx=10, pady=10)
 
     root = tk.Tk()
-    s = ttk.Style(root)
-    s.theme_use('clam')
-
     ttk.Button(root, text='Calendar', command=example1).pack(padx=10, pady=10)
     ttk.Button(root, text='DateEntry', command=example2).pack(padx=10, pady=10)
 

@@ -196,6 +196,7 @@ class TestCalendar(BaseWidgetTest):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'showweeknumbers',
                    'selectbackground',
                    'selectforeground',
                    'disabledselectbackground',
@@ -228,6 +229,11 @@ class TestCalendar(BaseWidgetTest):
         widget.config(cursor="watch")
         self.window.update()
         self.assertEqual(widget["cursor"], "watch")
+        self.assertTrue(widget["showweeknumbers"])
+        widget.config(showweeknumbers=False)
+        self.window.update()
+        self.assertFalse(widget["showweeknumbers"])
+        self.assertFalse(widget._week_nbs[0].winfo_ismapped())
         widget.config(font="Arial 20 bold")
         self.window.update()
         self.assertEqual(widget["font"], "Arial 20 bold")
