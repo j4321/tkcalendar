@@ -66,7 +66,7 @@ Calendar widget
 
         **day**: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
-        **locale**: locale to use, e.g. "fr_FR" for a French calendar (the locale needs to be installed, otherwise it will raise 'locale.Error: unsupported locale setting')
+        **locale**: locale to use, e.g. "fr_FR" for a French calendar
 
         **selectmode**: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
@@ -189,7 +189,6 @@ Changelog
 - tkcalendar 1.3.0
 
     * No longer set locale globally to avoid conflicts between several instances
-    * Automatically add encoding to the locale string if not given
 
 - tkcalendar 1.2.1
 

@@ -60,8 +60,6 @@ class Calendar(ttk.Frame):
             day: initially selected day, if month or year is given but not
                 day, no initial selection, otherwise, default is today
             locale: locale to use, e.g. 'fr_FR'
-                    (the locale needs to be installed, otherwise it will
-                     raise 'locale.Error: unsupported locale setting')
             selectmode: "none" or "day" (default) define whether the user
                         can change the selected day with a mouse click
             textvariable: StringVar that will contain the currently selected date as str
@@ -1097,7 +1095,7 @@ if __name__ == "__main__":
 
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
-        cal = DateEntry(top, width=12, background='darkblue', locale='de_DE',
+        cal = DateEntry(top, width=12, background='darkblue', locale='fr_FR',
                         foreground='white', borderwidth=2, year=2010)
         cal.pack(padx=10, pady=10)
 
