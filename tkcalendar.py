@@ -117,12 +117,12 @@ class Calendar(ttk.Frame):
         except ValueError:
             raise ValueError('expected integer for the borderwidth option.')
 
+        self._cal = calendar.TextCalendar(calendar.MONDAY)
+
         # --- locale
         locale = kw.pop("locale", getdefaultlocale()[0])
         self._day_names = get_day_names('abbreviated', locale=locale)
         self._month_names = get_month_names('wide', locale=locale)
-
-        self._cal = calendar.TextCalendar(calendar.MONDAY)
 
         # --- date
         today = self.date.today()
@@ -138,10 +138,7 @@ class Calendar(ttk.Frame):
             try:
                 self._sel_date = self.date(year, month, day)  # selected day
                 if self._textvariable is not None:
-                    if locale is not None:
-                        self._textvariable.set(format_date(self._sel_date, 'short', locale))
-                    else:
-                        self._textvariable.set(format_date(self._sel_date, 'short'))
+                    self._textvariable.set(format_date(self._sel_date, 'short', locale))
             except ValueError:
                 self._sel_date = None
 
@@ -153,13 +150,6 @@ class Calendar(ttk.Frame):
             raise ValueError("'selectmode' option should be 'none' or 'day'.")
         # --- show week numbers
         showweeknumbers = kw.pop('showweeknumbers', True)
-        # --- locale
-        locale = kw.pop("locale", None)
-
-        if locale is None:
-            self._cal = calendar.TextCalendar(calendar.MONDAY)
-        else:
-            self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
 
         # --- style
         self.style = ttk.Style(self)
@@ -666,19 +656,11 @@ class Calendar(ttk.Frame):
 
     def format_date(self, date=None):
         """Convert date (datetime.date) to a string in the locale (short format)."""
-        locale = self._properties['locale']
-        if locale is None:
-            return format_date(date, 'short')
-        else:
-            return format_date(date, 'short', locale)
+        return format_date(date, 'short', self._properties['locale'])
 
     def parse_date(self, date):
         """Parse string date in the locale format and return the corresponding datetime.date."""
-        locale = self._properties['locale']
-        if locale is None:
-            return parse_date(date)
-        else:
-            return parse_date(date, locale)
+        return parse_date(date, self._properties['locale'])
 
     # --- selection handling
     def selection_get(self):
@@ -1116,7 +1098,7 @@ if __name__ == "__main__":
 
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
-        cal = DateEntry(top, width=12, background='darkblue', locale='fr_FR',
+        cal = DateEntry(top, width=12, background='darkblue',
                         foreground='white', borderwidth=2, year=2010)
         cal.pack(padx=10, pady=10)
 
