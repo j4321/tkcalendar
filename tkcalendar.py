@@ -24,8 +24,9 @@ tkcalendar module providing Calendar and DateEntry widgets
 """
 # TODO: custom first week day?
 
+
 import calendar
-import locale
+from babel.dates import format_date, parse_date, get_day_names, get_month_names
 from sys import platform
 try:
     import tkinter as tk
@@ -35,6 +36,7 @@ except ImportError:
     import Tkinter as tk
     import ttk
     from tkFont import Font
+from locale import getdefaultlocale
 
 
 class Calendar(ttk.Frame):
@@ -57,9 +59,7 @@ class Calendar(ttk.Frame):
             year, month: initially displayed month, default is current month
             day: initially selected day, if month or year is given but not
                 day, no initial selection, otherwise, default is today
-            locale: locale to use, e.g. 'fr_FR.utf-8'
-                    (the locale need to be installed, otherwise it will
-                     raise 'locale.Error: unsupported locale setting')
+            locale: locale to use, e.g. 'fr_FR'
             selectmode: "none" or "day" (default) define whether the user
                         can change the selected day with a mouse click
             showweeknumbers: boolean (default is True) to show/hide week numbers
@@ -117,6 +117,13 @@ class Calendar(ttk.Frame):
         except ValueError:
             raise ValueError('expected integer for the borderwidth option.')
 
+        self._cal = calendar.TextCalendar(calendar.MONDAY)
+
+        # --- locale
+        locale = kw.pop("locale", getdefaultlocale()[0])
+        self._day_names = get_day_names('abbreviated', locale=locale)
+        self._month_names = get_month_names('wide', locale=locale)
+
         # --- date
         today = self.date.today()
 
@@ -131,7 +138,7 @@ class Calendar(ttk.Frame):
             try:
                 self._sel_date = self.date(year, month, day)  # selected day
                 if self._textvariable is not None:
-                    self._textvariable.set(self._sel_date.strftime("%x"))
+                    self._textvariable.set(format_date(self._sel_date, 'short', locale))
             except ValueError:
                 self._sel_date = None
 
@@ -143,13 +150,6 @@ class Calendar(ttk.Frame):
             raise ValueError("'selectmode' option should be 'none' or 'day'.")
         # --- show week numbers
         showweeknumbers = kw.pop('showweeknumbers', True)
-        # --- locale
-        locale = kw.pop("locale", None)
-
-        if locale is None:
-            self._cal = calendar.TextCalendar(calendar.MONDAY)
-        else:
-            self._cal = calendar.LocaleTextCalendar(calendar.MONDAY, locale)
 
         # --- style
         self.style = ttk.Style(self)
@@ -262,7 +262,8 @@ class Calendar(ttk.Frame):
                                                                         column=0,
                                                                         sticky="eswn")
 
-        for i, d in enumerate(self._cal.formatweekheader(3).split()):
+        for i in range(7):
+            d = self._day_names[i]
             self._cal_frame.columnconfigure(i + 1, weight=1)
             ttk.Label(self._cal_frame,
                       font=self._font,
@@ -335,7 +336,7 @@ class Calendar(ttk.Frame):
             elif key is 'textvariable':
                 if self._sel_date is not None:
                     if value is not None:
-                        value.set(self._sel_date.strftime("%x"))
+                        value.set(self.format_date(self._sel_date))
                     try:
                         if self._textvariable is not None:
                             self._textvariable.trace_remove('write', self._textvariable_trace_id)
@@ -442,13 +443,13 @@ class Calendar(ttk.Frame):
                 self._sel_date = None
             else:
                 try:
-                    self._sel_date = self.strptime(date, "%x")
-                except Exception as e:
+                    self._sel_date = self.parse_date(date)
+                except Exception:
                     if self._sel_date is None:
                         self._textvariable.set('')
                     else:
-                        self._textvariable.set(self._sel_date.strftime('%x'))
-                    raise type(e)("%r is not a valid date." % date)
+                        self._textvariable.set(self.format_date(self._sel_date))
+                    raise ValueError("%r is not a valid date." % date)
                 else:
                     self._date = self._sel_date.replace(day=1)
                     self._display_calendar()
@@ -529,7 +530,7 @@ class Calendar(ttk.Frame):
         year, month = self._date.year, self._date.month
 
         # update header text (Month, Year)
-        header = self._cal.formatmonthname(year, month, 0, False)
+        header = self._month_names[month]
         self._header_month.configure(text=header.title())
         self._header_year.configure(text=str(year))
 
@@ -650,8 +651,16 @@ class Calendar(ttk.Frame):
                 self._sel_date = self.date(year, month, day)
                 self._display_selection()
                 if self._textvariable is not None:
-                    self._textvariable.set(self._sel_date.strftime("%x"))
+                    self._textvariable.set(self.format_date(self._sel_date))
                 self.event_generate("<<CalendarSelected>>")
+
+    def format_date(self, date=None):
+        """Convert date (datetime.date) to a string in the locale (short format)."""
+        return format_date(date, 'short', self._properties['locale'])
+
+    def parse_date(self, date):
+        """Parse string date in the locale format and return the corresponding datetime.date."""
+        return parse_date(date, self._properties['locale'])
 
     # --- selection handling
     def selection_get(self):
@@ -686,11 +695,11 @@ class Calendar(ttk.Frame):
                     self._sel_date = date
                 else:
                     try:
-                        self._sel_date = self.strptime(date, "%x").date()
-                    except Exception as e:
-                        raise type(e)("%r is not a valid date." % date)
+                        self._sel_date = self.parse_date(date)
+                    except Exception:
+                        raise ValueError("%r is not a valid date." % date)
                 if self._textvariable is not None:
-                    self._textvariable.set(self._sel_date.strftime("%x"))
+                    self._textvariable.set(self.format_date(self._sel_date))
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
@@ -698,7 +707,7 @@ class Calendar(ttk.Frame):
     def get_date(self):
         """Return selected date as string."""
         if self._sel_date is not None:
-            return self._sel_date.strftime("%x")
+            return self.format_date(self._sel_date)
         else:
             return ""
 
@@ -775,10 +784,6 @@ class DateEntry(ttk.Entry):
             entry_kw[key] = kw.pop(key, self.entry_kw[key])
         entry_kw['font'] = kw.get('font', None)
 
-        # set locale to have the right date format
-        loc = kw.get('locale', '')
-        locale.setlocale(locale.LC_ALL, loc)
-
         ttk.Entry.__init__(self, master, **entry_kw)
         # down arrow button bbox (to detect if it was clicked upon)
         self._down_arrow_bbox = [0, 0, 0, 0]
@@ -793,6 +798,10 @@ class DateEntry(ttk.Entry):
         self._top_cal.overrideredirect(True)
         self._calendar = Calendar(self._top_cal, **kw)
         self._calendar.pack()
+
+        # locale date parsing / formatting
+        self.format_date = self._calendar.format_date
+        self.parse_date = self._calendar.parse_date
 
         # style
         self.style = ttk.Style(self)
@@ -816,7 +825,7 @@ class DateEntry(ttk.Entry):
                 self._date = self._calendar.date(year, month, day)
             except ValueError:
                 self._date = today
-        self._set_text(self._date.strftime('%x'))
+        self._set_text(self.format_date(self._date))
 
         self._theme_change = True
 
@@ -937,17 +946,17 @@ class DateEntry(ttk.Entry):
     def _validate_date(self):
         """Date entry validation: only dates in locale '%x' format are accepted."""
         try:
-            self._date = self._calendar.strptime(self.get(), '%x').date()
+            self._date = self.parse_date(self.get())
             return True
-        except ValueError:
-            self._set_text(self._date.strftime('%x'))
+        except (ValueError, IndexError):
+            self._set_text(self.format_date(self._date))
             return False
 
     def _select(self, event=None):
         """Display the selected date in the entry and hide the calendar."""
         date = self._calendar.selection_get()
         if date is not None:
-            self._set_text(date.strftime('%x'))
+            self._set_text(self.format_date(date))
             self.event_generate('<<DateEntrySelected>>')
         self._top_cal.withdraw()
         if 'readonly' not in self.state():
@@ -979,13 +988,13 @@ class DateEntry(ttk.Entry):
             self._top_cal.withdraw()
         else:
             self._validate_date()
-            date = self._calendar.strptime(self.get(), '%x')
+            date = self.parse_date(self.get())
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
             self._top_cal.geometry('+%i+%i' % (x, y))
             self._top_cal.deiconify()
             self._calendar.focus_set()
-            self._calendar.selection_set(date.date())
+            self._calendar.selection_set(date)
 
     def state(self, *args):
         """
@@ -1055,20 +1064,19 @@ class DateEntry(ttk.Entry):
         in locale '%x' format.
         """
         try:
-            txt = date.strftime('%x')
-        except AttributeError:
+            txt = self.format_date(date)
+        except AssertionError:
             txt = str(date)
             try:
-                self._calendar.strptime(txt, '%x')
-            except Exception as e:
-                raise type(e)("%r is not a valid date." % date)
+                self.parse_date(txt)
+            except Exception:
+                raise ValueError("%r is not a valid date." % date)
         self._set_text(txt)
 
     def get_date(self):
         """Return the content of the DateEntry as a datetime.date instance."""
         self._validate_date()
-        date = self.get()
-        return self._calendar.strptime(date, '%x').date()
+        return self.parse_date(self.get())
 
 
 if __name__ == "__main__":
@@ -1078,7 +1086,6 @@ if __name__ == "__main__":
             print(cal.selection_get())
 
         top = tk.Toplevel(root)
-        top.grab_set()
 
         cal = Calendar(top, font="Arial 14", selectmode='day',
                        cursor="hand1", year=2018, month=2, day=5)
@@ -1088,7 +1095,6 @@ if __name__ == "__main__":
 
     def example2():
         top = tk.Toplevel(root)
-        top.grab_set()
 
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 

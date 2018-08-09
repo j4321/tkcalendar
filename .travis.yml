@@ -10,7 +10,7 @@ before_install:
   - sleep 3
 install:
   - sudo apt-get install python-tk python3-tk
-  - python -m pip install coverage codecov pillow pynput
+  - python -m pip install coverage codecov pillow pynput babel
 script:
   - python -m pip install .
   - python -m nose
