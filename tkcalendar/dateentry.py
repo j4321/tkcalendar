@@ -76,10 +76,6 @@ class DateEntry(ttk.Entry):
             entry_kw[key] = kw.pop(key, self.entry_kw[key])
         entry_kw['font'] = kw.get('font', None)
 
-        # set locale to have the right date format
-        loc = kw.get('locale', '')
-        locale.setlocale(locale.LC_ALL, loc)
-
         ttk.Entry.__init__(self, master, **entry_kw)
         # down arrow button bbox (to detect if it was clicked upon)
         self._down_arrow_bbox = [0, 0, 0, 0]
@@ -94,6 +90,10 @@ class DateEntry(ttk.Entry):
         self._top_cal.overrideredirect(True)
         self._calendar = Calendar(self._top_cal, **kw)
         self._calendar.pack()
+
+        # locale date parsing / formatting
+        self.format_date = self._calendar.format_date
+        self.parse_date = self._calendar.parse_date
 
         # style
         self.style = ttk.Style(self)
@@ -117,7 +117,7 @@ class DateEntry(ttk.Entry):
                 self._date = self._calendar.date(year, month, day)
             except ValueError:
                 self._date = today
-        self._set_text(self._date.strftime('%x'))
+        self._set_text(self.format_date(self._date))
 
         self._theme_change = True
 
@@ -238,17 +238,17 @@ class DateEntry(ttk.Entry):
     def _validate_date(self):
         """Date entry validation: only dates in locale '%x' format are accepted."""
         try:
-            self._date = self._calendar.strptime(self.get(), '%x').date()
+            self._date = self.parse_date(self.get())
             return True
-        except ValueError:
-            self._set_text(self._date.strftime('%x'))
+        except (ValueError, IndexError):
+            self._set_text(self.format_date(self._date))
             return False
 
     def _select(self, event=None):
         """Display the selected date in the entry and hide the calendar."""
         date = self._calendar.selection_get()
         if date is not None:
-            self._set_text(date.strftime('%x'))
+            self._set_text(self.format_date(date))
             self.event_generate('<<DateEntrySelected>>')
         self._top_cal.withdraw()
         if 'readonly' not in self.state():
@@ -280,13 +280,13 @@ class DateEntry(ttk.Entry):
             self._top_cal.withdraw()
         else:
             self._validate_date()
-            date = self._calendar.strptime(self.get(), '%x')
+            date = self.parse_date(self.get())
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
             self._top_cal.geometry('+%i+%i' % (x, y))
             self._top_cal.deiconify()
             self._calendar.focus_set()
-            self._calendar.selection_set(date.date())
+            self._calendar.selection_set(date)
 
     def state(self, *args):
         """
@@ -356,17 +356,16 @@ class DateEntry(ttk.Entry):
         in locale '%x' format.
         """
         try:
-            txt = date.strftime('%x')
-        except AttributeError:
+            txt = self.format_date(date)
+        except AssertionError:
             txt = str(date)
             try:
-                self._calendar.strptime(txt, '%x')
-            except Exception as e:
-                raise type(e)("%r is not a valid date." % date)
+                self.parse_date(txt)
+            except Exception:
+                raise ValueError("%r is not a valid date." % date)
         self._set_text(txt)
 
     def get_date(self):
         """Return the content of the DateEntry as a datetime.date instance."""
         self._validate_date()
-        date = self.get()
-        return self._calendar.strptime(date, '%x').date()
+        return self.parse_date(self.get())

@@ -21,5 +21,11 @@ Test
 
 from tests.base_widget_testcase import BaseWidgetTest, TestEvent, tk, ttk
 import locale
+import babel.dates
 
 locale.setlocale(locale.LC_ALL, '')
+
+
+def format_date(date, length):
+    return babel.dates.format_date(date, length, locale=locale.getdefaultlocale()[0])
+

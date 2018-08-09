@@ -1,4 +1,4 @@
-from tests import BaseWidgetTest, TestEvent
+from tests import BaseWidgetTest, TestEvent, format_date
 from tkcalendar import DateEntry
 from datetime import datetime, date
 from pynput.mouse import Controller, Button
@@ -75,13 +75,13 @@ class TestDateEntry(BaseWidgetTest):
         widget.pack()
         self.window.update()
 
-        widget.set_date(datetime(2018, 12, 31).strftime('%x'))
+        widget.set_date(format_date(date(2018, 12, 31), 'short'))
         self.assertEqual(widget.get_date(), date(2018, 12, 31))
         with self.assertRaises(ValueError):
             widget.set_date("ab")
-        widget.set_date(datetime(2015, 12, 31))
+        widget.set_date(date(2015, 12, 31))
         self.assertEqual(widget.get_date(), date(2015, 12, 31))
-        self.assertEqual(widget.get(), datetime(2015, 12, 31).strftime("%x"))
+        self.assertEqual(widget.get(), format_date(date(2015, 12, 31), 'short'))
 
         widget.delete(0, "end")
         widget.insert(0, "abc")
