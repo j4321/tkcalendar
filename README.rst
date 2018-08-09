@@ -5,14 +5,14 @@ tkcalendar is a python module that provides the Calendar and DateEntry widgets f
 The DateEntry widget is similar to a Combobox, but the drop-down is not a list but a Calendar to select a date.
 Events can be displayed in the Calendar with custom colors and a tooltip displays the event list for a given day.
 tkcalendar is compatible with both Python 2 and Python 3.
-It supports all locale settings supported by the system and the colors are customizable.
+It supports many locale settings (e.g. 'fr_FR', 'en_US', ..) and the colors are customizable.
 
 
 Requirements
 ------------
 
 - Linux, Windows, Mac
-- Python 2 or 3 with tkinter + ttk (default for Windows but not for Linux)
+- Python 2 or 3 with tkinter + ttk (default for Windows but not for Linux) and babel
 
 
 Installation
@@ -68,7 +68,7 @@ Calendar widget
 
         **day**: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
 
-        **locale**: locale to use, e.g. "fr_FR.utf-8" for a French calendar
+        **locale**: locale to use, e.g. "fr_FR" for a French calendar
 
         **selectmode**: "none" or "day" (default) define whether the user can change the selected day with a mouse click
 
@@ -136,7 +136,7 @@ Calendar widget
     * Widget-Specific methods:
 
         **calevent_cget(ev_id, option)**: Return value of given option for the event *ev_id*.
-        
+
         **calevent_configure(ev_id, \*\*kw)**: Return value of given option for the event *ev_id*.
 
         **calevent_create(date, text, tags=[])**: Add new event in calendar and return event id.
@@ -144,9 +144,9 @@ Calendar widget
             Options:
 
                 *date*: datetime.date or datetime.datetime instance.
-                
+
                 *text*: text to put in the tooltip associated to date.
-                
+
                 *tags*: list of tags to apply to the event. The last tag determines the way the event is displayed. If there are several events on the same day, the lowest one (on the tooltip list) which has tags determines the colors of the day.
 
         **calevent_lower(ev_id, below=None)**: Lower event *ev_id* in tooltip event list.
@@ -154,7 +154,7 @@ Calendar widget
             *below:* put event below given one, if below is None, put it at the bottom of tooltip event list.
 
             The day's colors are determined by the last tag of the lowest event which has tags.
-            
+
         **calevent_raise(ev_id, above=None)**: Raise event *ev_id* in tooltip event list.
 
             *above*: put *ev_id* above given one, if above is None, put it on top of tooltip event list.
@@ -176,7 +176,7 @@ Calendar widget
             If only *date* is given, return event ids of all events on date.
             If only *tag* is given, return event ids of all events with tag.
             If both options are None, return all event ids.
-            
+
         **selection_get()**: If selectmode is 'day', return the selected date as a ``datetime.date`` instance, otherwise return ``None``.
 
         **selection_set(self, date)**: If selectmode is 'day', set the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
@@ -188,12 +188,12 @@ Calendar widget
             Keyword options: *foreground*, *background* (of the day in the calendar)
 
         **tag_delete(tag)**: Delete given tag and remove it from all events.
-        
+
         **tag_names()**: Return tuple of existing tags.
-        
-       
-        
-        
+
+
+
+
 DateEntry widget
 
     Date selection entry with drop-down calendar.
@@ -244,6 +244,7 @@ Changelog
 
 - tkcalendar 1.3.0
 
+    * No longer set locale globally to avoid conflicts between several instances
     * Add option showwekknumbers to show/hide week numbers
 
 - tkcalendar 1.2.1
@@ -258,7 +259,7 @@ Changelog
       disableddaybackground and disableddayforeground to configure colors
       when Calendar is disabled
     * Fix DateEntry behavior in readonly mode
-    * Make Calendar.selection_get always return a datetime.date
+    * Make Calendar.selection_get always return a ``datetime.date``
 
 - tkcalendar 1.1.5
 
@@ -325,15 +326,15 @@ Example
 
     from tkcalendar import Calendar, DateEntry
 
-    def example1():
+        def example1():
         def print_sel():
             print(cal.selection_get())
 
         top = tk.Toplevel(root)
 
-        cal = Calendar(top,
-                       font="Arial 14", selectmode='day',
+        cal = Calendar(top, font="Arial 14", selectmode='day',
                        cursor="hand1", year=2018, month=2, day=5)
+
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="ok", command=print_sel).pack()
 
@@ -342,14 +343,11 @@ Example
 
         ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 
-        cal = DateEntry(top, width=12, background='darkblue',
-                        foreground='white', borderwidth=2)
+        cal = DateEntry(top, width=12, background='darkblue', locale='fr_FR',
+                        foreground='white', borderwidth=2, year=2010)
         cal.pack(padx=10, pady=10)
 
     root = tk.Tk()
-    s = ttk.Style(root)
-    s.theme_use('clam')
-
     ttk.Button(root, text='Calendar', command=example1).pack(padx=10, pady=10)
     ttk.Button(root, text='DateEntry', command=example2).pack(padx=10, pady=10)
 
