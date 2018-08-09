@@ -24,5 +24,4 @@ tkcalendar module providing Calendar and DateEntry widgets
 """
 
 from tkcalendar.dateentry import DateEntry
-from tkcalendar.eventcalendar import EventCalendar
 from tkcalendar.calendar_ import Calendar

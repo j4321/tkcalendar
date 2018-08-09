@@ -32,11 +32,13 @@ try:
 except ImportError:
     import ttk
     from tkFont import Font
+from tkcalendar.tooltip import TooltipWrapper
 
 
 class Calendar(ttk.Frame):
     """Calendar widget."""
     date = calendar.datetime.date
+    datetime = calendar.datetime.datetime
     timedelta = calendar.datetime.timedelta
     strptime = calendar.datetime.datetime.strptime
     strftime = calendar.datetime.datetime.strftime
@@ -133,6 +135,10 @@ class Calendar(ttk.Frame):
                 self._sel_date = None
 
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
+        self.calevents = {}  # special events displayed in colors and with tooltips to show content
+        self._calevent_dates = {}  # list of event ids for each date
+        self._tags = {}  # tags to format event display
+        self.tooltip_wrapper = TooltipWrapper(self)
 
         # --- selectmode
         selectmode = kw.pop("selectmode", "day")
@@ -432,6 +438,7 @@ class Calendar(ttk.Frame):
             self._properties[key] = value
 
     def _textvariable_trace(self, *args):
+        """Connect StringVar value with selected date."""
         if self._properties.get("selectmode") is "day":
             date = self._textvariable.get()
             if not date:
@@ -521,6 +528,7 @@ class Calendar(ttk.Frame):
                        background=[('disabled', dis_bg)],
                        foreground=[('disabled', dis_fg)])
 
+    # --- display
     def _display_calendar(self):
         """Display the days of the current month (the one in self._date)."""
         year, month = self._date.year, self._date.month
@@ -561,9 +569,22 @@ class Calendar(ttk.Frame):
             self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % modulo + 1))
             for i_day in range(7):
                 style = week_days[i_day] + months[cal[i_week][i_day].month]
+                label = self._calendar[i_week][i_day]
                 txt = str(cal[i_week][i_day].day)
-                self._calendar[i_week][i_day].configure(text=txt,
-                                                        style=style)
+                label.configure(text=txt, style=style)
+                self.tooltip_wrapper.remove_tooltip(label)
+                if cal[i_week][i_day] in self._calevent_dates:
+                    date = cal[i_week][i_day]
+                    ev_ids = self._calevent_dates[date]
+                    i = len(ev_ids) - 1
+                    while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
+                        i -= 1
+                    if i >= 0:
+                        tag = self.calevents[ev_ids[i]]['tags'][-1]
+                        label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
+                    text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
+                    self.tooltip_wrapper.add_tooltip(label, text)
+
         self._display_selection()
 
     def _display_selection(self):
@@ -578,26 +599,69 @@ class Calendar(ttk.Frame):
                 if 0 <= w and w < 6:
                     self._calendar[w][d - 1].configure(style='sel.%s.TLabel' % self._style_prefixe)
 
+    def _reset_day(self, date):
+        """Restore usual week day colors."""
+        year, month = date.year, date.month
+        if year == self._date.year:
+            _, w, d = date.isocalendar()
+            wn = self._date.isocalendar()[1]
+            w -= wn
+            w %= max(52, wn)
+            if w >= 0 and w < 6:
+                self.tooltip_wrapper.remove_tooltip(self._calendar[w][d - 1])
+                if month == date.month:
+                    if d < 6:
+                        self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
+                    else:
+                        self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
+                else:
+                    if d < 6:
+                        self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
+                    else:
+                        self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+
     def _remove_selection(self):
         """Remove highlight of selected day."""
         if self._sel_date is not None:
-            year, month = self._sel_date.year, self._sel_date.month
-            if year == self._date.year:
-                _, w, d = self._sel_date.isocalendar()
-                wn = self._date.isocalendar()[1]
-                w -= wn
-                w %= max(52, wn)
-                if w >= 0 and w < 6:
-                    if month == self._date.month:
-                        if d < 6:
-                            self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
+            if self._sel_date in self._calevent_dates:
+                self._show_event(self._sel_date)
+            else:
+                year, month = self._sel_date.year, self._sel_date.month
+                if year == self._date.year:
+                    _, w, d = self._sel_date.isocalendar()
+                    wn = self._date.isocalendar()[1]
+                    w -= wn
+                    w %= max(52, wn)
+                    if w >= 0 and w < 6:
+                        if month == self._date.month:
+                            if d < 6:
+                                self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
+                            else:
+                                self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
                         else:
-                            self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
-                    else:
-                        if d < 6:
-                            self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
-                        else:
-                            self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+                            if d < 6:
+                                self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
+                            else:
+                                self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+
+    def _show_event(self, date):
+        if date.year == self._date.year:
+            _, w, d = date.isocalendar()
+            wn = self._date.isocalendar()[1]
+            w -= wn
+            w %= max(52, wn)
+            if w >= 0 and w < 6:
+                label = self._calendar[w][d - 1]
+                ev_ids = self._calevent_dates[date]
+                i = len(ev_ids) - 1
+                while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
+                    i -= 1
+                if i >= 0:
+                    tag = self.calevents[ev_ids[i]]['tags'][-1]
+                    label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
+                text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
+                self.tooltip_wrapper.remove_tooltip(label)
+                self.tooltip_wrapper.add_tooltip(label, text)
 
     # --- callbacks
     def _next_month(self):
@@ -605,9 +669,6 @@ class Calendar(ttk.Frame):
         year, month = self._date.year, self._date.month
         self._date = self._date + \
             self.timedelta(days=calendar.monthrange(year, month)[1])
-#        if month == 12:
-#            # don't increment year
-#            self._date = self._date.replace(year=year)
         self._display_calendar()
 
     def _prev_month(self):
@@ -698,6 +759,277 @@ class Calendar(ttk.Frame):
             return self._sel_date.strftime("%x")
         else:
             return ""
+
+    # --- events
+    def calevent_create(self, date, text, tags=[]):
+        """
+        Add event in calendar.
+
+        Options:
+
+            date: datetime.date or datetime.datetime instance
+            text: text to put in the tooltip associated to date
+            tags: list of tags to apply to the event. The last tag determines
+                  the way the event is displayed. If there are several events on
+                  the same day, the lowest one (on the tooltip list) which has
+                  tags determines the colors of the day.
+
+        Return event id.
+        """
+        if isinstance(date, Calendar.datetime):
+            date = date.date()
+        if not isinstance(date, Calendar.date):
+            raise TypeError("date option should be a %s instance" % (Calendar.date))
+        if self.calevents:
+            ev_id = max(self.calevents) + 1
+        else:
+            ev_id = 0
+        if isinstance(tags, str):
+            tags_ = [tags]
+        else:
+            tags_ = list(tags)
+        self.calevents[ev_id] = {'date': date, 'text': text, 'tags': tags_}
+        for tag in tags_:
+            if tag not in self._tags:
+                self._tag_initialize(tag)
+        if date not in self._calevent_dates:
+            self._calevent_dates[date] = [ev_id]
+        else:
+            self._calevent_dates[date].append(ev_id)
+        self._show_event(date)
+        return ev_id
+
+    def _calevent_remove(self, ev_id):
+        """Remove event ev_id."""
+        try:
+            date = self.calevents[ev_id]['date']
+        except KeyError:
+            ValueError("event %s does not exists" % ev_id)
+        else:
+            del self.calevents[ev_id]
+            self._calevent_dates[date].remove(ev_id)
+            if not self._calevent_dates[date]:
+                del self._calevent_dates[date]
+                self._reset_day(date)
+            else:
+                self._show_event(date)
+
+    def calevent_remove(self, *ev_ids, date=None, tag=None):
+        """
+        Remove event from calendar.
+
+            *ev_ids: event ids to remove or 'all' to remove them all
+            date: if no id is given, delete all events on date (datetime.date or datetime.datetime).
+            tag: if no id or date is given, delete all events with given tag,
+        """
+        if ev_ids:
+            if 'all' in ev_ids:
+                ev_ids = self.get_calevents()
+            for ev_id in ev_ids:
+                self._calevent_remove(ev_id)
+        elif date is not None:
+            if isinstance(date, Calendar.datetime):
+                date = date.date()
+            if not isinstance(date, Calendar.date):
+                raise TypeError("date option should be a %s instance" % (Calendar.date))
+            try:
+                ids = self._calevent_dates[date].copy()
+                for ev_id in ids:
+                    self._calevent_remove(ev_id)
+            except KeyError:
+                pass  # no event on date
+        elif tag is not None:
+            evs = self.get_calevents(tag=tag)
+            for ev_id in evs:
+                self._calevent_remove(ev_id)
+
+    def calevent_cget(self, ev_id, key):
+        try:
+            ev = self.calevents[ev_id]
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            try:
+                return ev[key]
+            except KeyError:
+                raise ValueError('unknown option "%s"' % key)
+
+    def calevent_configure(self, ev_id, **kw):
+        try:
+            ev = self.calevents[ev_id]
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            text = kw.pop('text', None)
+            tags = kw.pop('tags', None)
+            date = kw.pop('date', None)
+            if kw:
+                raise KeyError('Invalid keyword option(s) %s, valid options are "text", "tags" and "date".' % (kw.keys(),))
+            else:
+                if text is not None:
+                    ev['text'] = str(text)
+                if tags is not None:
+                    if isinstance(tags, str):
+                        tags_ = [tags]
+                    else:
+                        tags_ = list(tags)
+                    for tag in tags_:
+                        if tag not in self._tags:
+                            self._tag_initialize(tag)
+                    ev['tags'] = tags_
+                if date is not None:
+                    if isinstance(date, Calendar.datetime):
+                        date = date.date()
+                    if not isinstance(date, Calendar.date):
+                        raise TypeError("date option should be a %s instance" % (Calendar.date))
+                    old_date = ev['date']
+                    self._calevent_dates[old_date].remove(ev_id)
+                    if not self._calevent_dates[old_date]:
+                        self._reset_day(old_date)
+                    else:
+                        self._show_event(old_date)
+                    ev['date'] = date
+                    if date not in self._calevent_dates:
+                        self._calevent_dates[date] = [ev_id]
+                    else:
+                        self._calevent_dates[date].append(ev_id)
+                self._show_event(ev['date'])
+
+    def calevent_raise(self, ev_id, above=None):
+        """
+        Raise event in tooltip event list.
+
+            above: put event above given one, if above is None, put it on top
+                   of tooltip event list.
+
+        The day's colors are determined by the last tag of the lowest event
+        which has tags.
+        """
+        try:
+            date = self.calevents[ev_id]['date']
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            evs = self._calevent_dates[date]
+            if above is None:
+                evs.remove(ev_id)
+                evs.insert(0, ev_id)
+            else:
+                evs.remove(ev_id)
+                try:
+                    index = evs.index(above)
+                except ValueError:
+                    raise ValueError("event %s does not exists on %s" % (above, date))
+                else:
+                    evs.insert(index, ev_id)
+            self._show_event(date)
+
+    def calevent_lower(self, ev_id, below=None):
+        """
+        Lower event in tooltip event list.
+
+            below: put event below given one, if below is None, put it at the
+                   bottom of tooltip event list.
+
+        The day's colors are determined by the last tag of the lowest event
+        which has tags.
+        """
+        try:
+            date = self.calevents[ev_id]['date']
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            evs = self._calevent_dates[date]
+            if below is None:
+                evs.remove(ev_id)
+                evs.append(ev_id)
+            else:
+                evs.remove(ev_id)
+                try:
+                    index = evs.index(below) + 1
+                except ValueError:
+                    raise ValueError("event %s does not exists on %s" % (below, date))
+                else:
+                    evs.insert(index, ev_id)
+            self._show_event(date)
+
+    def get_calevents(self, date=None, tag=None):
+        """
+        Return event ids.
+
+            date: return event ids of events on date
+            tag: return event ids of event with given tag and on given date if
+                 date is not None
+
+        If both options are None, return all event ids.
+        """
+        if date is not None:
+            if isinstance(date, Calendar.datetime):
+                date = date.date()
+            if not isinstance(date, Calendar.date):
+                raise TypeError("date option should be a %s instance" % (Calendar.date))
+            try:
+                if tag is not None:
+                    return tuple(ev_id for ev_id in self._calevent_dates[date] if tag in self.calevents[ev_id]['tags'])
+                else:
+                    return tuple(self._calevent_dates[date])
+            except KeyError:
+                return ()
+        elif tag is not None:
+            return tuple(ev_id for ev_id, prop in self.calevents.items() if tag in prop['tags'])
+        else:
+            return tuple(self.calevents.keys())
+
+    def _tag_initialize(self, tag):
+        props = dict(foreground='white', background='royal blue')
+        self._tags[tag] = props
+        self.style.configure('tag_%s.%s.TLabel' % (tag, self._style_prefixe), **props)
+
+    def tag_config(self, tag, **kw):
+        """
+        Configure tag.
+
+        keyword options: foreground, background (of the day in the calendar)
+        """
+        if tag not in self._tags:
+            self._tags[tag] = {}
+        props = dict(foreground='white', background='royal blue')  # default
+        props.update(self._tags[tag])
+        props.update(kw)
+        self.style.configure('tag_%s.%s.TLabel' % (tag, self._style_prefixe), **props)
+        self._tags[tag] = props
+
+    def tag_cget(self, tag, option):
+        """Return the value of the tag's option."""
+        try:
+            prop = self._tags[tag]
+        except KeyError:
+            raise ValueError('unknow tag "%s"' % tag)
+        else:
+            try:
+                return prop[option]
+            except KeyError:
+                raise ValueError('unknow option "%s"' % option)
+
+    def tag_names(self):
+        """Return tuple of existing tags."""
+        return tuple(self._tags.keys())
+
+    def tag_delete(self, tag):
+        """
+        Delete given tag.
+
+        Delete tag properties and remove tag from all events.
+        """
+        try:
+            del self._tags[tag]
+        except KeyError:
+            raise ValueError('tag "%s" does not exists' % tag)
+        else:
+            for props in self.calevents.values():
+                if tag in props['tags']:
+                    props['tags'].remove(tag)
+            self._display_calendar()
 
     # --- other methods
     def keys(self):
