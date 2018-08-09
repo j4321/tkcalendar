@@ -91,6 +91,13 @@ class Calendar(ttk.Frame):
 
             A <<CalendarSelected>> event is generated each time the user
             selects a day with the mouse.
+
+        CALENDAR EVENTS
+
+            Special events (e.g. birthdays, ..) can be managed using the 'calevent_..'
+            methods. The way they are displayed in the calendar is determined with
+            tags. An id is attributed to each event upon creation and can be used
+            to edit the event (ev_id argument).
         """
 
         curs = kw.pop("cursor", "")
@@ -259,12 +266,11 @@ class Calendar(ttk.Frame):
         # --- *-- calendar
         self._cal_frame = ttk.Frame(self,
                                     style='cal.%s.TFrame' % self._style_prefixe)
-
         ttk.Label(self._cal_frame,
                   style='headers.%s.TLabel' % self._style_prefixe).grid(row=0,
                                                                         column=0,
                                                                         sticky="eswn")
-
+        # week day names
         for i, d in enumerate(self._cal.formatweekheader(3).split()):
             self._cal_frame.columnconfigure(i + 1, weight=1)
             ttk.Label(self._cal_frame,
@@ -273,8 +279,8 @@ class Calendar(ttk.Frame):
                       anchor="center",
                       text=d, width=4).grid(row=0, column=i + 1,
                                             sticky="ew", pady=(0, 1))
-        self._week_nbs = []
-        self._calendar = []
+        self._week_nbs = []  # week numbers
+        self._calendar = []  # days
         for i in range(1, 7):
             self._cal_frame.rowconfigure(i, weight=1)
             wlabel = ttk.Label(self._cal_frame, style='headers.%s.TLabel' % self._style_prefixe,
@@ -541,6 +547,9 @@ class Calendar(ttk.Frame):
         # update calendar shown dates
         cal = self._cal.monthdatescalendar(year, month)
 
+        # remove previous tooltips
+        self.tooltip_wrapper.remove_all()
+
         next_m = month + 1
         y = year
         if next_m == 13:
@@ -555,6 +564,7 @@ class Calendar(ttk.Frame):
             if len(cal) < 6:
                 cal.append(self._cal.monthdatescalendar(y, next_m)[i + 1])
 
+        # style names depending on the type of day
         week_days = {i: 'normal' for i in range(7)}
         week_days[5] = 'we'
         week_days[6] = 'we'
@@ -572,7 +582,6 @@ class Calendar(ttk.Frame):
                 label = self._calendar[i_week][i_day]
                 txt = str(cal[i_week][i_day].day)
                 label.configure(text=txt, style=style)
-                self.tooltip_wrapper.remove_tooltip(label)
                 if cal[i_week][i_day] in self._calevent_dates:
                     date = cal[i_week][i_day]
                     ev_ids = self._calevent_dates[date]
@@ -645,6 +654,7 @@ class Calendar(ttk.Frame):
                                 self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
 
     def _show_event(self, date):
+        """Display events on date if visible."""
         if date.year == self._date.year:
             _, w, d = date.isocalendar()
             wn = self._date.isocalendar()[1]
@@ -763,18 +773,16 @@ class Calendar(ttk.Frame):
     # --- events
     def calevent_create(self, date, text, tags=[]):
         """
-        Add event in calendar.
+        Add new event in calendar and return event id.
 
         Options:
 
-            date: datetime.date or datetime.datetime instance
-            text: text to put in the tooltip associated to date
+            date: datetime.date or datetime.datetime instance.
+            text: text to put in the tooltip associated to date.
             tags: list of tags to apply to the event. The last tag determines
                   the way the event is displayed. If there are several events on
                   the same day, the lowest one (on the tooltip list) which has
                   tags determines the colors of the day.
-
-        Return event id.
         """
         if isinstance(date, Calendar.datetime):
             date = date.date()
@@ -814,47 +822,48 @@ class Calendar(ttk.Frame):
             else:
                 self._show_event(date)
 
-    def calevent_remove(self, *ev_ids, date=None, tag=None):
+    def calevent_remove(self, *ev_ids, **kw):
         """
-        Remove event from calendar.
+        Remove events from calendar.
 
-            *ev_ids: event ids to remove or 'all' to remove them all
-            date: if no id is given, delete all events on date (datetime.date or datetime.datetime).
-            tag: if no id or date is given, delete all events with given tag,
+        Arguments: event ids to remove or 'all' to remove them all.
+
+        Keyword arguments: tag, date.
+
+            They are taken into account only if no id is given. Remove all events
+            with given tag on given date. If only date is given, remove all events
+            on date and if only tag is given, remove all events with tag.
         """
         if ev_ids:
             if 'all' in ev_ids:
                 ev_ids = self.get_calevents()
             for ev_id in ev_ids:
                 self._calevent_remove(ev_id)
-        elif date is not None:
-            if isinstance(date, Calendar.datetime):
-                date = date.date()
-            if not isinstance(date, Calendar.date):
-                raise TypeError("date option should be a %s instance" % (Calendar.date))
-            try:
-                ids = self._calevent_dates[date].copy()
-                for ev_id in ids:
-                    self._calevent_remove(ev_id)
-            except KeyError:
-                pass  # no event on date
-        elif tag is not None:
-            evs = self.get_calevents(tag=tag)
+        else:
+            date = kw.get('date')
+            tag = kw.get('tag')
+            evs = self.get_calevents(tag=tag, date=date)
             for ev_id in evs:
                 self._calevent_remove(ev_id)
 
-    def calevent_cget(self, ev_id, key):
+    def calevent_cget(self, ev_id, option):
+        """Return value of given option for the event ev_id."""
         try:
             ev = self.calevents[ev_id]
         except KeyError:
             raise ValueError("event %s does not exists" % ev_id)
         else:
             try:
-                return ev[key]
+                return ev[option]
             except KeyError:
-                raise ValueError('unknown option "%s"' % key)
+                raise ValueError('unknown option "%s"' % option)
 
     def calevent_configure(self, ev_id, **kw):
+        """
+        Configure the event ev_id.
+
+        Keyword options: date, text, tags (see calevent_create options).
+        """
         try:
             ev = self.calevents[ev_id]
         except KeyError:
@@ -897,9 +906,9 @@ class Calendar(ttk.Frame):
 
     def calevent_raise(self, ev_id, above=None):
         """
-        Raise event in tooltip event list.
+        Raise event ev_id in tooltip event list.
 
-            above: put event above given one, if above is None, put it on top
+            above: put ev_id above given one, if above is None, put it on top
                    of tooltip event list.
 
         The day's colors are determined by the last tag of the lowest event
@@ -926,9 +935,9 @@ class Calendar(ttk.Frame):
 
     def calevent_lower(self, ev_id, below=None):
         """
-        Lower event in tooltip event list.
+        Lower event ev_id in tooltip event list.
 
-            below: put event below given one, if below is None, put it at the
+            below: put ev_id below given one, if below is None, put it at the
                    bottom of tooltip event list.
 
         The day's colors are determined by the last tag of the lowest event
@@ -955,12 +964,10 @@ class Calendar(ttk.Frame):
 
     def get_calevents(self, date=None, tag=None):
         """
-        Return event ids.
+        Return event ids of events with given tag and on given date.
 
-            date: return event ids of events on date
-            tag: return event ids of event with given tag and on given date if
-                 date is not None
-
+        If only date is given, return event ids of all events on date.
+        If only tag is given, return event ids of all events with tag.
         If both options are None, return all event ids.
         """
         if date is not None:
@@ -989,7 +996,7 @@ class Calendar(ttk.Frame):
         """
         Configure tag.
 
-        keyword options: foreground, background (of the day in the calendar)
+        Keyword options: foreground, background (of the day in the calendar)
         """
         if tag not in self._tags:
             self._tags[tag] = {}

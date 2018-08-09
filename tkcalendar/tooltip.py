@@ -26,6 +26,7 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
+from sys import platform
 
 
 class Tooltip(tk.Toplevel):
@@ -34,7 +35,8 @@ class Tooltip(tk.Toplevel):
         if 'title' in kwargs:
             self.title(kwargs['title'])
         self.transient(parent)
-        self.attributes('-type', 'tooltip')
+        if platform is 'linux':
+            self.attributes('-type', 'tooltip')
         self.attributes('-alpha', kwargs.get('alpha', 0.8))
         self.overrideredirect(True)
         self.configure(padx=kwargs.get('padx', 4))
@@ -75,6 +77,8 @@ class Tooltip(tk.Toplevel):
 class TooltipWrapper:
     def __init__(self, master, **kwargs):
         self.widgets = {}
+        self.bind_enter_ids = {}
+        self.bind_leave_ids = {}
         if 'delay' in kwargs:
             self.delay = kwargs.pop('delay')
         else:
@@ -90,17 +94,29 @@ class TooltipWrapper:
 
     def add_tooltip(self, widget, text):
         self.widgets[str(widget)] = text
-        widget.bind('<Enter>', self._on_enter)
-        widget.bind('<Leave>', self._on_leave)
+        self.bind_enter_ids[str(widget)] = widget.bind('<Enter>', self._on_enter)
+        self.bind_leave_ids[str(widget)] = widget.bind('<Leave>', self._on_leave)
 
     def set_tooltip_text(self, widget, text):
         self.widgets[str(widget)] = text
 
+    def remove_all(self):
+        for name in self.widgets:
+            widget = self.tooltip.nametowidget(name)
+            widget.unbind('<Enter>', self.bind_enter_ids[name])
+            widget.unbind('<Leave>', self.bind_leave_ids[name])
+        self.widgets.clear()
+        self.bind_enter_ids.clear()
+        self.bind_leave_ids.clear()
+
     def remove_tooltip(self, widget):
         try:
-            del self.widgets[str(widget)]
-            widget.unbind('<Enter>')
-            widget.unbind('<Leave>')
+            name = str(widget)
+            del self.widgets[name]
+            widget.unbind('<Enter>', self.bind_enter_ids[name])
+            widget.unbind('<Leave>', self.bind_leave_ids[name])
+            del self.bind_enter_ids[name]
+            del self.bind_leave_ids[name]
         except KeyError:
             pass
 

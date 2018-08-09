@@ -1,9 +1,11 @@
 tkcalendar
 ==========
 
-tkcalendar is a python module that provides the Calendar and DateEntry widgets for Tkinter. The DateEntry widget is similar to a Combobox, but the drop-down is not a list but a Calendar to select a date.
+tkcalendar is a python module that provides the Calendar and DateEntry widgets for Tkinter.
+The DateEntry widget is similar to a Combobox, but the drop-down is not a list but a Calendar to select a date.
+Events can be displayed in the Calendar with custom colors and a tooltip displays the event list for a given day.
 tkcalendar is compatible with both Python 2 and Python 3.
-It support all locale settings supported by the system and the colors are customizable.
+It supports all locale settings supported by the system and the colors are customizable.
 
 
 Requirements
@@ -133,13 +135,65 @@ Calendar widget
 
     * Widget-Specific methods:
 
-        **get_date()**: If selectmode is 'day', returns the string corresponding to the selected date in the ``Calendar`` locale, otherwise returns ``""``.
+        **calevent_cget(ev_id, option)**: Return value of given option for the event *ev_id*.
+        
+        **calevent_configure(ev_id, \*\*kw)**: Return value of given option for the event *ev_id*.
 
-        **selection_get()**: If selectmode is 'day', returns the selected date as a ``datetime.date`` instance, otherwise returns ``None``.
+        **calevent_create(date, text, tags=[])**: Add new event in calendar and return event id.
 
-        **selection_set(self, date)**: If selectmode is 'day', sets the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
+            Options:
 
+                *date*: datetime.date or datetime.datetime instance.
+                
+                *text*: text to put in the tooltip associated to date.
+                
+                *tags*: list of tags to apply to the event. The last tag determines the way the event is displayed. If there are several events on the same day, the lowest one (on the tooltip list) which has tags determines the colors of the day.
 
+        **calevent_lower(ev_id, below=None)**: Lower event *ev_id* in tooltip event list.
+
+            *below:* put event below given one, if below is None, put it at the bottom of tooltip event list.
+
+            The day's colors are determined by the last tag of the lowest event which has tags.
+            
+        **calevent_raise(ev_id, above=None)**: Raise event *ev_id* in tooltip event list.
+
+            *above*: put *ev_id* above given one, if above is None, put it on top of tooltip event list.
+
+            The day's colors are determined by the last tag of the lowest event which has tags.
+
+        **calevent_remove(\*ev_ids, \*\*kw)**: Remove events from calendar.
+
+            Arguments: event ids to remove or 'all' to remove them all.
+
+            Keyword arguments: *tag*, *date*.
+
+                They are taken into account only if no id is given. Remove all events with given tag on given date. If only date is given, remove all events on date and if only tag is given, remove all events with tag.
+
+        **get_date()**: If selectmode is 'day', return the string corresponding to the selected date in the ``Calendar`` locale, otherwise return ``""``.
+
+        **get_calevents**(date=None, tag=None)**: Return event ids of events with given tag and on given date.
+
+            If only *date* is given, return event ids of all events on date.
+            If only *tag* is given, return event ids of all events with tag.
+            If both options are None, return all event ids.
+            
+        **selection_get()**: If selectmode is 'day', return the selected date as a ``datetime.date`` instance, otherwise return ``None``.
+
+        **selection_set(self, date)**: If selectmode is 'day', set the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
+
+        **tag_cget(tag, option)**: Return the value of the tag's option.
+
+        **tag_config(self, tag, **kw)**: Configure *tag*.
+
+            Keyword options: *foreground*, *background* (of the day in the calendar)
+
+        **tag_delete(tag)**: Delete given tag and remove it from all events.
+        
+        **tag_names()**: Return tuple of existing tags.
+        
+       
+        
+        
 DateEntry widget
 
     Date selection entry with drop-down calendar.
@@ -177,11 +231,11 @@ DateEntry widget
 
     * Widget-Specific methods:
 
-        **drop_down()**: Displays or withdraws the drop-down calendar depending on its current state.
+        **drop_down()**: Display or withdraw the drop-down calendar depending on its current state.
 
-        **get_date()**: Returns the selected date as a ``datetime.date`` instance.
+        **get_date()**: Return the selected date as a ``datetime.date`` instance.
 
-        **set_date(self, date)**: Sets the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
+        **set_date(self, date)**: Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
