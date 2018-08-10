@@ -14,6 +14,7 @@ install:
 script:
   - python -m pip install .
   - python -m nose
+  - cat /tmp/test.log
 after_success:
   - coverage run nosetests
   - codecov
