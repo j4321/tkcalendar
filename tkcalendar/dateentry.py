@@ -25,7 +25,6 @@ DateEntry widget
 
 
 from sys import platform
-import locale
 try:
     import tkinter as tk
     from tkinter import ttk

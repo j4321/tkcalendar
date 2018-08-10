@@ -13,7 +13,6 @@ def example1():
         print(cal.selection_get())
 
     top = tk.Toplevel(root)
-    top.grab_set()
 
     cal = Calendar(top, font="Arial 14", selectmode='day',
                    cursor="hand1", year=2018, month=2, day=5)
@@ -25,7 +24,6 @@ def example1():
 def example2():
 
     top = tk.Toplevel(root)
-    top.grab_set()
 
     cal = Calendar(top, selectmode='none')
     date = datetime.datetime.today() + datetime.timedelta(days=2)
@@ -42,7 +40,6 @@ def example2():
 
 def example3():
     top = tk.Toplevel(root)
-    top.grab_set()
 
     ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
 

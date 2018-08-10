@@ -143,7 +143,7 @@ class TooltipWrapper:
             self.tooltip.withdraw()
 
     def display_tooltip(self):
-        if "disabled" not in self.current_widget.state():
+        if self.current_widget is not None and "disabled" not in self.current_widget.state():
             self.tooltip['text'] = self.widgets[str(self.current_widget)]
             self.tooltip.deiconify()
             x = self.current_widget.winfo_pointerx() + 14

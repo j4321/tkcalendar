@@ -1,6 +1,6 @@
 from tests import BaseWidgetTest, TestEvent, format_date
 from tkcalendar import DateEntry
-from datetime import datetime, date
+from datetime import date
 from pynput.mouse import Controller, Button
 
 
@@ -15,6 +15,9 @@ class TestDateEntry(BaseWidgetTest):
         widget.pack()
         self.window.update()
         widget.destroy()
+        widget = DateEntry(self.window, year=2012, day=32)
+        self.window.update()
+        self.assertEqual(widget.get_date(), date.today())
 
     def test_dateentry_drop_down(self):
         """Check whether drop down opens on click."""

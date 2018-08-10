@@ -56,36 +56,58 @@ class Calendar(ttk.Frame):
 
         WIDGET-SPECIFIC OPTIONS
 
-            year, month: initially displayed month, default is current month
-            day: initially selected day, if month or year is given but not
-                day, no initial selection, otherwise, default is today
+            year: initially displayed year, default is current year
+
+            month: initially displayed month, default is current month
+
+            day: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
+
             locale: locale to use, e.g. 'fr_FR'
-            selectmode: "none" or "day" (default) define whether the user
-                        can change the selected day with a mouse click
+
+            selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
+
             showweeknumbers: boolean (default is True) to show/hide week numbers
+
             textvariable: StringVar that will contain the currently selected date as str
+
             background: background color of calendar border and month/year name
+
             foreground: foreground color of month/year name
+
             bordercolor: day border color
+
             selectbackground: background color of selected day
+
             selectforeground: foreground color of selected day
+
             disabledselectbackground: background color of selected day in disabled state
+
             disabledselectforeground: foreground color of selected day in disabled state
+
             normalbackground: background color of normal week days
+
             normalforeground: foreground color of normal week days
-            othermonthforeground: foreground color of normal week days
-                                  belonging to the previous/next month
-            othermonthbackground: background color of normal week days
-                                  belonging to the previous/next month
-            othermonthweforeground: foreground color of week-end days
-                                    belonging to the previous/next month
+
+            othermonthforeground: foreground color of normal week days belonging to the previous/next month
+
+            othermonthbackground: background color of normal week days belonging to the previous/next month
+
+            othermonthweforeground: foreground color of week-end days belonging to the previous/next month
+
             othermonthwebackground: background color of week-end days
-                                    belonging to the previous/next month
+
+            belonging to the previous/next month
+
             weekendbackground: background color of week-end days
+
             weekendforeground: foreground color of week-end days
+
             headersbackground: background color of day names and week numbers
+
             headersforeground: foreground color of day names and week numbers
+
             disableddaybackground: background color of days in disabled state
+
             disableddayforeground: foreground color of days in disabled state
 
         VIRTUAL EVENTS
@@ -134,20 +156,30 @@ class Calendar(ttk.Frame):
         # --- date
         today = self.date.today()
 
-        if (("month" in kw) or ("year" in kw)) and ("day" not in kw):
-            month = kw.pop("month", today.month)
-            year = kw.pop('year', today.year)
-            self._sel_date = None  # selected day
-        else:
-            day = kw.pop('day', today.day)
-            month = kw.pop("month", today.month)
-            year = kw.pop('year', today.year)
+        if self._textvariable is not None:
+            # the variable overrides day, month and year keywords
             try:
-                self._sel_date = self.date(year, month, day)  # selected day
-                if self._textvariable is not None:
-                    self._textvariable.set(format_date(self._sel_date, 'short', locale))
-            except ValueError:
+                self._sel_date = parse_date(self._textvariable.get(), locale)
+                month = self._sel_date.month
+                year = self._sel_date.year
+            except IndexError:
                 self._sel_date = None
+                self._textvariable.set('')
+                month = kw.pop("month", today.month)
+                year = kw.pop('year', today.year)
+        else:
+            if (("month" in kw) or ("year" in kw)) and ("day" not in kw):
+                month = kw.pop("month", today.month)
+                year = kw.pop('year', today.year)
+                self._sel_date = None  # selected day
+            else:
+                day = kw.pop('day', today.day)
+                month = kw.pop("month", today.month)
+                year = kw.pop('year', today.year)
+                try:
+                    self._sel_date = self.date(year, month, day)  # selected day
+                except ValueError:
+                    self._sel_date = None
 
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
         self.calevents = {}  # special events displayed in colors and with tooltips to show content
@@ -345,20 +377,18 @@ class Calendar(ttk.Frame):
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
             elif key is 'textvariable':
-                if self._sel_date is not None:
+                try:
+                    if self._textvariable is not None:
+                        self._textvariable.trace_remove('write', self._textvariable_trace_id)
                     if value is not None:
-                        value.set(self.format_date(self._sel_date))
-                    try:
-                        if self._textvariable is not None:
-                            self._textvariable.trace_remove('write', self._textvariable_trace_id)
-                        if value is not None:
-                            self._textvariable_trace_id = value.trace_add('write', self._textvariable_trace)
-                    except AttributeError:
-                        if self._textvariable is not None:
-                            self._textvariable.trace_vdelete('w', self._textvariable_trace_id)
-                        if value is not None:
-                            value.trace('w', self._textvariable_trace)
+                        self._textvariable_trace_id = value.trace_add('write', self._textvariable_trace)
+                except AttributeError:
+                    if self._textvariable is not None:
+                        self._textvariable.trace_vdelete('w', self._textvariable_trace_id)
+                    if value is not None:
+                        value.trace('w', self._textvariable_trace)
                 self._textvariable = value
+                value.set(value.get())
             elif key is 'showweeknumbers':
                 if value:
                     for wlabel in self._week_nbs:
@@ -935,12 +965,11 @@ class Calendar(ttk.Frame):
                 evs.remove(ev_id)
                 evs.insert(0, ev_id)
             else:
-                evs.remove(ev_id)
-                try:
-                    index = evs.index(above)
-                except ValueError:
+                if above not in evs:
                     raise ValueError("event %s does not exists on %s" % (above, date))
                 else:
+                    evs.remove(ev_id)
+                    index = evs.index(above)
                     evs.insert(index, ev_id)
             self._show_event(date)
 
@@ -964,12 +993,11 @@ class Calendar(ttk.Frame):
                 evs.remove(ev_id)
                 evs.append(ev_id)
             else:
-                evs.remove(ev_id)
-                try:
-                    index = evs.index(below) + 1
-                except ValueError:
+                if below not in evs:
                     raise ValueError("event %s does not exists on %s" % (below, date))
                 else:
+                    evs.remove(ev_id)
+                    index = evs.index(below) + 1
                     evs.insert(index, ev_id)
             self._show_event(date)
 
