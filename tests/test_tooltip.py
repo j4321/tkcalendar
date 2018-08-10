@@ -16,7 +16,7 @@ class TestTooltip(BaseWidgetTest):
 
 
 class TestTooltipWrapper(BaseWidgetTest):
-    def test_tooltiptreewrapper(self):
+    def test_tooltipwrapper(self):
         b1 = ttk.Button(self.window, text='Button 1')
         b2 = ttk.Button(self.window, text='Button 2')
         b3 = ttk.Button(self.window, text='Button 2')
@@ -33,11 +33,9 @@ class TestTooltipWrapper(BaseWidgetTest):
         x, y = b1.winfo_rootx(), b1.winfo_rooty()
         mouse_controller = Controller()
         mouse_controller.position = (x + 10, y + 10)
-        self.window.update()
         self.assertEqual(tw.current_widget, b1)
         tw.display_tooltip()
         mouse_controller.position = (x - 10, y - 10)
-        self.window.update()
         self.assertIsNone(tw.current_widget)
         tw.display_tooltip()
         self.window.update()

@@ -4,6 +4,7 @@ environment:
     - PYTHON: "C:\\PYTHON34"
     - PYTHON: "C:\\PYTHON35"
     - PYTHON: "C:\\PYTHON36"
+    - PYTHON: "C:\\PYTHON37"
 install:
   - "%PYTHON%\\python.exe -m pip install codecov coverage nose pillow pynput babel"
 build: off
