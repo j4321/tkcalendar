@@ -45,9 +45,9 @@ class TestTooltipWrapper(BaseWidgetTest):
         self.window.update()
         mouse_controller.position = (x - 10, y - 10)
         self.window.update()
-#        raise ValueError(str(self.window.winfo_containing(*self.window.winfo_pointerxy())))
-        with self.assertRaises(KeyError):
-            print(self.window.winfo_containing(*self.window.winfo_pointerxy()))
+        print(self.window.winfo_containing(*self.window.winfo_pointerxy()))
+        raise ValueError(str(self.window.winfo_containing(*self.window.winfo_pointerxy())))
+
 #        self.assertIsNone(tw.current_widget)
 #        tw.remove_tooltip(self.window)
 #        tw.remove_tooltip(b1)
