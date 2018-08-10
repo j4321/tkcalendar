@@ -37,10 +37,10 @@ class TestTooltipWrapper(BaseWidgetTest):
         self.assertEqual(tw.current_widget, b1)
         tw.display_tooltip()
         mouse_controller.position = (x - 10, y - 10)
+        mouse_controller.position = (x - 10, y - 10)
         self.window.update()
         print(self.window.winfo_containing(*self.window.winfo_pointerxy()))
-        raise ValueError(str(self.window.winfo_containing(*self.window.winfo_pointerxy())))
-
+        self.assertIsNone(tw.current_widget)
 #        self.assertIsNone(tw.current_widget)
 #        tw.display_tooltip()
 #        self.window.update()
