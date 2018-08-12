@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-tkcalendar module providing Calendar and DateEntry widgets
+Calendar widget
 """
 # TODO: custom first week day?
 
@@ -29,19 +29,19 @@ import calendar
 from babel.dates import format_date, parse_date, get_day_names, get_month_names
 from sys import platform
 try:
-    import tkinter as tk
     from tkinter import ttk
     from tkinter.font import Font
 except ImportError:
-    import Tkinter as tk
     import ttk
     from tkFont import Font
+from tkcalendar.tooltip import TooltipWrapper
 from locale import getdefaultlocale
 
 
 class Calendar(ttk.Frame):
     """Calendar widget."""
     date = calendar.datetime.date
+    datetime = calendar.datetime.datetime
     timedelta = calendar.datetime.timedelta
     strptime = calendar.datetime.datetime.strptime
     strftime = calendar.datetime.datetime.strftime
@@ -56,42 +56,71 @@ class Calendar(ttk.Frame):
 
         WIDGET-SPECIFIC OPTIONS
 
-            year, month: initially displayed month, default is current month
-            day: initially selected day, if month or year is given but not
-                day, no initial selection, otherwise, default is today
+            year: initially displayed year, default is current year
+
+            month: initially displayed month, default is current month
+
+            day: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
+
             locale: locale to use, e.g. 'fr_FR'
-            selectmode: "none" or "day" (default) define whether the user
-                        can change the selected day with a mouse click
+
+            selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
+
             showweeknumbers: boolean (default is True) to show/hide week numbers
+
             textvariable: StringVar that will contain the currently selected date as str
+
             background: background color of calendar border and month/year name
+
             foreground: foreground color of month/year name
+
             bordercolor: day border color
+
             selectbackground: background color of selected day
+
             selectforeground: foreground color of selected day
+
             disabledselectbackground: background color of selected day in disabled state
+
             disabledselectforeground: foreground color of selected day in disabled state
+
             normalbackground: background color of normal week days
+
             normalforeground: foreground color of normal week days
-            othermonthforeground: foreground color of normal week days
-                                  belonging to the previous/next month
-            othermonthbackground: background color of normal week days
-                                  belonging to the previous/next month
-            othermonthweforeground: foreground color of week-end days
-                                    belonging to the previous/next month
+
+            othermonthforeground: foreground color of normal week days belonging to the previous/next month
+
+            othermonthbackground: background color of normal week days belonging to the previous/next month
+
+            othermonthweforeground: foreground color of week-end days belonging to the previous/next month
+
             othermonthwebackground: background color of week-end days
-                                    belonging to the previous/next month
+
+            belonging to the previous/next month
+
             weekendbackground: background color of week-end days
+
             weekendforeground: foreground color of week-end days
+
             headersbackground: background color of day names and week numbers
+
             headersforeground: foreground color of day names and week numbers
+
             disableddaybackground: background color of days in disabled state
+
             disableddayforeground: foreground color of days in disabled state
 
         VIRTUAL EVENTS
 
             A <<CalendarSelected>> event is generated each time the user
             selects a day with the mouse.
+
+        CALENDAR EVENTS
+
+            Special events (e.g. birthdays, ..) can be managed using the 'calevent_..'
+            methods. The way they are displayed in the calendar is determined with
+            tags. An id is attributed to each event upon creation and can be used
+            to edit the event (ev_id argument).
         """
 
         curs = kw.pop("cursor", "")
@@ -127,22 +156,36 @@ class Calendar(ttk.Frame):
         # --- date
         today = self.date.today()
 
-        if (("month" in kw) or ("year" in kw)) and ("day" not in kw):
-            month = kw.pop("month", today.month)
-            year = kw.pop('year', today.year)
-            self._sel_date = None  # selected day
-        else:
-            day = kw.pop('day', today.day)
-            month = kw.pop("month", today.month)
-            year = kw.pop('year', today.year)
+        if self._textvariable is not None:
+            # the variable overrides day, month and year keywords
             try:
-                self._sel_date = self.date(year, month, day)  # selected day
-                if self._textvariable is not None:
-                    self._textvariable.set(format_date(self._sel_date, 'short', locale))
-            except ValueError:
+                self._sel_date = parse_date(self._textvariable.get(), locale)
+                month = self._sel_date.month
+                year = self._sel_date.year
+            except IndexError:
                 self._sel_date = None
+                self._textvariable.set('')
+                month = kw.pop("month", today.month)
+                year = kw.pop('year', today.year)
+        else:
+            if (("month" in kw) or ("year" in kw)) and ("day" not in kw):
+                month = kw.pop("month", today.month)
+                year = kw.pop('year', today.year)
+                self._sel_date = None  # selected day
+            else:
+                day = kw.pop('day', today.day)
+                month = kw.pop("month", today.month)
+                year = kw.pop('year', today.year)
+                try:
+                    self._sel_date = self.date(year, month, day)  # selected day
+                except ValueError:
+                    self._sel_date = None
 
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
+        self.calevents = {}  # special events displayed in colors and with tooltips to show content
+        self._calevent_dates = {}  # list of event ids for each date
+        self._tags = {}  # tags to format event display
+        self.tooltip_wrapper = TooltipWrapper(self)
 
         # --- selectmode
         selectmode = kw.pop("selectmode", "day")
@@ -261,7 +304,7 @@ class Calendar(ttk.Frame):
                   style='headers.%s.TLabel' % self._style_prefixe).grid(row=0,
                                                                         column=0,
                                                                         sticky="eswn")
-
+        # week day names
         for i in range(7):
             d = self._day_names[i]
             self._cal_frame.columnconfigure(i + 1, weight=1)
@@ -271,8 +314,8 @@ class Calendar(ttk.Frame):
                       anchor="center",
                       text=d, width=4).grid(row=0, column=i + 1,
                                             sticky="ew", pady=(0, 1))
-        self._week_nbs = []
-        self._calendar = []
+        self._week_nbs = []  # week numbers
+        self._calendar = []  # days
         for i in range(1, 7):
             self._cal_frame.rowconfigure(i, weight=1)
             wlabel = ttk.Label(self._cal_frame, style='headers.%s.TLabel' % self._style_prefixe,
@@ -334,20 +377,18 @@ class Calendar(ttk.Frame):
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
             elif key is 'textvariable':
-                if self._sel_date is not None:
+                try:
+                    if self._textvariable is not None:
+                        self._textvariable.trace_remove('write', self._textvariable_trace_id)
                     if value is not None:
-                        value.set(self.format_date(self._sel_date))
-                    try:
-                        if self._textvariable is not None:
-                            self._textvariable.trace_remove('write', self._textvariable_trace_id)
-                        if value is not None:
-                            self._textvariable_trace_id = value.trace_add('write', self._textvariable_trace)
-                    except AttributeError:
-                        if self._textvariable is not None:
-                            self._textvariable.trace_vdelete('w', self._textvariable_trace_id)
-                        if value is not None:
-                            value.trace('w', self._textvariable_trace)
+                        self._textvariable_trace_id = value.trace_add('write', self._textvariable_trace)
+                except AttributeError:
+                    if self._textvariable is not None:
+                        self._textvariable.trace_vdelete('w', self._textvariable_trace_id)
+                    if value is not None:
+                        value.trace('w', self._textvariable_trace)
                 self._textvariable = value
+                value.set(value.get())
             elif key is 'showweeknumbers':
                 if value:
                     for wlabel in self._week_nbs:
@@ -436,6 +477,7 @@ class Calendar(ttk.Frame):
             self._properties[key] = value
 
     def _textvariable_trace(self, *args):
+        """Connect StringVar value with selected date."""
         if self._properties.get("selectmode") is "day":
             date = self._textvariable.get()
             if not date:
@@ -525,6 +567,7 @@ class Calendar(ttk.Frame):
                        background=[('disabled', dis_bg)],
                        foreground=[('disabled', dis_fg)])
 
+    # --- display
     def _display_calendar(self):
         """Display the days of the current month (the one in self._date)."""
         year, month = self._date.year, self._date.month
@@ -536,6 +579,9 @@ class Calendar(ttk.Frame):
 
         # update calendar shown dates
         cal = self._cal.monthdatescalendar(year, month)
+
+        # remove previous tooltips
+        self.tooltip_wrapper.remove_all()
 
         next_m = month + 1
         y = year
@@ -551,6 +597,7 @@ class Calendar(ttk.Frame):
             if len(cal) < 6:
                 cal.append(self._cal.monthdatescalendar(y, next_m)[i + 1])
 
+        # style names depending on the type of day
         week_days = {i: 'normal' for i in range(7)}
         week_days[5] = 'we'
         week_days[6] = 'we'
@@ -565,9 +612,21 @@ class Calendar(ttk.Frame):
             self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % modulo + 1))
             for i_day in range(7):
                 style = week_days[i_day] + months[cal[i_week][i_day].month]
+                label = self._calendar[i_week][i_day]
                 txt = str(cal[i_week][i_day].day)
-                self._calendar[i_week][i_day].configure(text=txt,
-                                                        style=style)
+                label.configure(text=txt, style=style)
+                if cal[i_week][i_day] in self._calevent_dates:
+                    date = cal[i_week][i_day]
+                    ev_ids = self._calevent_dates[date]
+                    i = len(ev_ids) - 1
+                    while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
+                        i -= 1
+                    if i >= 0:
+                        tag = self.calevents[ev_ids[i]]['tags'][-1]
+                        label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
+                    text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
+                    self.tooltip_wrapper.add_tooltip(label, text)
+
         self._display_selection()
 
     def _display_selection(self):
@@ -582,26 +641,70 @@ class Calendar(ttk.Frame):
                 if 0 <= w and w < 6:
                     self._calendar[w][d - 1].configure(style='sel.%s.TLabel' % self._style_prefixe)
 
+    def _reset_day(self, date):
+        """Restore usual week day colors."""
+        year, month = date.year, date.month
+        if year == self._date.year:
+            _, w, d = date.isocalendar()
+            wn = self._date.isocalendar()[1]
+            w -= wn
+            w %= max(52, wn)
+            if w >= 0 and w < 6:
+                self.tooltip_wrapper.remove_tooltip(self._calendar[w][d - 1])
+                if month == date.month:
+                    if d < 6:
+                        self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
+                    else:
+                        self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
+                else:
+                    if d < 6:
+                        self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
+                    else:
+                        self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+
     def _remove_selection(self):
         """Remove highlight of selected day."""
         if self._sel_date is not None:
-            year, month = self._sel_date.year, self._sel_date.month
-            if year == self._date.year:
-                _, w, d = self._sel_date.isocalendar()
-                wn = self._date.isocalendar()[1]
-                w -= wn
-                w %= max(52, wn)
-                if w >= 0 and w < 6:
-                    if month == self._date.month:
-                        if d < 6:
-                            self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
+            if self._sel_date in self._calevent_dates:
+                self._show_event(self._sel_date)
+            else:
+                year, month = self._sel_date.year, self._sel_date.month
+                if year == self._date.year:
+                    _, w, d = self._sel_date.isocalendar()
+                    wn = self._date.isocalendar()[1]
+                    w -= wn
+                    w %= max(52, wn)
+                    if w >= 0 and w < 6:
+                        if month == self._date.month:
+                            if d < 6:
+                                self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
+                            else:
+                                self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
                         else:
-                            self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
-                    else:
-                        if d < 6:
-                            self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
-                        else:
-                            self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+                            if d < 6:
+                                self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
+                            else:
+                                self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+
+    def _show_event(self, date):
+        """Display events on date if visible."""
+        if date.year == self._date.year:
+            _, w, d = date.isocalendar()
+            wn = self._date.isocalendar()[1]
+            w -= wn
+            w %= max(52, wn)
+            if w >= 0 and w < 6:
+                label = self._calendar[w][d - 1]
+                ev_ids = self._calevent_dates[date]
+                i = len(ev_ids) - 1
+                while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
+                    i -= 1
+                if i >= 0:
+                    tag = self.calevents[ev_ids[i]]['tags'][-1]
+                    label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
+                text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
+                self.tooltip_wrapper.remove_tooltip(label)
+                self.tooltip_wrapper.add_tooltip(label, text)
 
     # --- callbacks
     def _next_month(self):
@@ -609,9 +712,6 @@ class Calendar(ttk.Frame):
         year, month = self._date.year, self._date.month
         self._date = self._date + \
             self.timedelta(days=calendar.monthrange(year, month)[1])
-#        if month == 12:
-#            # don't increment year
-#            self._date = self._date.replace(year=year)
         self._display_calendar()
 
     def _prev_month(self):
@@ -711,6 +811,272 @@ class Calendar(ttk.Frame):
         else:
             return ""
 
+    # --- events
+    def calevent_create(self, date, text, tags=[]):
+        """
+        Add new event in calendar and return event id.
+
+        Options:
+
+            date: datetime.date or datetime.datetime instance.
+            text: text to put in the tooltip associated to date.
+            tags: list of tags to apply to the event. The last tag determines
+                  the way the event is displayed. If there are several events on
+                  the same day, the lowest one (on the tooltip list) which has
+                  tags determines the colors of the day.
+        """
+        if isinstance(date, Calendar.datetime):
+            date = date.date()
+        if not isinstance(date, Calendar.date):
+            raise TypeError("date option should be a %s instance" % (Calendar.date))
+        if self.calevents:
+            ev_id = max(self.calevents) + 1
+        else:
+            ev_id = 0
+        if isinstance(tags, str):
+            tags_ = [tags]
+        else:
+            tags_ = list(tags)
+        self.calevents[ev_id] = {'date': date, 'text': text, 'tags': tags_}
+        for tag in tags_:
+            if tag not in self._tags:
+                self._tag_initialize(tag)
+        if date not in self._calevent_dates:
+            self._calevent_dates[date] = [ev_id]
+        else:
+            self._calevent_dates[date].append(ev_id)
+        self._show_event(date)
+        return ev_id
+
+    def _calevent_remove(self, ev_id):
+        """Remove event ev_id."""
+        try:
+            date = self.calevents[ev_id]['date']
+        except KeyError:
+            ValueError("event %s does not exists" % ev_id)
+        else:
+            del self.calevents[ev_id]
+            self._calevent_dates[date].remove(ev_id)
+            if not self._calevent_dates[date]:
+                del self._calevent_dates[date]
+                self._reset_day(date)
+            else:
+                self._show_event(date)
+
+    def calevent_remove(self, *ev_ids, **kw):
+        """
+        Remove events from calendar.
+
+        Arguments: event ids to remove or 'all' to remove them all.
+
+        Keyword arguments: tag, date.
+
+            They are taken into account only if no id is given. Remove all events
+            with given tag on given date. If only date is given, remove all events
+            on date and if only tag is given, remove all events with tag.
+        """
+        if ev_ids:
+            if 'all' in ev_ids:
+                ev_ids = self.get_calevents()
+            for ev_id in ev_ids:
+                self._calevent_remove(ev_id)
+        else:
+            date = kw.get('date')
+            tag = kw.get('tag')
+            evs = self.get_calevents(tag=tag, date=date)
+            for ev_id in evs:
+                self._calevent_remove(ev_id)
+
+    def calevent_cget(self, ev_id, option):
+        """Return value of given option for the event ev_id."""
+        try:
+            ev = self.calevents[ev_id]
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            try:
+                return ev[option]
+            except KeyError:
+                raise ValueError('unknown option "%s"' % option)
+
+    def calevent_configure(self, ev_id, **kw):
+        """
+        Configure the event ev_id.
+
+        Keyword options: date, text, tags (see calevent_create options).
+        """
+        try:
+            ev = self.calevents[ev_id]
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            text = kw.pop('text', None)
+            tags = kw.pop('tags', None)
+            date = kw.pop('date', None)
+            if kw:
+                raise KeyError('Invalid keyword option(s) %s, valid options are "text", "tags" and "date".' % (kw.keys(),))
+            else:
+                if text is not None:
+                    ev['text'] = str(text)
+                if tags is not None:
+                    if isinstance(tags, str):
+                        tags_ = [tags]
+                    else:
+                        tags_ = list(tags)
+                    for tag in tags_:
+                        if tag not in self._tags:
+                            self._tag_initialize(tag)
+                    ev['tags'] = tags_
+                if date is not None:
+                    if isinstance(date, Calendar.datetime):
+                        date = date.date()
+                    if not isinstance(date, Calendar.date):
+                        raise TypeError("date option should be a %s instance" % (Calendar.date))
+                    old_date = ev['date']
+                    self._calevent_dates[old_date].remove(ev_id)
+                    if not self._calevent_dates[old_date]:
+                        self._reset_day(old_date)
+                    else:
+                        self._show_event(old_date)
+                    ev['date'] = date
+                    if date not in self._calevent_dates:
+                        self._calevent_dates[date] = [ev_id]
+                    else:
+                        self._calevent_dates[date].append(ev_id)
+                self._show_event(ev['date'])
+
+    def calevent_raise(self, ev_id, above=None):
+        """
+        Raise event ev_id in tooltip event list.
+
+            above: put ev_id above given one, if above is None, put it on top
+                   of tooltip event list.
+
+        The day's colors are determined by the last tag of the lowest event
+        which has tags.
+        """
+        try:
+            date = self.calevents[ev_id]['date']
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            evs = self._calevent_dates[date]
+            if above is None:
+                evs.remove(ev_id)
+                evs.insert(0, ev_id)
+            else:
+                if above not in evs:
+                    raise ValueError("event %s does not exists on %s" % (above, date))
+                else:
+                    evs.remove(ev_id)
+                    index = evs.index(above)
+                    evs.insert(index, ev_id)
+            self._show_event(date)
+
+    def calevent_lower(self, ev_id, below=None):
+        """
+        Lower event ev_id in tooltip event list.
+
+            below: put ev_id below given one, if below is None, put it at the
+                   bottom of tooltip event list.
+
+        The day's colors are determined by the last tag of the lowest event
+        which has tags.
+        """
+        try:
+            date = self.calevents[ev_id]['date']
+        except KeyError:
+            raise ValueError("event %s does not exists" % ev_id)
+        else:
+            evs = self._calevent_dates[date]
+            if below is None:
+                evs.remove(ev_id)
+                evs.append(ev_id)
+            else:
+                if below not in evs:
+                    raise ValueError("event %s does not exists on %s" % (below, date))
+                else:
+                    evs.remove(ev_id)
+                    index = evs.index(below) + 1
+                    evs.insert(index, ev_id)
+            self._show_event(date)
+
+    def get_calevents(self, date=None, tag=None):
+        """
+        Return event ids of events with given tag and on given date.
+
+        If only date is given, return event ids of all events on date.
+        If only tag is given, return event ids of all events with tag.
+        If both options are None, return all event ids.
+        """
+        if date is not None:
+            if isinstance(date, Calendar.datetime):
+                date = date.date()
+            if not isinstance(date, Calendar.date):
+                raise TypeError("date option should be a %s instance" % (Calendar.date))
+            try:
+                if tag is not None:
+                    return tuple(ev_id for ev_id in self._calevent_dates[date] if tag in self.calevents[ev_id]['tags'])
+                else:
+                    return tuple(self._calevent_dates[date])
+            except KeyError:
+                return ()
+        elif tag is not None:
+            return tuple(ev_id for ev_id, prop in self.calevents.items() if tag in prop['tags'])
+        else:
+            return tuple(self.calevents.keys())
+
+    def _tag_initialize(self, tag):
+        props = dict(foreground='white', background='royal blue')
+        self._tags[tag] = props
+        self.style.configure('tag_%s.%s.TLabel' % (tag, self._style_prefixe), **props)
+
+    def tag_config(self, tag, **kw):
+        """
+        Configure tag.
+
+        Keyword options: foreground, background (of the day in the calendar)
+        """
+        if tag not in self._tags:
+            self._tags[tag] = {}
+        props = dict(foreground='white', background='royal blue')  # default
+        props.update(self._tags[tag])
+        props.update(kw)
+        self.style.configure('tag_%s.%s.TLabel' % (tag, self._style_prefixe), **props)
+        self._tags[tag] = props
+
+    def tag_cget(self, tag, option):
+        """Return the value of the tag's option."""
+        try:
+            prop = self._tags[tag]
+        except KeyError:
+            raise ValueError('unknow tag "%s"' % tag)
+        else:
+            try:
+                return prop[option]
+            except KeyError:
+                raise ValueError('unknow option "%s"' % option)
+
+    def tag_names(self):
+        """Return tuple of existing tags."""
+        return tuple(self._tags.keys())
+
+    def tag_delete(self, tag):
+        """
+        Delete given tag.
+
+        Delete tag properties and remove tag from all events.
+        """
+        try:
+            del self._tags[tag]
+        except KeyError:
+            raise ValueError('tag "%s" does not exists' % tag)
+        else:
+            for props in self.calevents.values():
+                if tag in props['tags']:
+                    props['tags'].remove(tag)
+            self._display_calendar()
+
     # --- other methods
     def keys(self):
         """Return a list of all resource names of this widget."""
@@ -741,360 +1107,3 @@ class Calendar(ttk.Frame):
         """
         for item, value in kw.items():
             self[item] = value
-
-
-class DateEntry(ttk.Entry):
-    """Date selection entry with drop-down calendar."""
-
-    entry_kw = {'exportselection': 1,
-                'invalidcommand': '',
-                'justify': 'left',
-                'show': '',
-                'cursor': 'xterm',
-                'style': '',
-                'state': 'normal',
-                'takefocus': 'ttk::takefocus',
-                'textvariable': '',
-                'validate': 'none',
-                'validatecommand': '',
-                'width': 12,
-                'xscrollcommand': ''}
-
-    def __init__(self, master=None, **kw):
-        """
-        Create an entry with a drop-down calendar to select a date.
-
-        When the entry looses focus, if the user input is not a valid date,
-        the entry content is reset to the last valid date.
-
-        KEYWORDS OPTIONS
-
-            usual ttk.Entry options and Calendar options
-
-        VIRTUAL EVENTS
-
-            A <<DateEntrySelected>> event is generated each time
-            the user selects a date.
-        """
-        # sort keywords between entry options and calendar options
-        kw['selectmode'] = 'day'
-        entry_kw = {}
-
-        for key in self.entry_kw:
-            entry_kw[key] = kw.pop(key, self.entry_kw[key])
-        entry_kw['font'] = kw.get('font', None)
-
-        ttk.Entry.__init__(self, master, **entry_kw)
-
-        self._determine_downarrow_name_after_id = ''
-
-        # drop-down calendar
-        self._top_cal = tk.Toplevel(self)
-        self._top_cal.withdraw()
-        if platform == "linux":
-            self._top_cal.attributes('-type', 'DROPDOWN_MENU')
-        self._top_cal.overrideredirect(True)
-        self._calendar = Calendar(self._top_cal, **kw)
-        self._calendar.pack()
-
-        # locale date parsing / formatting
-        self.format_date = self._calendar.format_date
-        self.parse_date = self._calendar.parse_date
-
-        # style
-        self.style = ttk.Style(self)
-        self._setup_style()
-        self.configure(style='DateEntry')
-
-        # add validation to Entry so that only date in the locale '%x' format
-        # are accepted
-        validatecmd = self.register(self._validate_date)
-        self.configure(validate='focusout',
-                       validatecommand=validatecmd)
-
-        # initially selected date
-        self._date = self._calendar.selection_get()
-        if self._date is None:
-            today = self._calendar.date.today()
-            year = kw.get('year', today.year)
-            month = kw.get('month', today.month)
-            day = kw.get('day', today.day)
-            try:
-                self._date = self._calendar.date(year, month, day)
-            except ValueError:
-                self._date = today
-        self._set_text(self.format_date(self._date))
-
-        self._theme_change = True
-
-        # --- bindings
-        # reconfigure style if theme changed
-        self.bind('<<ThemeChanged>>',
-                  lambda e: self.after(10, self._on_theme_change))
-        # determine new downarrow button bbox
-        self.bind('<Configure>', self._determine_downarrow_name)
-        self.bind('<Map>', self._determine_downarrow_name)
-        # handle appearence to make the entry behave like a Combobox but with
-        # a drop-down calendar instead of a drop-down list
-        self.bind('<Leave>', lambda e: self.state(['!active']))
-        self.bind('<Motion>', self._on_motion)
-        self.bind('<ButtonPress-1>', self._on_b1_press)
-        # update entry content when date is selected in the Calendar
-        self._calendar.bind('<<CalendarSelected>>', self._select)
-        # hide calendar if it looses focus
-        self._calendar.bind('<FocusOut>', self._on_focus_out_cal)
-
-    def __getitem__(self, key):
-        """Return the resource value for a KEY given as string."""
-        return self.cget(key)
-
-    def __setitem__(self, key, value):
-        self.configure(**{key: value})
-
-    def _setup_style(self, event=None):
-        """Style configuration."""
-        self.style.layout('DateEntry', self.style.layout('TCombobox'))
-        fieldbg = self.style.map('TCombobox', 'fieldbackground')
-        self.update_idletasks()
-
-        self.style.map('DateEntry', fieldbackground=fieldbg)
-        try:
-            self.after_cancel(self._determine_downarrow_name_after_id)
-        except ValueError:
-            # nothing to cancel
-            pass
-        self._determine_downarrow_name_after_id = self.after(10, self._determine_downarrow_name)
-
-    def _determine_downarrow_name(self, event=None):
-        """Determine downarrow button bbox."""
-        try:
-            self.after_cancel(self._determine_downarrow_name_after_id)
-        except ValueError:
-            # nothing to cancel
-            pass
-        if self.winfo_ismapped():
-            self.update_idletasks()
-            y = self.winfo_height() // 2
-            x = self.winfo_width() - 10
-            name = self.identify(x, y)
-            if name:
-                self._downarrow_name = name
-            else:
-                self._determine_downarrow_name_after_id = self.after(10, self._determine_downarrow_name)
-
-    def _on_motion(self, event):
-        """Set widget state depending on mouse position to mimic Combobox behavior."""
-        x, y = event.x, event.y
-        if 'disabled' not in self.state():
-            if self.identify(x, y) == self._downarrow_name:
-                self.state(['active'])
-                self.configure(cursor='arrow')
-            else:
-                self.state(['!active'])
-                if 'readonly' not in self.state():
-                    self.configure(cursor='xterm')
-
-    def _on_theme_change(self):
-        if self._theme_change:
-            self._theme_change = False
-            self._setup_style()
-            self.after(50, self._set_theme_change)
-
-    def _set_theme_change(self):
-        self._theme_change = True
-
-    def _on_b1_press(self, event):
-        """Trigger self.drop_down on downarrow button press and set widget state to ['pressed', 'active']."""
-        x, y = event.x, event.y
-        if (('disabled' not in self.state()) and self.identify(x, y) == self._downarrow_name):
-            self.state(['pressed'])
-            self.drop_down()
-
-    def _on_focus_out_cal(self, event):
-        """Withdraw drop-down calendar when it looses focus."""
-        if self.focus_get() is not None:
-            if self.focus_get() == self:
-                x, y = event.x, event.y
-                if (type(x) != int or type(y) != int or self.identify(x, y) != self._downarrow_name):
-                    self._top_cal.withdraw()
-                    self.state(['!pressed'])
-            else:
-                self._top_cal.withdraw()
-                self.state(['!pressed'])
-        else:
-            x, y = self._top_cal.winfo_pointerxy()
-            xc = self._top_cal.winfo_rootx()
-            yc = self._top_cal.winfo_rooty()
-            w = self._top_cal.winfo_width()
-            h = self._top_cal.winfo_height()
-            if xc <= x <= xc + w and yc <= y <= yc + h:
-                # re-focus calendar so that <FocusOut> will be triggered next time
-                self._calendar.focus_force()
-            else:
-                self._top_cal.withdraw()
-                self.state(['!pressed'])
-
-    def _validate_date(self):
-        """Date entry validation: only dates in locale '%x' format are accepted."""
-        try:
-            self._date = self.parse_date(self.get())
-            return True
-        except (ValueError, IndexError):
-            self._set_text(self.format_date(self._date))
-            return False
-
-    def _select(self, event=None):
-        """Display the selected date in the entry and hide the calendar."""
-        date = self._calendar.selection_get()
-        if date is not None:
-            self._set_text(self.format_date(date))
-            self.event_generate('<<DateEntrySelected>>')
-        self._top_cal.withdraw()
-        if 'readonly' not in self.state():
-            self.focus_set()
-
-    def _set_text(self, txt):
-        """Insert text in the entry."""
-        if 'readonly' in self.state():
-            readonly = True
-            self.state(('!readonly',))
-        else:
-            readonly = False
-        self.delete(0, 'end')
-        self.insert(0, txt)
-        if readonly:
-            self.state(('readonly',))
-
-    def destroy(self):
-        try:
-            self.after_cancel(self._determine_downarrow_name_after_id)
-        except ValueError:
-            # nothing to cancel
-            pass
-        ttk.Entry.destroy(self)
-
-    def drop_down(self):
-        """Display or withdraw the drop-down calendar depending on its current state."""
-        if self._calendar.winfo_ismapped():
-            self._top_cal.withdraw()
-        else:
-            self._validate_date()
-            date = self.parse_date(self.get())
-            x = self.winfo_rootx()
-            y = self.winfo_rooty() + self.winfo_height()
-            self._top_cal.geometry('+%i+%i' % (x, y))
-            self._top_cal.deiconify()
-            self._calendar.focus_set()
-            self._calendar.selection_set(date)
-
-    def state(self, *args):
-        """
-        Modify or inquire widget state.
-
-        Widget state is returned if statespec is None, otherwise it is
-        set according to the statespec flags and then a new state spec
-        is returned indicating which flags were changed. statespec is
-        expected to be a sequence.
-        """
-        if args:
-            # change cursor depending on state to mimic Combobox behavior
-            states = args[0]
-            if 'disabled' in states or 'readonly' in states:
-                self.configure(cursor='arrow')
-            elif '!disabled' in states or '!readonly' in states:
-                self.configure(cursor='xterm')
-        return ttk.Entry.state(self, *args)
-
-    def keys(self):
-        """Return a list of all resource names of this widget."""
-        keys = list(self.entry_kw)
-        keys.extend(self._calendar.keys())
-        return list(set(keys))
-
-    def cget(self, key):
-        """Return the resource value for a KEY given as string."""
-        if key in self.entry_kw:
-            return ttk.Entry.cget(self, key)
-        else:
-            return self._calendar.cget(key)
-
-    def configure(self, **kw):
-        """
-        Configure resources of a widget.
-
-        The values for resources are specified as keyword
-        arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
-        """
-        entry_kw = {}
-        keys = list(kw.keys())
-        for key in keys:
-            if key in self.entry_kw:
-                entry_kw[key] = kw.pop(key)
-        font = kw.get('font', None)
-        if font is not None:
-            entry_kw['font'] = font
-        ttk.Entry.configure(self, **entry_kw)
-        self._calendar.configure(**kw)
-
-    def config(self, **kw):
-        """
-        Configure resources of a widget.
-
-        The values for resources are specified as keyword
-        arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
-        """
-        self.configure(**kw)
-
-    def set_date(self, date):
-        """
-        Set the value of the DateEntry to date.
-
-        date can be a datetime.date, a datetime.datetime or a string
-        in locale '%x' format.
-        """
-        try:
-            txt = self.format_date(date)
-        except AssertionError:
-            txt = str(date)
-            try:
-                self.parse_date(txt)
-            except Exception:
-                raise ValueError("%r is not a valid date." % date)
-        self._set_text(txt)
-
-    def get_date(self):
-        """Return the content of the DateEntry as a datetime.date instance."""
-        self._validate_date()
-        return self.parse_date(self.get())
-
-
-if __name__ == "__main__":
-
-    def example1():
-        def print_sel():
-            print(cal.selection_get())
-
-        top = tk.Toplevel(root)
-
-        cal = Calendar(top, font="Arial 14", selectmode='day',
-                       cursor="hand1", year=2018, month=2, day=5)
-
-        cal.pack(fill="both", expand=True)
-        ttk.Button(top, text="ok", command=print_sel).pack()
-
-    def example2():
-        top = tk.Toplevel(root)
-
-        ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
-
-        cal = DateEntry(top, width=12, background='darkblue',
-                        foreground='white', borderwidth=2, year=2010)
-        cal.pack(padx=10, pady=10)
-
-    root = tk.Tk()
-    ttk.Button(root, text='Calendar', command=example1).pack(padx=10, pady=10)
-    ttk.Button(root, text='DateEntry', command=example2).pack(padx=10, pady=10)
-
-    root.mainloop()

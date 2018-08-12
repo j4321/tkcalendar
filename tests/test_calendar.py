@@ -20,44 +20,9 @@ Test
 """
 
 
-import unittest
-from tkcalendar import Calendar, DateEntry
+from tests import BaseWidgetTest, TestEvent, tk, ttk, format_date
+from tkcalendar import Calendar
 from datetime import date
-import babel.dates
-try:
-    import Tkinter as tk
-    import ttk
-except ImportError:
-    import tkinter as tk
-    from tkinter import ttk
-from pynput.mouse import Controller, Button
-from locale import getdefaultlocale
-
-
-def format_date(date, length):
-    return babel.dates.format_date(date, length, locale=getdefaultlocale()[0])
-
-
-class BaseWidgetTest(unittest.TestCase):
-    def setUp(self):
-        self.window = tk.Toplevel()
-        self.window.update()
-
-    def tearDown(self):
-        self.window.update()
-        self.window.destroy()
-
-
-class TestEvent:
-    """Fake event for testing."""
-    def __init__(self, **kwargs):
-        self._prop = kwargs
-
-    def __getattr__(self, attr):
-        if attr not in self._prop:
-            raise AttributeError("TestEvent has no attribute %s." % attr)
-        else:
-            return self._prop[attr]
 
 
 class TestCalendar(BaseWidgetTest):
@@ -65,6 +30,16 @@ class TestCalendar(BaseWidgetTest):
         widget = Calendar(self.window)
         widget.pack()
         self.window.update()
+        widget.destroy()
+        widget = Calendar(self.window, showweeknumbers=False)
+        self.window.update()
+        widget.destroy()
+        today = format_date(date.today(), 'short')
+        var = tk.StringVar(self.window, today)
+        widget = Calendar(self.window, textvariable=var, month=3, year=2011, day=10)
+        self.window.update()
+        self.assertEqual(var.get(), today)
+        self.assertEqual(widget.selection_get(), date.today())
         widget.destroy()
         widget = Calendar(self.window, font="Arial 14", selectmode='day',
                           cursor="hand1", year=2018, month=2, day=5)
@@ -153,8 +128,9 @@ class TestCalendar(BaseWidgetTest):
                           year=2015, month=1, day=3, textvariable=var)
         widget.pack()
         self.window.update()
-        self.assertEqual(format_date(date(2015, 1, 3), 'short'), var.get())
-        self.assertEqual(format_date(date(2015, 1, 3), 'short'), widget.get_date())
+        self.assertEqual('', var.get())
+        self.assertEqual('', widget.get_date())
+        self.assertEqual(date(2015, 1, 1), widget._date)
         widget.selection_set(date(2018, 11, 21))
         self.window.update()
         self.assertEqual(format_date(date(2018, 11, 21), 'short'), var.get())
@@ -183,6 +159,12 @@ class TestCalendar(BaseWidgetTest):
         self.assertIsNone(widget.selection_get())
         self.assertEqual('', var.get())
         self.assertEqual('', widget.get_date())
+
+        var2 = tk.StringVar(widget, format_date(date(2011, 1, 21), 'short'))
+        widget['textvariable'] = var2
+        self.window.update()
+        self.assertEqual(widget.get_date(), var2.get())
+        self.assertEqual('', var.get())
 
     def test_calendar_get_set(self):
         widget = Calendar(self.window, foreground="red")
@@ -263,105 +245,105 @@ class TestCalendar(BaseWidgetTest):
         for op in options[7:]:
             self.assertEqual(widget.cget(op), "yellow")
 
-
-class TestDateEntry(BaseWidgetTest):
-    def test_dateentry_init(self):
-        widget = DateEntry(self.window, width=12, background='darkblue',
-                           foreground='white', borderwidth=2)
+    def test_calevents(self):
+        widget = Calendar(self.window)
         widget.pack()
         self.window.update()
-        widget.destroy()
-        widget = DateEntry(self.window, year=2012)
-        widget.pack()
-        self.window.update()
-        widget.destroy()
+        evdate = date.today() + widget.timedelta(days=2)
+        widget.calevent_create(evdate, 'Hello World', 'message')
+        widget.calevent_create(evdate, 'Reminder 2', 'reminder')
+        widget.calevent_create(evdate + widget.timedelta(days=-2), 'Reminder 1', 'reminder')
+        widget.calevent_create(evdate + widget.timedelta(days=3), 'Message', 'message')
 
-    def test_dateentry_drop_down(self):
-        """Check whether drop down opens on click."""
-        widget = DateEntry(self.window)
-        widget.pack()
-        self.window.update()
-        w = widget.winfo_width()
-        h = widget.winfo_height()
-        widget._on_b1_press(TestEvent(widget=widget, x=w - 10, y=h // 2))
-        self.window.update()
-        self.assertTrue(widget._top_cal.winfo_ismapped())
+        widget.tag_config('reminder', background='red', foreground='yellow')
+        widget.tag_config('test', background='blue', foreground='white')
 
-    def test_dateentry_get_set(self):
-        widget = DateEntry(self.window, width=12, background='darkblue',
-                           foreground='white', borderwidth=2, font='Arial 9')
-        widget.pack()
-        self.window.update()
+        # get_calevents
+        self.assertEqual(widget.get_calevents(), tuple(i for i in range(4)))
+        self.assertEqual(widget.get_calevents(date=evdate), (0, 1))
+        self.assertEqual(widget.get_calevents(tag='message'), (0, 3))
+        self.assertEqual(widget.get_calevents(tag='message', date=evdate), (0,))
+        with self.assertRaises(TypeError):
+            widget.get_calevents(date='12/12/2012')
 
-        keys = ['exportselection',
-                'invalidcommand',
-                'justify',
-                'show',
-                'cursor',
-                'style',
-                'state',
-                'takefocus',
-                'textvariable',
-                'validate',
-                'validatecommand',
-                'width',
-                'xscrollcommand']
-        keys.extend(widget._calendar.keys())
-        self.assertEqual(sorted(list(set(keys))), sorted(widget.keys()))
-
-        self.assertEqual(widget["background"], 'darkblue')
-        self.assertEqual(widget.cget("width"), 12)
-
-        widget["borderwidth"] = 5
-        self.window.update()
-        self.assertEqual(widget["borderwidth"], 5)
-
-        widget.config(font="Arial 20 bold")
-        self.window.update()
-        self.assertEqual(widget["font"], "Arial 20 bold")
-
-        widget.config(style="my.TEntry")
-        self.window.update()
-        self.assertEqual(widget["style"], "my.TEntry")
-
-    def test_dateentry_functions(self):
-        widget = DateEntry(self.window, width=12, background='darkblue',
-                           foreground='white', borderwidth=2)
-        widget.pack()
-        self.window.update()
-
-        widget.set_date(format_date(date(2018, 12, 31), 'short'))
-        self.assertEqual(widget.get_date(), date(2018, 12, 31))
+        # cget / configure
+        self.assertEqual(widget.calevent_cget(1, 'tags'), ['reminder'])
+        self.assertEqual(widget.calevent_cget(0, 'text'), 'Hello World')
+        self.assertEqual(widget.calevent_cget(2, 'date'), evdate + widget.timedelta(days=-2))
+        widget.calevent_configure(1, tags=['reminder', 'new'])
+        self.assertEqual(widget.calevent_cget(1, 'tags'), ['reminder', 'new'])
+        widget.calevent_configure(1, tags='reminder')
+        self.assertEqual(widget.calevent_cget(1, 'tags'), ['reminder'])
+        widget.calevent_configure(0, text='Hi')
+        self.assertEqual(widget.calevent_cget(0, 'text'), 'Hi')
+        self.assertNotIn(evdate + widget.timedelta(days=5), widget._calevent_dates)
+        widget.calevent_configure(3, date=evdate + widget.timedelta(days=5, minutes=2))
+        self.assertEqual(widget.calevent_cget(3, 'date'), evdate + widget.timedelta(days=5))
+        self.assertIn(evdate + widget.timedelta(days=5), widget._calevent_dates)
+        widget.calevent_configure(2, date=evdate)
+        self.assertEqual(widget.calevent_cget(2, 'date'), evdate)
         with self.assertRaises(ValueError):
-            widget.set_date("ab")
-        widget.set_date(date(2015, 12, 31))
-        self.assertEqual(widget.get_date(), date(2015, 12, 31))
-        self.assertEqual(widget.get(), format_date(date(2015, 12, 31), 'short'))
+            widget.calevent_cget(1, 'arg')
+        with self.assertRaises(ValueError):
+            widget.calevent_cget(5, 'date')
+        with self.assertRaises(ValueError):
+            widget.calevent_configure(5, text='a')
+        with self.assertRaises(KeyError):
+            widget.calevent_configure(1, test='a')
+        with self.assertRaises(TypeError):
+            widget.calevent_configure(1, date='a')
 
-        widget.delete(0, "end")
-        widget.insert(0, "abc")
-        self.window.focus_force()
-        self.assertEqual(widget.get_date(), date(2015, 12, 31))
+        # lower / raise
+        self.assertEqual(widget._calevent_dates[evdate], [0, 1, 2])
+        widget.calevent_lower(0)
+        self.assertEqual(widget._calevent_dates[evdate], [1, 2, 0])
+        widget.calevent_lower(1, 2)
+        self.assertEqual(widget._calevent_dates[evdate], [2, 1, 0])
+        widget.calevent_raise(0)
+        self.assertEqual(widget._calevent_dates[evdate], [0, 2, 1])
+        widget.calevent_raise(1, 2)
+        self.assertEqual(widget._calevent_dates[evdate], [0, 1, 2])
+        with self.assertRaises(ValueError):
+            widget.calevent_raise(4)
+        with self.assertRaises(ValueError):
+            widget.calevent_raise(1, 4)
+        with self.assertRaises(ValueError):
+            widget.calevent_lower(4)
+        with self.assertRaises(ValueError):
+            widget.calevent_lower(1, 4)
 
-        widget._on_motion(TestEvent(x=10, y=20))
-        widget._on_b1_press(TestEvent(x=10, y=20))
-        widget._on_b1_press(TestEvent(x=widget.winfo_width() - 2, y=2))
-        widget._on_focus_out_cal(TestEvent(x=10, y=20))
+        # tags
+        self.assertEqual(set(widget.tag_names()), set(('new', 'message', 'reminder', 'test')))
+        self.assertEqual(widget.tag_cget('test', 'foreground'), 'white')
+        self.assertEqual(widget.tag_cget('test', 'background'), 'blue')
+        with self.assertRaises(ValueError):
+            widget.tag_delete('birthday')
+        widget.tag_delete('message')
+        self.assertEqual(set(widget.tag_names()), set(('new', 'reminder', 'test')))
+        self.assertEqual(widget.calevent_cget(0, 'tags'), [])
 
-        widget.state(("disabled",))
+        # remove
+        widget.calevent_remove(0)
+        self.assertEqual(widget.get_calevents(), tuple(i for i in range(1, 4)))
+        widget.calevent_remove(date=evdate + widget.timedelta(days=3))
+        self.assertEqual(widget.get_calevents(), tuple(i for i in range(1, 4)))
+        widget.calevent_remove(date=evdate + widget.timedelta(days=5))
+        self.assertEqual(widget.get_calevents(), tuple(i for i in range(1, 3)))
+        widget.calevent_remove(tag='reminder')
+        self.assertEqual(widget.get_calevents(), ())
+        widget.calevent_create(evdate, 'Hello World', 'message')
+        widget.calevent_create(evdate, 'Reminder 2', 'reminder')
+        widget.calevent_create(evdate + widget.timedelta(days=-2), 'Reminder 1', 'reminder')
+        widget.calevent_create(evdate + widget.timedelta(days=3), 'Message', 'message')
         self.window.update()
-        self.assertIn("disabled", widget.state())
+        self.assertEqual(widget.get_calevents(), tuple(i for i in range(4)))
+        widget.calevent_remove(tag='reminder', date=evdate)
+        self.assertEqual(widget.get_calevents(), (0, 2, 3))
+        widget.calevent_remove(3, tag='reminder', date=evdate)
+        self.assertEqual(widget.get_calevents(), (0, 2))
+        widget.calevent_remove('all')
+        self.assertEqual(widget.get_calevents(), ())
 
-        widget.drop_down()
-        self.window.update()
-        widget._select()
-        self.window.update()
-        widget.drop_down()
-        self.window.update()
-        widget.drop_down()
-        self.window.update()
 
-        widget.configure(state='readonly')
-        self.window.update()
-        widget._select()
-        self.assertIn('readonly', widget.state())
+
+
