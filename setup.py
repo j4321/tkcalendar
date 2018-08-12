@@ -31,4 +31,7 @@ setup(name='tkcalendar',
                    'Operating System :: OS Independent'],
       keywords=['tkinter', 'calendar', 'date'],
       requires=["sys", "locale", "calendar", "tkinter", "babel"],
-      py_modules=["tkcalendar"])
+      py_modules=["tkcalendar.calendar_",
+                  "tkcalendar.dateentry",
+                  "tkcalendar.tooltip"],
+      packages=["tkcalendar"])
