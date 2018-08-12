@@ -1,7 +1,6 @@
 from tests import BaseWidgetTest, TestEvent, format_date
 from tkcalendar import DateEntry
 from datetime import date
-from pynput.mouse import Controller, Button
 
 
 class TestDateEntry(BaseWidgetTest):

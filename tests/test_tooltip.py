@@ -1,6 +1,5 @@
 from tkcalendar.tooltip import Tooltip, TooltipWrapper
 from tests import BaseWidgetTest, TestEvent
-from pynput.mouse import Controller, Button
 try:
     import ttk
 except ImportError:
@@ -29,27 +28,22 @@ class TestTooltipWrapper(BaseWidgetTest):
         tw.add_tooltip(b2, "tooltip 2")
         tw.add_tooltip(b3, "tooltip 3")
         self.window.update()
-        x, y = b1.winfo_rootx(), b1.winfo_rooty()
-        mouse_controller = Controller()
-        mouse_controller.position = (x + 10, y + 10)
+        b1.event_generate('<Enter>', x=0, y=0)
         self.window.update()
         self.assertEqual(tw.current_widget, b1)
         tw.display_tooltip()
-        mouse_controller.position = (x + self.window.winfo_width() + 100, y + self.window.winfo_height() + 100)
-        tw._on_leave(TestEvent(widget=b1))
+        b1.event_generate('<Leave>', x=0, y=0)
         self.window.update()
         self.assertIsNone(tw.current_widget)
         tw.display_tooltip()
         self.window.update()
-        mouse_controller.position = (x + 10, y + 10)
-        self.window.update()
-        mouse_controller.position = (x + self.window.winfo_width() + 100, y + self.window.winfo_height() + 100)
-        tw._on_leave(TestEvent(widget=b1))
+        b1.event_generate('<Leave>', x=0, y=0)
         self.window.update()
         self.assertIsNone(tw.current_widget)
         tw.remove_tooltip(self.window)
         tw.remove_tooltip(b1)
-        mouse_controller.position = (x + 10, y + 10)
+        self.window.update()
+        b1.event_generate('<Enter>', x=0, y=0)
         self.window.update()
         self.assertIsNone(tw.current_widget)
         tw.remove_all()
