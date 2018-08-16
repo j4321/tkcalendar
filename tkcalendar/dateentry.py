@@ -58,14 +58,17 @@ class DateEntry(ttk.Entry):
         When the entry looses focus, if the user input is not a valid date,
         the entry content is reset to the last valid date.
 
-        KEYWORDS OPTIONS
+        Keyword Options
+        ---------------
 
-            usual ttk.Entry options and Calendar options
+        usual ttk.Entry options and Calendar options
 
-        VIRTUAL EVENTS
+        Virtual event
+        -------------
 
-            A <<DateEntrySelected>> event is generated each time
-            the user selects a date.
+        A ``<<DateEntrySelected>>`` event is generated each time
+        the user selects a date.
+
         """
         # sort keywords between entry options and calendar options
         kw['selectmode'] = 'day'
@@ -359,4 +362,3 @@ class DateEntry(ttk.Entry):
         """Return the content of the DateEntry as a datetime.date instance."""
         self._validate_date()
         return self.parse_date(self.get())
-

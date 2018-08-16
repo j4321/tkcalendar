@@ -1,6 +1,10 @@
 from tests import BaseWidgetTest, TestEvent, format_date
 from tkcalendar import DateEntry
 from datetime import date
+try:
+    from tkinter import ttk
+except ImportError:
+    import ttk
 
 
 class TestDateEntry(BaseWidgetTest):
@@ -25,9 +29,12 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
         w = widget.winfo_width()
         h = widget.winfo_height()
-        widget._on_b1_press(TestEvent(widget=widget, x=w - 10, y=h // 2))
+        widget.event_generate('<1>', x=w - 10, y=h // 2)
         self.window.update()
         self.assertTrue(widget._top_cal.winfo_ismapped())
+        widget._calendar.event_generate('<FocusOut>')
+        self.window.update()
+        self.assertFalse(widget._top_cal.winfo_ismapped())
 
     def test_dateentry_get_set(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
@@ -65,6 +72,9 @@ class TestDateEntry(BaseWidgetTest):
         widget.config(style="my.TEntry")
         self.window.update()
         self.assertEqual(widget["style"], "my.TEntry")
+
+        style = ttk.Style(self.window)
+        style.theme_use('clam')
 
     def test_dateentry_functions(self):
         widget = DateEntry(self.window, width=12, background='darkblue',

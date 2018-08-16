@@ -197,7 +197,12 @@ class TestCalendar(BaseWidgetTest):
                    'headersbackground',
                    'headersforeground',
                    'disableddaybackground',
-                   'disableddayforeground']
+                   'disableddayforeground',
+                   'tooltipbackground',
+                   'tooltipforeground',
+                   'tooltipalpha',
+                   'tooltipdelay']
+
         self.assertEqual(sorted(widget.keys()), sorted(options))
 
         with self.assertRaises(AttributeError):
@@ -239,11 +244,21 @@ class TestCalendar(BaseWidgetTest):
             widget.config(locale="en_US.UTF-8")
         with self.assertRaises(AttributeError):
             widget.config(test="test")
-        dic = {op: "yellow" for op in options[7:]}
+        dic = {op: "yellow" for op in options[7:-4]}
         widget.configure(**dic)
         self.window.update()
-        for op in options[7:]:
+        for op in options[7:-4]:
             self.assertEqual(widget.cget(op), "yellow")
+        widget.config(tooltipalpha=0.5)
+        self.assertEqual(widget["tooltipalpha"], 0.5)
+        self.assertEqual(widget.tooltip_wrapper["alpha"], 0.5)
+        widget.config(tooltipdelay=1000)
+        self.assertEqual(widget["tooltipdelay"], 1000)
+        self.assertEqual(widget.tooltip_wrapper["delay"], 1000)
+        widget.config(tooltipforeground='black')
+        self.assertEqual(widget["tooltipforeground"], 'black')
+        widget.config(tooltipbackground='cyan')
+        self.assertEqual(widget["tooltipbackground"], 'cyan')
 
     def test_calevents(self):
         widget = Calendar(self.window)
@@ -261,8 +276,11 @@ class TestCalendar(BaseWidgetTest):
         # get_calevents
         self.assertEqual(widget.get_calevents(), tuple(i for i in range(4)))
         self.assertEqual(widget.get_calevents(date=evdate), (0, 1))
+        self.assertEqual(widget.get_calevents(date=evdate + widget.timedelta(days=-5)), ())
         self.assertEqual(widget.get_calevents(tag='message'), (0, 3))
         self.assertEqual(widget.get_calevents(tag='message', date=evdate), (0,))
+        self.assertEqual(widget.get_calevents(tag='message',
+                                              date=evdate + widget.timedelta(days=-2)), ())
         with self.assertRaises(TypeError):
             widget.get_calevents(date='12/12/2012')
 
@@ -316,6 +334,10 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(set(widget.tag_names()), set(('new', 'message', 'reminder', 'test')))
         self.assertEqual(widget.tag_cget('test', 'foreground'), 'white')
         self.assertEqual(widget.tag_cget('test', 'background'), 'blue')
+        with self.assertRaises(ValueError):
+            widget.tag_cget('hello', 'background')
+        with self.assertRaises(ValueError):
+            widget.tag_cget('test', 'text')
         with self.assertRaises(ValueError):
             widget.tag_delete('birthday')
         widget.tag_delete('message')

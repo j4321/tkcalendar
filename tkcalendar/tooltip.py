@@ -38,17 +38,21 @@ class Tooltip(tk.Toplevel):
         """
         Construct a Tooltip with parent master.
 
-        KEYWORDS OPTIONS
+        Keyword Options
+        ---------------
 
-            ttk.Label options,
-            alpha: Tooltip opacity between 0 and 1.
+        ttk.Label options,
+
+        alpha: float. Tooltip opacity between 0 and 1.
         """
         tk.Toplevel.__init__(self, parent, padx=0, pady=0)
         self.transient(parent)
+        self.overrideredirect(True)
+        self.update_idletasks()
+        self.attributes('-alpha', kwargs.pop('alpha', 0.8))
         if platform == 'linux':
             self.attributes('-type', 'tooltip')
-        self.attributes('-alpha', kwargs.get('alpha', 0.8))
-        self.overrideredirect(True)
+
 
         if not Tooltip._initialized:
             # default tooltip style
@@ -84,7 +88,7 @@ class Tooltip(tk.Toplevel):
     def configure(self, **kwargs):
         if 'alpha' in kwargs:
             self.attributes('-alpha', kwargs.pop('alpha'))
-        self.label.configure(self, **kwargs)
+        self.label.configure(**kwargs)
 
     def keys(self):
         keys = list(self.label.keys())
@@ -101,11 +105,14 @@ class TooltipWrapper:
         """
         Construct a Tooltip wrapper with parent master.
 
-        KEYWORDS OPTIONS
+        Keyword Options
+        ---------------
 
-            Tooltip options,
-            delay: time (ms) the mouse has to stay still over the widget before
-            the Tooltip is displayed.
+        Tooltip options,
+
+        delay: time (ms) the mouse has to stay still over the widget before
+        the Tooltip is displayed.
+
         """
         self.widgets = {}  # {widget name: tooltip text, ...}
         # keep track of binding ids to cleanly remove them
@@ -113,16 +120,15 @@ class TooltipWrapper:
         self.bind_leave_ids = {}  # {widget name: bind id, ...}
 
         # time delay before displaying the tooltip
-        if 'delay' in kwargs:
-            self.delay = kwargs.pop('delay')
-        else:
-            self.delay = 2000
+        self._delay = 2000
         self._timer_id = None
 
-        self.tooltip = Tooltip(master, **kwargs)
+        self.tooltip = Tooltip(master)
         self.tooltip.withdraw()
         # widget currently under the mouse if among wrapped widgets:
         self.current_widget = None
+
+        self.configure(**kwargs)
 
         self.config = self.configure
 
@@ -136,12 +142,15 @@ class TooltipWrapper:
 
     def cget(self, key):
         if key == 'delay':
-            return self.delay
+            return self._delay
         else:
             return self.tooltip.cget(key)
 
     def configure(self, **kwargs):
-        self.delay = kwargs.pop('delay', self.delay)
+        try:
+            self._delay = int(kwargs.pop('delay', self._delay))
+        except ValueError:
+            raise ValueError('expected integer for the delay option.')
         self.tooltip.configure(**kwargs)
 
     def add_tooltip(self, widget, text):
@@ -179,7 +188,7 @@ class TooltipWrapper:
     def _on_enter(self, event):
         """Change current widget and launch timer to display tooltip."""
         if not self.tooltip.winfo_ismapped():
-            self._timer_id = event.widget.after(self.delay, self.display_tooltip)
+            self._timer_id = event.widget.after(self._delay, self.display_tooltip)
             self.current_widget = event.widget
 
     def _on_leave(self, event):
@@ -203,7 +212,14 @@ class TooltipWrapper:
 
     def display_tooltip(self):
         """Display tooltip with text corresponding to current widget."""
-        if self.current_widget is not None and "disabled" not in self.current_widget.state():
+        if self.current_widget is None:
+            return
+        try:
+            disabled = "disabled" in self.current_widget.state()
+        except AttributeError:
+            disabled = self.current_widget.cget('state') == "disabled"
+
+        if not disabled:
             self.tooltip['text'] = self.widgets[str(self.current_widget)]
             self.tooltip.deiconify()
             x = self.current_widget.winfo_pointerx() + 14

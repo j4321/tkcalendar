@@ -50,77 +50,125 @@ class Calendar(ttk.Frame):
         """
         Construct a Calendar with parent master.
 
-        STANDARD OPTIONS
+        Standard Options
+        ----------------
 
-            cursor, font, borderwidth, state
+        cursor, font, borderwidth, state
 
-        WIDGET-SPECIFIC OPTIONS
+        Widget-specific Options
+        -----------------------
 
-            year: initially displayed year, default is current year
+        year : int
+            intinitially displayed year, default is current year.
 
-            month: initially displayed month, default is current month
+        month : int
+            initially displayed month, default is current month.
 
-            day: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
+        day : int
+            initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today.
 
-            locale: locale to use, e.g. 'fr_FR'
+        locale : str
+            locale to use, e.g. 'en_US'
 
-            selectmode: "none" or "day" (default) define whether the user can change the selected day with a mouse click
+        selectmode : "none" or "day" (default)
+            whether the user can change the selected day with a mouse click.
 
-            showweeknumbers: boolean (default is True) to show/hide week numbers
+        showweeknumbers : boolean (default is True)
+            whether to display week numbers.
 
-            textvariable: StringVar that will contain the currently selected date as str
+        textvariable : StringVar
+            connect the currently selected date to the variable.
 
-            background: background color of calendar border and month/year name
+        Style Options
+        -------------
 
-            foreground: foreground color of month/year name
+        background :
+            background color of calendar border and month/year name
 
-            bordercolor: day border color
+        foreground :
+            foreground color of month/year name
 
-            selectbackground: background color of selected day
+        bordercolor :
+            day border color
 
-            selectforeground: foreground color of selected day
+        headersbackground :
+            background color of day names and week numbers
 
-            disabledselectbackground: background color of selected day in disabled state
+        headersforeground :
+            foreground color of day names and week numbers
 
-            disabledselectforeground: foreground color of selected day in disabled state
+        selectbackground :
+            background color of selected day
 
-            normalbackground: background color of normal week days
+        selectforeground :
+            foreground color of selected day
 
-            normalforeground: foreground color of normal week days
+        disabledselectbackground :
+            background color of selected day in disabled state
 
-            othermonthforeground: foreground color of normal week days belonging to the previous/next month
+        disabledselectforeground :
+            foreground color of selected day in disabled state
 
-            othermonthbackground: background color of normal week days belonging to the previous/next month
+        normalbackground :
+            background color of normal week days
 
-            othermonthweforeground: foreground color of week-end days belonging to the previous/next month
+        normalforeground :
+            foreground color of normal week days
 
-            othermonthwebackground: background color of week-end days
+        weekendbackground :
+            background color of week-end days
 
-            belonging to the previous/next month
+        weekendforeground :
+            foreground color of week-end days
 
-            weekendbackground: background color of week-end days
+        othermonthforeground :
+            foreground color of normal week days belonging to the previous/next month
 
-            weekendforeground: foreground color of week-end days
+        othermonthbackground :
+            background color of normal week days belonging to the previous/next month
 
-            headersbackground: background color of day names and week numbers
+        othermonthweforeground :
+            foreground color of week-end days belonging to the previous/next month
 
-            headersforeground: foreground color of day names and week numbers
+        othermonthwebackground :
+            background color of week-end days belonging to the previous/next month
 
-            disableddaybackground: background color of days in disabled state
+        disableddaybackground :
+            background color of days in disabled state
 
-            disableddayforeground: foreground color of days in disabled state
+        disableddayforeground :
+            foreground color of days in disabled state
 
-        VIRTUAL EVENTS
+        Tooltip Options (for calevents)
+        -------------------------------
 
-            A <<CalendarSelected>> event is generated each time the user
-            selects a day with the mouse.
+        tooltipforeground :
+            tooltip text color
 
-        CALENDAR EVENTS
+        tooltipbackground :
+            tooltip background color
 
-            Special events (e.g. birthdays, ..) can be managed using the 'calevent_..'
-            methods. The way they are displayed in the calendar is determined with
-            tags. An id is attributed to each event upon creation and can be used
-            to edit the event (ev_id argument).
+        tooltipalpha : float
+            tooltip opacity between 0 and 1
+
+        tooltipdelay : int
+            delay in ms before displaying the tooltip
+
+        Virtual Event
+        -------------
+
+        A ``<<CalendarSelected>>`` event is generated each time the user
+        selects a day with the mouse.
+
+        Calendar Events
+        ---------------
+
+        Special events (e.g. birthdays, ..) can be managed using the
+        ``calevent_..`` methods. The way they are displayed in the calendar is
+        determined with tags. An id is attributed to each event upon creation
+        and can be used to edit the event (ev_id argument).
+
+
         """
 
         curs = kw.pop("cursor", "")
@@ -182,10 +230,6 @@ class Calendar(ttk.Frame):
                     self._sel_date = None
 
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
-        self.calevents = {}  # special events displayed in colors and with tooltips to show content
-        self._calevent_dates = {}  # list of event ids for each date
-        self._tags = {}  # tags to format event display
-        self.tooltip_wrapper = TooltipWrapper(self)
 
         # --- selectmode
         selectmode = kw.pop("selectmode", "day")
@@ -228,7 +272,11 @@ class Calendar(ttk.Frame):
                    'headersbackground',
                    'headersforeground',
                    'disableddaybackground',
-                   'disableddayforeground']
+                   'disableddayforeground',
+                   'tooltipforeground',
+                   'tooltipbackground',
+                   'tooltipalpha',
+                   'tooltipdelay']
 
         keys = list(kw.keys())
         for option in keys:
@@ -261,8 +309,21 @@ class Calendar(ttk.Frame):
                             'headersbackground': 'gray70',
                             'headersforeground': 'black',
                             'disableddaybackground': dis_bg,
-                            'disableddayforeground': dis_fg}
+                            'disableddayforeground': dis_fg,
+                            'tooltipforeground': 'gray90',
+                            'tooltipbackground': 'black',
+                            'tooltipalpha': 0.8,
+                            'tooltipdelay': 2000}
         self._properties.update(kw)
+
+        # --- calevents
+        self.calevents = {}  # special events displayed in colors and with tooltips to show content
+        self._calevent_dates = {}  # list of event ids for each date
+        self._tags = {}  # tags to format event display
+        self.tooltip_wrapper = TooltipWrapper(self,
+                                              alpha=self._properties['tooltipalpha'],
+                                              style=self._style_prefixe + '.tooltip.TLabel',
+                                              delay=self._properties['tooltipdelay'])
 
         # --- init calendar
         # --- *-- header: month - year
@@ -474,6 +535,16 @@ class Calendar(ttk.Frame):
                 self.style.configure('main.%s.TLabel' % self._style_prefixe, foreground=value)
             elif key is "cursor":
                 ttk.Frame.configure(self, cursor=value)
+            elif key is "tooltipbackground":
+                self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
+                                     background=value)
+            elif key is "tooltipforeground":
+                self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
+                                     foreground=value)
+            elif key is "tooltipalpha":
+                self.tooltip_wrapper.configure(alpha=value)
+            elif key is "tooltipdelay":
+                self.tooltip_wrapper.configure(delay=value)
             self._properties[key] = value
 
     def _textvariable_trace(self, *args):
@@ -549,6 +620,9 @@ class Calendar(ttk.Frame):
         self.style.configure('L.%s.TButton' % self._style_prefixe, background=bg,
                              arrowsize=size, arrowcolor=fg, bordercolor=bg,
                              relief="flat", lightcolor=bg, darkcolor=bg)
+        self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
+                             background=self._properties['tooltipbackground'],
+                             foreground=self._properties['tooltipforeground'])
 
         self.style.map('R.%s.TButton' % self._style_prefixe, background=[('active', active_bg)],
                        bordercolor=[('active', active_bg)],

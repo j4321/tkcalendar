@@ -1,5 +1,6 @@
+##########
 tkcalendar
-==========
+##########
 
 tkcalendar is a python module that provides the Calendar and DateEntry widgets for Tkinter.
 The DateEntry widget is similar to a Combobox, but the drop-down is not a list but a Calendar to select a date.
@@ -7,16 +8,17 @@ Events can be displayed in the Calendar with custom colors and a tooltip display
 tkcalendar is compatible with both Python 2 and Python 3.
 It supports many locale settings (e.g. 'fr_FR', 'en_US', ..) and the colors are customizable.
 
+.. contents:: Table of Contents
 
 Requirements
-------------
+============
 
-- Linux, Windows, Mac
+- Linux, Windows, OSX
 - Python 2 or 3 with tkinter + ttk (default for Windows but not for Linux) and babel
 
 
 Installation
-------------
+============
 
 - Ubuntu: use the PPA `ppa:j-4321-i/ppa`
 
@@ -38,108 +40,155 @@ Installation
 
 
 Documentation
--------------
+=============
 
 Calendar widget
+---------------
 
-    Syntax:
+Syntax
+~~~~~~
 
     ::
 
         Calendar(master=None, **kw)
 
-    Widget keyword options:
+Widget keyword options
+~~~~~~~~~~~~~~~~~~~~~~
 
-    * Standard options
+* Standard options
 
-        **cursor**: cursor to display when the pointer is in the widget
+    cursor : str
+        cursor to display when the pointer is in the widget
+    
+    font : str such as "Arial 20 bold" or a Tkinter Font instance
+        font of the calendar, can be a 
+    
+    borderwidth : int
+        width of the border around the calendar
+    
+    state : str
+        "normal" or "disabled" (unresponsive widget)
 
-        **font**: font of the calendar, can be a string such as "Arial 20 bold" or a Tkinter Font instance
+* Widget-specific options:
 
-        **borderwidth**: width of the border around the calendar (integer)
+    year : int
+        intinitially displayed year, default is current year.
 
-        **state**: normal or disabled (unresponsive widget)
+    month : int
+        initially displayed month, default is current month.
 
-    * Widget-Specific Options
+    day : int
+        initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today.
 
-        **year**:  initially displayed year, default is current year
+    locale : str
+        locale to use, e.g. 'en_US'
 
-        **month**: initially displayed month, default is current month
+    selectmode : "none" or "day" (default)
+        whether the user can change the selected day with a mouse click.
 
-        **day**: initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today
+    showweeknumbers : boolean (default is True)
+        whether to display week numbers.
 
-        **locale**: locale to use, e.g. "fr_FR" for a French calendar
+    textvariable : StringVar
+        connect the currently selected date to the variable.
 
-        **selectmode**: "none" or "day" (default) define whether the user can change the selected day with a mouse click
+* Style options:
 
-        **textvariable**: StringVar that will contain the currently selected date as str
+    background :
+        background color of calendar border and month/year name
 
-        **showweeknumbers**: boolean (default is True) to show/hide week numbers
+    foreground :
+        foreground color of month/year name
 
-        **background**: calendar border and month/year name background color
+    bordercolor :
+        day border color
 
-        **foreground**: month/year name foreground color
+    headersbackground :
+        background color of day names and week numbers
 
-        **bordercolor**: day border color
+    headersforeground :
+        foreground color of day names and week numbers
 
-        **background**: background color of calendar border and month/year name
+    selectbackground :
+        background color of selected day
 
-        **foreground**: foreground color of month/year name
+    selectforeground :
+        foreground color of selected day
 
-        **bordercolor**: day border color
+    disabledselectbackground :
+        background color of selected day in disabled state
 
-        **selectbackground**: background color of selected day
+    disabledselectforeground :
+        foreground color of selected day in disabled state
 
-        **selectforeground**: foreground color of selected day
+    normalbackground :
+        background color of normal week days
 
-        **disabledselectbackground**: background color of selected day in disabled state
+    normalforeground :
+        foreground color of normal week days
 
-        **disabledselectforeground**: foreground color of selected day in disabled state
+    weekendbackground :
+        background color of week-end days
 
-        **normalbackground**: background color of normal week days
+    weekendforeground :
+        foreground color of week-end days
 
-        **normalforeground**: foreground color of normal week days
+    othermonthforeground :
+        foreground color of normal week days belonging to the previous/next month
 
-        **othermonthforeground**: foreground color of normal week days belonging to the previous/next month
+    othermonthbackground :
+        background color of normal week days belonging to the previous/next month
 
-        **othermonthbackground**: background color of normal week days belonging to the previous/next month
+    othermonthweforeground :
+        foreground color of week-end days belonging to the previous/next month
 
-        **othermonthweforeground**: foreground color of week-end days belonging to the previous/next month
+    othermonthwebackground :
+        background color of week-end days belonging to the previous/next month
 
-        **othermonthwebackground**: background color of week-end days belonging to the previous/next month
+    disableddaybackground :
+        background color of days in disabled state
 
-        **weekendbackground**: background color of week-end days
+    disableddayforeground :
+        foreground color of days in disabled state
 
-        **weekendforeground**: foreground color of week-end days
+* Tooltip options (for calevents):
 
-        **headersbackground**: background color of day names and week numbers
+    tooltipforeground :
+        tooltip text color
 
-        **headersforeground**: foreground color of day names and week numbers
+    tooltipbackground :
+        tooltip background color
 
-        **disableddaybackground**: background color of days in disabled state
+    tooltipalpha : float
+        tooltip opacity between 0 and 1
 
-        **disableddayforeground**: foreground color of days in disabled state
+    tooltipdelay : int
+        delay in ms before displaying the tooltip
 
+Virtual Events
+~~~~~~~~~~~~~~
+    
+    A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
 
-    * Virtual Events
-
-        A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
-
-    Widget methods:
+Widget methods
+~~~~~~~~~~~~~~
 
     * Standard methods:
 
-        - The methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
+        - methods common to all tkinter widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
 
-        - The methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
+        - methods common to all ttk widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
 
     * Widget-Specific methods:
 
-        **calevent_cget(ev_id, option)**: Return value of given option for the event *ev_id*.
+        calevent_cget(ev_id, option) : 
+            Return value of given option for the event *ev_id*.
 
-        **calevent_configure(ev_id, \*\*kw)**: Return value of given option for the event *ev_id*.
+        calevent_configure(ev_id, \*\*kw) : 
+            Return value of given option for the event *ev_id*.
 
-        **calevent_create(date, text, tags=[])**: Add new event in calendar and return event id.
+        calevent_create(date, text, tags=[]) : 
+            Add new event in calendar and return event id.
 
             Options:
 
@@ -149,63 +198,76 @@ Calendar widget
 
                 *tags*: list of tags to apply to the event. The last tag determines the way the event is displayed. If there are several events on the same day, the lowest one (on the tooltip list) which has tags determines the colors of the day.
 
-        **calevent_lower(ev_id, below=None)**: Lower event *ev_id* in tooltip event list.
+        calevent_lower(ev_id, below=None) : 
+            Lower event *ev_id* in tooltip event list.
 
-            *below:* put event below given one, if below is None, put it at the bottom of tooltip event list.
-
-            The day's colors are determined by the last tag of the lowest event which has tags.
-
-        **calevent_raise(ev_id, above=None)**: Raise event *ev_id* in tooltip event list.
-
-            *above*: put *ev_id* above given one, if above is None, put it on top of tooltip event list.
+                *below*: put event below given one, if below is None, put it at the bottom of tooltip event list.
 
             The day's colors are determined by the last tag of the lowest event which has tags.
 
-        **calevent_remove(\*ev_ids, \*\*kw)**: Remove events from calendar.
+        calevent_raise(ev_id, above=None) : 
+            Raise event *ev_id* in tooltip event list.
+
+                *above*: put *ev_id* above given one, if above is None, put it on top of tooltip event list.
+
+            The day's colors are determined by the last tag of the lowest event which has tags.
+
+        calevent_remove(\*ev_ids, \*\*kw) : 
+            Remove events from calendar.
 
             Arguments: event ids to remove or 'all' to remove them all.
 
-            Keyword arguments: *tag*, *date*.
+            Keyword arguments: *tag*, *date*. They are taken into account only if no id is given. Remove all events with given tag on given date. If only date is given, remove all events on date and if only tag is given, remove all events with tag.
 
-                They are taken into account only if no id is given. Remove all events with given tag on given date. If only date is given, remove all events on date and if only tag is given, remove all events with tag.
+        get_date() : 
+            If selectmode is 'day', return the string corresponding to the selected date in the ``Calendar`` locale, otherwise return ``""``.
 
-        **get_date()**: If selectmode is 'day', return the string corresponding to the selected date in the ``Calendar`` locale, otherwise return ``""``.
-
-        **get_calevents**(date=None, tag=None)**: Return event ids of events with given tag and on given date.
+        get_calevents(date=None, tag=None) : 
+            Return event ids of events with given tag and on given date.
 
             If only *date* is given, return event ids of all events on date.
+            
             If only *tag* is given, return event ids of all events with tag.
+            
             If both options are None, return all event ids.
 
-        **selection_get()**: If selectmode is 'day', return the selected date as a ``datetime.date`` instance, otherwise return ``None``.
+        selection_get() : 
+            If selectmode is 'day', return the selected date as a ``datetime.date`` instance, otherwise return ``None``.
 
-        **selection_set(self, date)**: If selectmode is 'day', set the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
+        selection_set(self, date) : 
+            If selectmode is 'day', set the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
 
-        **tag_cget(tag, option)**: Return the value of the tag's option.
+        tag_cget(tag, option) : 
+            Return the value of the tag's option.
 
-        **tag_config(self, tag, **kw)**: Configure *tag*.
+        tag_config(self, tag, \*\*kw) : 
+            Configure *tag*.
 
             Keyword options: *foreground*, *background* (of the day in the calendar)
 
-        **tag_delete(tag)**: Delete given tag and remove it from all events.
+        tag_delete(tag) : 
+            Delete given tag and remove it from all events.
 
-        **tag_names()**: Return tuple of existing tags.
-
+        tag_names() : 
+            Return tuple of existing tags.
 
 
 
 DateEntry widget
+----------------
 
-    Date selection entry with drop-down calendar.
+Date selection entry with drop-down calendar.
 
 
-    Syntax:
+Syntax
+~~~~~~
 
     ::
 
         DateEntry(master=None, **kw)
 
-    Widget keyword options:
+Widget keyword options
+~~~~~~~~~~~~~~~~~~~~~~
 
     * Keyword options of ``Calendar`` to configure the drop-down calendar
 
@@ -219,27 +281,31 @@ DateEntry widget
 
         A ``<<DateEntrySelected>>`` event is generated each time the user selects a date.
 
-    Widget methods:
+Widget methods
+~~~~~~~~~~~~~~
 
     * Standard methods:
 
-        - The methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
+        - methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
 
-        - The methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
+        - methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
 
-        - The methods of the ``Entry`` widget (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html)
+        - methods of the ``Entry`` widget (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html)
 
     * Widget-Specific methods:
 
-        **drop_down()**: Display or withdraw the drop-down calendar depending on its current state.
+        drop_down() : 
+            Display or withdraw the drop-down calendar depending on its current state.
 
-        **get_date()**: Return the selected date as a ``datetime.date`` instance.
+        get_date() : 
+            Return the selected date as a ``datetime.date`` instance.
 
-        **set_date(self, date)**: Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
+        set_date(self, date) : 
+            Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
----------
+=========
 
 
 - tkcalendar 1.3.0
@@ -373,3 +439,12 @@ Example
     ttk.Button(root, text='DateEntry', command=example3).pack(padx=10, pady=10)
 
     root.mainloop()
+
+
+
+
+
+
+
+
+
