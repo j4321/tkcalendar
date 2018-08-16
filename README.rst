@@ -175,9 +175,11 @@ Widget methods
 
     * Standard methods:
 
-        - methods common to all tkinter widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
+        - methods common to all tkinter widgets 
+          (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
 
-        - methods common to all ttk widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
+        - methods common to all ttk widgets 
+          (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
 
     * Widget-Specific methods:
 
@@ -196,7 +198,9 @@ Widget methods
 
                 *text*: text to put in the tooltip associated to date.
 
-                *tags*: list of tags to apply to the event. The last tag determines the way the event is displayed. If there are several events on the same day, the lowest one (on the tooltip list) which has tags determines the colors of the day.
+                *tags*: list of tags to apply to the event. The last tag determines the way the event is displayed. 
+                If there are several events on the same day, the lowest one (on the tooltip list) 
+                which has tags determines the colors of the day.
 
         calevent_lower(ev_id, below=None) : 
             Lower event *ev_id* in tooltip event list.
@@ -217,10 +221,13 @@ Widget methods
 
                 Arguments: event ids to remove or 'all' to remove them all.
     
-                Keyword arguments: *tag*, *date*. They are taken into account only if no id is given. Remove all events with given tag on given date. If only date is given, remove all events on date and if only tag is given, remove all events with tag.
+                Keyword arguments: *tag*, *date*. They are taken into account only if no id is given. 
+                Remove all events with given tag on given date. If only date is given, 
+                remove all events on date and if only tag is given, remove all events with tag.
 
         get_date() : 
-            If selectmode is 'day', return the string corresponding to the selected date in the ``Calendar`` locale, otherwise return ``""``.
+            If selectmode is 'day', return the string corresponding to the selected date in the 
+            ``Calendar`` locale, otherwise return ``""``.
 
         get_calevents(date=None, tag=None) : 
             Return event ids of events with given tag and on given date.
@@ -232,10 +239,13 @@ Widget methods
                 If both options are None, return all event ids.
 
         selection_get() : 
-            If selectmode is 'day', return the selected date as a ``datetime.date`` instance, otherwise return ``None``.
+            If selectmode is 'day', return the selected date as a ``datetime.date`` 
+            instance, otherwise return ``None``.
 
         selection_set(self, date) : 
-            If selectmode is 'day', set the selection to *date* where *date* can be either a ```datetime.date``` instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` locale. Does nothing if selectmode is ``"none"``.
+            If selectmode is 'day', set the selection to *date* where *date* can be either a ``datetime.date``
+             instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` 
+             locale. Does nothing if selectmode is ``"none"``.
 
         tag_cget(tag, option) : 
             Return the value of the tag's option.
@@ -273,9 +283,12 @@ Widget keyword options
 
     * Keyword options of ``ttk.Entry``
 
-        By default, 'validate' is set to 'focusout' and 'validatecommand' is configured so that each time the widget looses focus, if the content is not a valid date (in locale format '%x'), it is reset to the previous valid date.
+        By default, 'validate' is set to 'focusout' and 'validatecommand' is configured so that each 
+        time the widget looses focus, if the content is not a valid date (in locale format '%x'), 
+        it is reset to the previous valid date.
 
-        The widget style is set to 'DateEntry'. A custom style inheritting from 'DateEntry' can be created by naming it  '<style name>.DateEntry'
+        The widget style is set to 'DateEntry'. A custom style inheritting from 'DateEntry' 
+        can be created by naming it  '<style name>.DateEntry'
 
     * Virtual Events
 
@@ -286,11 +299,14 @@ Widget methods
 
     * Standard methods:
 
-        - methods common to all tkinter widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
+        - methods common to all tkinter widgets 
+          (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
 
-        - methods common to all ttk widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
+        - methods common to all ttk widgets 
+          (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
 
-        - methods of the ``Entry`` widget (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html>`__)
+        - methods of the ``Entry`` widget 
+          (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html>`__)
 
     * Widget-Specific methods:
 
@@ -301,7 +317,8 @@ Widget methods
             Return the selected date as a ``datetime.date`` instance.
 
         set_date(self, date) : 
-            Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
+            Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` 
+            instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
 Changelog
@@ -313,6 +330,9 @@ Changelog
     * No longer set locale globally to avoid conflicts between several instances, use babel module instead
     * Add option showwekknumbers to show/hide week numbers
     * Make DateEntry compatible with more ttk themes, especially OSX default theme
+    * Add possibility to display special events (like birthdays, ..) in the calendar.
+      The events are displayed with colors defined by tags and the event description is displayed in a tooltip 
+      (see documentation). 
 
 - tkcalendar 1.2.1
 
@@ -439,6 +459,8 @@ Example
     ttk.Button(root, text='DateEntry', command=example3).pack(padx=10, pady=10)
 
     root.mainloop()
+
+
 
 
 
