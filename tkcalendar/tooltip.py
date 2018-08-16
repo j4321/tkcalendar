@@ -30,77 +30,132 @@ from sys import platform
 
 
 class Tooltip(tk.Toplevel):
+    """Tooltip widget displays a ttk.Label in a Toplevel without window decoration."""
+
+    _initialized = False
+
     def __init__(self, parent, **kwargs):
-        tk.Toplevel.__init__(self, parent)
-        if 'title' in kwargs:
-            self.title(kwargs['title'])
+        """
+        Construct a Tooltip with parent master.
+
+        KEYWORDS OPTIONS
+
+            ttk.Label options,
+            alpha: Tooltip opacity between 0 and 1.
+        """
+        tk.Toplevel.__init__(self, parent, padx=0, pady=0)
         self.transient(parent)
         if platform == 'linux':
             self.attributes('-type', 'tooltip')
         self.attributes('-alpha', kwargs.get('alpha', 0.8))
         self.overrideredirect(True)
-        self.configure(padx=kwargs.get('padx', 4))
-        self.configure(pady=kwargs.get('pady', 4))
 
-        self.style = ttk.Style(self)
-        bg = kwargs.get('background', 'black')
-        self.configure(background=bg)
-        self.style.configure('tooltip.TLabel',
-                             foreground=kwargs.get('foreground', 'gray90'),
-                             background=bg,
-                             font='TkDefaultFont 9 bold')
+        if not Tooltip._initialized:
+            # default tooltip style
+            style = ttk.Style(self)
+            style.configure('tooltip.TLabel',
+                            foreground='gray90',
+                            background='black',
+                            font='TkDefaultFont 9 bold')
+            Tooltip._initialized = True
 
-        self.im = kwargs.get('image', None)
-        self.label = ttk.Label(self, text=kwargs.get('text', ''), image=self.im,
-                               style='tooltip.TLabel',
-                               compound=kwargs.get('compound', 'left'))
-        self.label.pack()
+        # default options
+        kw = {'compound': 'left', 'style': 'tooltip.TLabel', 'padding': 4}
+        # update with given options
+        kw.update(kwargs)
+
+        self.label = ttk.Label(self, **kw)
+        self.label.pack(fill='both')
+
+        self.config = self.configure
 
     def __setitem__(self, key, value):
         self.configure(**{key: value})
 
+    def __getitem__(self, key):
+        return self.cget(key)
+
+    def cget(self, key):
+        if key == 'alpha':
+            return self.attributes('-alpha')
+        else:
+            return self.label.cget(key)
+
     def configure(self, **kwargs):
-        if 'text' in kwargs:
-            self.label.configure(text=kwargs.pop('text'))
-        if 'image' in kwargs:
-            self.label.configure(image=kwargs.pop('image'))
-        if 'background' in kwargs:
-            self.style.configure('tooltip.TLabel', background=kwargs['background'])
-        if 'foreground' in kwargs:
-            fg = kwargs.pop('foreground')
-            self.style.configure('tooltip.TLabel', foreground=fg)
         if 'alpha' in kwargs:
             self.attributes('-alpha', kwargs.pop('alpha'))
-        tk.Toplevel.configure(self, **kwargs)
+        self.label.configure(self, **kwargs)
+
+    def keys(self):
+        keys = list(self.label.keys())
+        keys.insert(0, 'alpha')
+        return keys
 
 
 class TooltipWrapper:
+    """
+    Tooltip wrapper widget handle tooltip display when the mouse hovers over
+    widgets.
+    """
     def __init__(self, master, **kwargs):
-        self.widgets = {}
-        self.bind_enter_ids = {}
-        self.bind_leave_ids = {}
+        """
+        Construct a Tooltip wrapper with parent master.
+
+        KEYWORDS OPTIONS
+
+            Tooltip options,
+            delay: time (ms) the mouse has to stay still over the widget before
+            the Tooltip is displayed.
+        """
+        self.widgets = {}  # {widget name: tooltip text, ...}
+        # keep track of binding ids to cleanly remove them
+        self.bind_enter_ids = {}  # {widget name: bind id, ...}
+        self.bind_leave_ids = {}  # {widget name: bind id, ...}
+
+        # time delay before displaying the tooltip
         if 'delay' in kwargs:
             self.delay = kwargs.pop('delay')
         else:
             self.delay = 2000
-        self.kwargs = kwargs.copy()
         self._timer_id = None
-        self.tooltip = Tooltip(master, **self.kwargs)
-        self.tooltip.withdraw()
 
+        self.tooltip = Tooltip(master, **kwargs)
+        self.tooltip.withdraw()
+        # widget currently under the mouse if among wrapped widgets:
         self.current_widget = None
+
+        self.config = self.configure
 
         self.tooltip.bind('<Leave>', self._on_leave_tooltip)
 
+    def __setitem__(self, key, value):
+        self.configure(**{key: value})
+
+    def __getitem__(self, key):
+        return self.cget(key)
+
+    def cget(self, key):
+        if key == 'delay':
+            return self.delay
+        else:
+            return self.tooltip.cget(key)
+
+    def configure(self, **kwargs):
+        self.delay = kwargs.pop('delay', self.delay)
+        self.tooltip.configure(**kwargs)
+
     def add_tooltip(self, widget, text):
+        """Add new widget to wrapper."""
         self.widgets[str(widget)] = text
         self.bind_enter_ids[str(widget)] = widget.bind('<Enter>', self._on_enter)
         self.bind_leave_ids[str(widget)] = widget.bind('<Leave>', self._on_leave)
 
     def set_tooltip_text(self, widget, text):
+        """Change tooltip text for given widget."""
         self.widgets[str(widget)] = text
 
     def remove_all(self):
+        """Remove all tooltips."""
         for name in self.widgets:
             widget = self.tooltip.nametowidget(name)
             widget.unbind('<Enter>', self.bind_enter_ids[name])
@@ -110,6 +165,7 @@ class TooltipWrapper:
         self.bind_leave_ids.clear()
 
     def remove_tooltip(self, widget):
+        """Remove widget from wrapper."""
         try:
             name = str(widget)
             del self.widgets[name]
@@ -121,11 +177,13 @@ class TooltipWrapper:
             pass
 
     def _on_enter(self, event):
+        """Change current widget and launch timer to display tooltip."""
         if not self.tooltip.winfo_ismapped():
             self._timer_id = event.widget.after(self.delay, self.display_tooltip)
             self.current_widget = event.widget
 
     def _on_leave(self, event):
+        """Hide tooltip if visible or cancel tooltip display."""
         if self.tooltip.winfo_ismapped():
             x, y = event.widget.winfo_pointerxy()
             if not event.widget.winfo_containing(x, y) in [event.widget, self.tooltip]:
@@ -138,11 +196,13 @@ class TooltipWrapper:
         self.current_widget = None
 
     def _on_leave_tooltip(self, event):
+        """Hide tooltip."""
         x, y = event.widget.winfo_pointerxy()
         if not event.widget.winfo_containing(x, y) in [self.current_widget, self.tooltip]:
             self.tooltip.withdraw()
 
     def display_tooltip(self):
+        """Display tooltip with text corresponding to current widget."""
         if self.current_widget is not None and "disabled" not in self.current_widget.state():
             self.tooltip['text'] = self.widgets[str(self.current_widget)]
             self.tooltip.deiconify()
