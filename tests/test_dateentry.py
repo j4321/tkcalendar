@@ -38,6 +38,8 @@ class TestDateEntry(BaseWidgetTest):
         y = widget._top_cal.winfo_rooty() + widget._top_cal.winfo_height() + 10
         mouse.position = x, y
         widget._calendar.event_generate('<FocusOut>')
+        widget._on_focus_out_cal(TestEvent(widget=widget._calendar,
+                                           x='', y=''))
         self.window.update()
         self.assertFalse(widget._top_cal.winfo_ismapped())
 
