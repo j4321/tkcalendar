@@ -76,10 +76,8 @@ class DateEntry(ttk.Entry):
         entry_kw['font'] = kw.get('font', None)
 
         ttk.Entry.__init__(self, master, **entry_kw)
-        # down arrow button bbox (to detect if it was clicked upon)
-        self._down_arrow_bbox = [0, 0, 0, 0]
 
-        self._determine_bbox_after_id = ''
+        self._determine_downarrow_name_after_id = ''
 
         # drop-down calendar
         self._top_cal = tk.Toplevel(self)
@@ -125,8 +123,8 @@ class DateEntry(ttk.Entry):
         self.bind('<<ThemeChanged>>',
                   lambda e: self.after(10, self._on_theme_change))
         # determine new downarrow button bbox
-        self.bind('<Configure>', self._determine_bbox)
-        self.bind('<Map>', self._determine_bbox)
+        self.bind('<Configure>', self._determine_downarrow_name)
+        self.bind('<Map>', self._determine_downarrow_name)
         # handle appearence to make the entry behave like a Combobox but with
         # a drop-down calendar instead of a drop-down list
         self.bind('<Leave>', lambda e: self.state(['!active']))
@@ -148,41 +146,38 @@ class DateEntry(ttk.Entry):
         """Style configuration."""
         self.style.layout('DateEntry', self.style.layout('TCombobox'))
         fieldbg = self.style.map('TCombobox', 'fieldbackground')
+        self.update_idletasks()
+
         self.style.map('DateEntry', fieldbackground=fieldbg)
         try:
-            self.after_cancel(self._determine_bbox_after_id)
+            self.after_cancel(self._determine_downarrow_name_after_id)
         except ValueError:
             # nothing to cancel
             pass
-        self._determine_bbox_after_id = self.after(10, self._determine_bbox)
+        self._determine_downarrow_name_after_id = self.after(10, self._determine_downarrow_name)
 
-    def _determine_bbox(self, event=None):
+    def _determine_downarrow_name(self, event=None):
         """Determine downarrow button bbox."""
         try:
-            self.after_cancel(self._determine_bbox_after_id)
+            self.after_cancel(self._determine_downarrow_name_after_id)
         except ValueError:
             # nothing to cancel
             pass
         if self.winfo_ismapped():
             self.update_idletasks()
-            h = self.winfo_height()
-            w = self.winfo_width()
-            y = h // 2
-            x = 0
-            if self.identify(x, y):
-                while x < w and 'downarrow' not in self.identify(x, y):
-                    x += 1
-                if x < w:
-                    self._down_arrow_bbox = [x, 0, w, h]
+            y = self.winfo_height() // 2
+            x = self.winfo_width() - 10
+            name = self.identify(x, y)
+            if name:
+                self._downarrow_name = name
             else:
-                self._determine_bbox_after_id = self.after(10, self._determine_bbox)
+                self._determine_downarrow_name_after_id = self.after(10, self._determine_downarrow_name)
 
     def _on_motion(self, event):
         """Set widget state depending on mouse position to mimic Combobox behavior."""
         x, y = event.x, event.y
-        x1, y1, x2, y2 = self._down_arrow_bbox
         if 'disabled' not in self.state():
-            if x >= x1 and x <= x2 and y >= y1 and y <= y2:
+            if self.identify(x, y) == self._downarrow_name:
                 self.state(['active'])
                 self.configure(cursor='arrow')
             else:
@@ -202,9 +197,7 @@ class DateEntry(ttk.Entry):
     def _on_b1_press(self, event):
         """Trigger self.drop_down on downarrow button press and set widget state to ['pressed', 'active']."""
         x, y = event.x, event.y
-        x1, y1, x2, y2 = self._down_arrow_bbox
-        if (('disabled' not in self.state()) and
-                x >= x1 and x <= x2 and y >= y1 and y <= y2):
+        if (('disabled' not in self.state()) and self.identify(x, y) == self._downarrow_name):
             self.state(['pressed'])
             self.drop_down()
 
@@ -213,9 +206,7 @@ class DateEntry(ttk.Entry):
         if self.focus_get() is not None:
             if self.focus_get() == self:
                 x, y = event.x, event.y
-                x1, y1, x2, y2 = self._down_arrow_bbox
-                if (type(x) != int or type(y) != int or
-                        not (x >= x1 and x <= x2 and y >= y1 and y <= y2)):
+                if (type(x) != int or type(y) != int or self.identify(x, y) != self._downarrow_name):
                     self._top_cal.withdraw()
                     self.state(['!pressed'])
             else:
@@ -267,7 +258,7 @@ class DateEntry(ttk.Entry):
 
     def destroy(self):
         try:
-            self.after_cancel(self._determine_bbox_after_id)
+            self.after_cancel(self._determine_downarrow_name_after_id)
         except ValueError:
             # nothing to cancel
             pass
@@ -368,3 +359,4 @@ class DateEntry(ttk.Entry):
         """Return the content of the DateEntry as a datetime.date instance."""
         self._validate_date()
         return self.parse_date(self.get())
+

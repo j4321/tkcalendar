@@ -35,7 +35,7 @@ class Tooltip(tk.Toplevel):
         if 'title' in kwargs:
             self.title(kwargs['title'])
         self.transient(parent)
-        if platform is 'linux':
+        if platform == 'linux':
             self.attributes('-type', 'tooltip')
         self.attributes('-alpha', kwargs.get('alpha', 0.8))
         self.overrideredirect(True)
