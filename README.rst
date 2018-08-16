@@ -215,9 +215,9 @@ Widget methods
         calevent_remove(\*ev_ids, \*\*kw) : 
             Remove events from calendar.
 
-            Arguments: event ids to remove or 'all' to remove them all.
-
-            Keyword arguments: *tag*, *date*. They are taken into account only if no id is given. Remove all events with given tag on given date. If only date is given, remove all events on date and if only tag is given, remove all events with tag.
+                Arguments: event ids to remove or 'all' to remove them all.
+    
+                Keyword arguments: *tag*, *date*. They are taken into account only if no id is given. Remove all events with given tag on given date. If only date is given, remove all events on date and if only tag is given, remove all events with tag.
 
         get_date() : 
             If selectmode is 'day', return the string corresponding to the selected date in the ``Calendar`` locale, otherwise return ``""``.
@@ -225,11 +225,11 @@ Widget methods
         get_calevents(date=None, tag=None) : 
             Return event ids of events with given tag and on given date.
 
-            If only *date* is given, return event ids of all events on date.
-            
-            If only *tag* is given, return event ids of all events with tag.
-            
-            If both options are None, return all event ids.
+                If only *date* is given, return event ids of all events on date.
+                
+                If only *tag* is given, return event ids of all events with tag.
+                
+                If both options are None, return all event ids.
 
         selection_get() : 
             If selectmode is 'day', return the selected date as a ``datetime.date`` instance, otherwise return ``None``.
@@ -243,7 +243,7 @@ Widget methods
         tag_config(self, tag, \*\*kw) : 
             Configure *tag*.
 
-            Keyword options: *foreground*, *background* (of the day in the calendar)
+                Keyword options: *foreground*, *background* (of the day in the calendar)
 
         tag_delete(tag) : 
             Delete given tag and remove it from all events.
@@ -286,11 +286,11 @@ Widget methods
 
     * Standard methods:
 
-        - methods common to all tkinter widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html)
+        - methods common to all tkinter widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
 
-        - methods common to all ttk widgets (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html)
+        - methods common to all ttk widgets (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
 
-        - methods of the ``Entry`` widget (more details here: http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html)
+        - methods of the ``Entry`` widget (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html>`__)
 
     * Widget-Specific methods:
 
@@ -439,6 +439,7 @@ Example
     ttk.Button(root, text='DateEntry', command=example3).pack(padx=10, pady=10)
 
     root.mainloop()
+
 
 
 
