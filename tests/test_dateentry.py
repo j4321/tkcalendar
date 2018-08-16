@@ -5,6 +5,7 @@ try:
     from tkinter import ttk
 except ImportError:
     import ttk
+from pynput.mouse import Controller
 
 
 class TestDateEntry(BaseWidgetTest):
@@ -32,6 +33,10 @@ class TestDateEntry(BaseWidgetTest):
         widget.event_generate('<1>', x=w - 10, y=h // 2)
         self.window.update()
         self.assertTrue(widget._top_cal.winfo_ismapped())
+        mouse = Controller()
+        x = self.window.winfo_rootx() + self.window.winfo_width() + 10
+        y = self.window.winfo_rooty() + self.window.winfo_height() + 10
+        mouse.position = x, y
         widget._calendar.event_generate('<FocusOut>')
         self.window.update()
         self.assertFalse(widget._top_cal.winfo_ismapped())
