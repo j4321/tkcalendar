@@ -8,6 +8,8 @@ Events can be displayed in the Calendar with custom colors and a tooltip display
 tkcalendar is compatible with both Python 2 and Python 3.
 It supports many locale settings (e.g. 'fr_FR', 'en_US', ..) and the colors are customizable.
 
+The documentation is also available here: https://tkcalendar.readthedocs.io
+
 .. contents:: Table of Contents
 
 Requirements
