@@ -178,6 +178,7 @@ class TestCalendar(BaseWidgetTest):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'firstweekday',
                    'showweeknumbers',
                    'selectbackground',
                    'selectforeground',
@@ -229,6 +230,11 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget["borderwidth"], 5)
         with self.assertRaises(ValueError):
             widget.config(borderwidth="a")
+        widget.config(firstweekday='sunday')
+        self.window.update()
+        self.assertEqual(widget["firstweekday"], 'sunday')
+        with self.assertRaises(ValueError):
+            widget.config(firstweekday="a")
         widget.config(selectmode="none")
         self.window.update()
         self.assertEqual(widget["selectmode"], "none")
@@ -244,10 +250,10 @@ class TestCalendar(BaseWidgetTest):
             widget.config(locale="en_US.UTF-8")
         with self.assertRaises(AttributeError):
             widget.config(test="test")
-        dic = {op: "yellow" for op in options[7:-4]}
+        dic = {op: "yellow" for op in options[8:-4]}
         widget.configure(**dic)
         self.window.update()
-        for op in options[7:-4]:
+        for op in options[8:-4]:
             self.assertEqual(widget.cget(op), "yellow")
         widget.config(tooltipalpha=0.5)
         self.assertEqual(widget["tooltipalpha"], 0.5)
@@ -365,7 +371,4 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget.get_calevents(), (0, 2))
         widget.calevent_remove('all')
         self.assertEqual(widget.get_calevents(), ())
-
-
-
 

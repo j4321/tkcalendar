@@ -59,13 +59,13 @@ Widget keyword options
 
     cursor : str
         cursor to display when the pointer is in the widget
-    
+
     font : str such as "Arial 20 bold" or a Tkinter Font instance
-        font of the calendar, can be a 
-    
+        font of the calendar, can be a
+
     borderwidth : int
         width of the border around the calendar
-    
+
     state : str
         "normal" or "disabled" (unresponsive widget)
 
@@ -80,14 +80,17 @@ Widget keyword options
     day : int
         initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today.
 
+    firstweekday : "monday" or "sunday"
+        first day of the week
+
+    showweeknumbers : boolean (default is True)
+        whether to display week numbers.
+
     locale : str
         locale to use, e.g. 'en_US'
 
     selectmode : "none" or "day" (default)
         whether the user can change the selected day with a mouse click.
-
-    showweeknumbers : boolean (default is True)
-        whether to display week numbers.
 
     textvariable : StringVar
         connect the currently selected date to the variable.
@@ -167,7 +170,7 @@ Widget keyword options
 
 Virtual Events
 ~~~~~~~~~~~~~~
-    
+
     A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
 
 Widget methods
@@ -175,21 +178,21 @@ Widget methods
 
     * Standard methods:
 
-        - methods common to all tkinter widgets 
+        - methods common to all tkinter widgets
           (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
 
-        - methods common to all ttk widgets 
+        - methods common to all ttk widgets
           (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
 
     * Widget-Specific methods:
 
-        calevent_cget(ev_id, option) : 
+        calevent_cget(ev_id, option) :
             Return value of given option for the event *ev_id*.
 
-        calevent_configure(ev_id, \*\*kw) : 
+        calevent_configure(ev_id, \*\*kw) :
             Return value of given option for the event *ev_id*.
 
-        calevent_create(date, text, tags=[]) : 
+        calevent_create(date, text, tags=[]) :
             Add new event in calendar and return event id.
 
             Options:
@@ -198,67 +201,67 @@ Widget methods
 
                 *text*: text to put in the tooltip associated to date.
 
-                *tags*: list of tags to apply to the event. The last tag determines the way the event is displayed. 
-                If there are several events on the same day, the lowest one (on the tooltip list) 
+                *tags*: list of tags to apply to the event. The last tag determines the way the event is displayed.
+                If there are several events on the same day, the lowest one (on the tooltip list)
                 which has tags determines the colors of the day.
 
-        calevent_lower(ev_id, below=None) : 
+        calevent_lower(ev_id, below=None) :
             Lower event *ev_id* in tooltip event list.
 
                 *below*: put event below given one, if below is None, put it at the bottom of tooltip event list.
 
             The day's colors are determined by the last tag of the lowest event which has tags.
 
-        calevent_raise(ev_id, above=None) : 
+        calevent_raise(ev_id, above=None) :
             Raise event *ev_id* in tooltip event list.
 
                 *above*: put *ev_id* above given one, if above is None, put it on top of tooltip event list.
 
             The day's colors are determined by the last tag of the lowest event which has tags.
 
-        calevent_remove(\*ev_ids, \*\*kw) : 
+        calevent_remove(\*ev_ids, \*\*kw) :
             Remove events from calendar.
 
                 Arguments: event ids to remove or 'all' to remove them all.
-    
-                Keyword arguments: *tag*, *date*. They are taken into account only if no id is given. 
-                Remove all events with given tag on given date. If only date is given, 
+
+                Keyword arguments: *tag*, *date*. They are taken into account only if no id is given.
+                Remove all events with given tag on given date. If only date is given,
                 remove all events on date and if only tag is given, remove all events with tag.
 
-        get_date() : 
-            If selectmode is 'day', return the string corresponding to the selected date in the 
+        get_date() :
+            If selectmode is 'day', return the string corresponding to the selected date in the
             ``Calendar`` locale, otherwise return ``""``.
 
-        get_calevents(date=None, tag=None) : 
+        get_calevents(date=None, tag=None) :
             Return event ids of events with given tag and on given date.
 
                 If only *date* is given, return event ids of all events on date.
-                
+
                 If only *tag* is given, return event ids of all events with tag.
-                
+
                 If both options are None, return all event ids.
 
-        selection_get() : 
-            If selectmode is 'day', return the selected date as a ``datetime.date`` 
+        selection_get() :
+            If selectmode is 'day', return the selected date as a ``datetime.date``
             instance, otherwise return ``None``.
 
-        selection_set(self, date) : 
+        selection_set(self, date) :
             If selectmode is 'day', set the selection to *date* where *date* can be either a ``datetime.date``
-             instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` 
+             instance or a string corresponding to the date format ``"%x"`` in the ``Calendar``
              locale. Does nothing if selectmode is ``"none"``.
 
-        tag_cget(tag, option) : 
+        tag_cget(tag, option) :
             Return the value of the tag's option.
 
-        tag_config(self, tag, \*\*kw) : 
+        tag_config(self, tag, \*\*kw) :
             Configure *tag*.
 
                 Keyword options: *foreground*, *background* (of the day in the calendar)
 
-        tag_delete(tag) : 
+        tag_delete(tag) :
             Delete given tag and remove it from all events.
 
-        tag_names() : 
+        tag_names() :
             Return tuple of existing tags.
 
 
@@ -283,11 +286,11 @@ Widget keyword options
 
     * Keyword options of ``ttk.Entry``
 
-        By default, 'validate' is set to 'focusout' and 'validatecommand' is configured so that each 
-        time the widget looses focus, if the content is not a valid date (in locale format '%x'), 
+        By default, 'validate' is set to 'focusout' and 'validatecommand' is configured so that each
+        time the widget looses focus, if the content is not a valid date (in locale format '%x'),
         it is reset to the previous valid date.
 
-        The widget style is set to 'DateEntry'. A custom style inheritting from 'DateEntry' 
+        The widget style is set to 'DateEntry'. A custom style inheritting from 'DateEntry'
         can be created by naming it  '<style name>.DateEntry'
 
     * Virtual Events
@@ -299,25 +302,25 @@ Widget methods
 
     * Standard methods:
 
-        - methods common to all tkinter widgets 
+        - methods common to all tkinter widgets
           (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`__)
 
-        - methods common to all ttk widgets 
+        - methods common to all ttk widgets
           (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`__)
 
-        - methods of the ``Entry`` widget 
+        - methods of the ``Entry`` widget
           (more details `here <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html>`__)
 
     * Widget-Specific methods:
 
-        drop_down() : 
+        drop_down() :
             Display or withdraw the drop-down calendar depending on its current state.
 
-        get_date() : 
+        get_date() :
             Return the selected date as a ``datetime.date`` instance.
 
-        set_date(self, date) : 
-            Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date`` 
+        set_date(self, date) :
+            Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date``
             instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
 
@@ -329,10 +332,11 @@ Changelog
 
     * No longer set locale globally to avoid conflicts between several instances, use babel module instead
     * Add option showwekknumbers to show/hide week numbers
+    * Add option firstweekday to choose first week day between 'monday' and 'sunday'
     * Make DateEntry compatible with more ttk themes, especially OSX default theme
     * Add possibility to display special events (like birthdays, ..) in the calendar.
-      The events are displayed with colors defined by tags and the event description is displayed in a tooltip 
-      (see documentation). 
+      The events are displayed with colors defined by tags and the event description is displayed in a tooltip
+      (see documentation).
 
 - tkcalendar 1.2.1
 

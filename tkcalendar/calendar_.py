@@ -22,12 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Calendar widget
 """
-# TODO: custom first week day?
 
 
 import calendar
 from babel.dates import format_date, parse_date, get_day_names, get_month_names
-from sys import platform
 try:
     from tkinter import ttk
     from tkinter.font import Font
@@ -67,14 +65,17 @@ class Calendar(ttk.Frame):
         day : int
             initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today.
 
+        firstweekday : "monday" or "sunday"
+            first day of the week
+
+        showweeknumbers : boolean (default is True)
+            whether to display week numbers.
+
         locale : str
             locale to use, e.g. 'en_US'
 
         selectmode : "none" or "day" (default)
             whether the user can change the selected day with a mouse click.
-
-        showweeknumbers : boolean (default is True)
-            whether to display week numbers.
 
         textvariable : StringVar
             connect the currently selected date to the variable.
@@ -194,7 +195,10 @@ class Calendar(ttk.Frame):
         except ValueError:
             raise ValueError('expected integer for the borderwidth option.')
 
-        self._cal = calendar.TextCalendar(calendar.MONDAY)
+        firstweekday = kw.pop('firstweekday', 'monday')
+        if firstweekday not in ["monday", "sunday"]:
+            raise ValueError("'firstweekday' option should be 'monday' or 'sunday'.")
+        self._cal = calendar.TextCalendar((firstweekday == 'sunday') * 6)
 
         # --- locale
         locale = kw.pop("locale", getdefaultlocale()[0])
@@ -254,6 +258,7 @@ class Calendar(ttk.Frame):
                    'textvariable',
                    'locale',
                    'showweeknumbers',
+                   'firstweekday',
                    'selectbackground',
                    'selectforeground',
                    'disabledselectbackground',
@@ -290,6 +295,7 @@ class Calendar(ttk.Frame):
                             "locale": locale,
                             "selectmode": selectmode,
                             'textvariable': self._textvariable,
+                            'firstweekday': firstweekday,
                             'showweeknumbers': showweeknumbers,
                             'selectbackground': active_bg,
                             'selectforeground': 'white',
@@ -366,15 +372,16 @@ class Calendar(ttk.Frame):
                                                                         column=0,
                                                                         sticky="eswn")
         # week day names
-        for i in range(7):
-            d = self._day_names[i]
+        self._week_days = []
+        for i, day in enumerate(self._cal.iterweekdays()):
+            d = self._day_names[day % 7]
             self._cal_frame.columnconfigure(i + 1, weight=1)
-            ttk.Label(self._cal_frame,
-                      font=self._font,
-                      style='headers.%s.TLabel' % self._style_prefixe,
-                      anchor="center",
-                      text=d, width=4).grid(row=0, column=i + 1,
-                                            sticky="ew", pady=(0, 1))
+            self._week_days.append(ttk.Label(self._cal_frame,
+                                             font=self._font,
+                                             style='headers.%s.TLabel' % self._style_prefixe,
+                                             anchor="center",
+                                             text=d, width=4))
+            self._week_days[-1].grid(row=0, column=i + 1, sticky="ew", pady=(0, 1))
         self._week_nbs = []  # week numbers
         self._calendar = []  # days
         for i in range(1, 7):
@@ -457,6 +464,13 @@ class Calendar(ttk.Frame):
                 else:
                     for wlabel in self._week_nbs:
                         wlabel.grid_remove()
+            elif key is 'firstweekday':
+                if value not in ["monday", "sunday"]:
+                    raise ValueError("'firstweekday' option should be 'monday' or 'sunday'.")
+                self._cal.firstweekday = (value == 'sunday') * 6
+                for label, day in zip(self._week_days, self._cal.iterweekdays()):
+                    label.configure(text=self._day_names[day % 7])
+                self._display_calendar()
             elif key is 'borderwidth':
                 try:
                     bd = int(value)
@@ -673,14 +687,15 @@ class Calendar(ttk.Frame):
 
         # style names depending on the type of day
         week_days = {i: 'normal' for i in range(7)}
-        week_days[5] = 'we'
-        week_days[6] = 'we'
+        offset = (self['firstweekday'] == 'sunday') * 6
+        week_days[(5 - offset) % 7] = 'we'
+        week_days[(6 - offset) % 7] = 'we'
         prev_m = (month - 2) % 12 + 1
         months = {month: '.%s.TLabel' % self._style_prefixe,
                   next_m: '_om.%s.TLabel' % self._style_prefixe,
                   prev_m: '_om.%s.TLabel' % self._style_prefixe}
 
-        week_nb = self._date.isocalendar()[1]
+        week_nb = cal[0][1].isocalendar()[1]
         modulo = max(week_nb, 52)
         for i_week in range(6):
             self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % modulo + 1))

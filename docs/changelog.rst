@@ -6,10 +6,11 @@ tkcalendar 1.3.0
 
 * No longer set locale globally to avoid conflicts between several instances, use babel module instead
 * Add option showwekknumbers to show/hide week numbers
+* Add option firstweekday to choose first week day between 'monday' and 'sunday'
 * Make DateEntry compatible with more ttk themes, especially OSX default theme
 * Add possibility to display special events (like birthdays, ..) in the calendar.
-  The events are displayed with colors defined by tags and the event description is displayed in a tooltip 
-  (see documentation). 
+  The events are displayed with colors defined by tags and the event description is displayed in a tooltip
+  (see documentation).
 
 tkcalendar 1.2.1
 ----------------
