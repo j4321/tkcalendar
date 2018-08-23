@@ -61,7 +61,7 @@ Widget keyword options
         cursor to display when the pointer is in the widget
 
     font : str such as "Arial 20 bold" or a Tkinter Font instance
-        font of the calendar, can be a
+        font of the calendar
 
     borderwidth : int
         width of the border around the calendar
