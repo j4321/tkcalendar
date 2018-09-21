@@ -9,7 +9,7 @@ tkcalendar
 .. image:: https://badge.fury.io/py/tkcalendar.svg
     :target: https://pypi.org/project/tkcalendar/
     :alt: Pypi version
-.. image:: https://travis-ci.org/j4321/tkcalendar.svg?branch=master
+.. image:: https://travis-ci.org/j4321/tkcalendar.svg?branch=master?logo=default
     :target: https://travis-ci.org/j4321/tkcalendar
     :alt: Travis CI Build Status
 .. image:: https://ci.appveyor.com/api/projects/status/9a5bi9ewvccdmo3a/branch/master?svg=true
