@@ -46,6 +46,8 @@ class TestCalendar(BaseWidgetTest):
         widget.pack()
         self.window.update()
         self.assertEqual(widget.selection_get(), date(2018, 2, 5))
+        w, d = widget._get_day_coords(date(2018, 2, 5))
+        self.assertEqual(widget._calendar[w][d].cget('text'), '5')
         widget.destroy()
 
         widget = Calendar(self.window, year=2011, month=2, day=35)

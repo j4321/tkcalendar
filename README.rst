@@ -330,6 +330,9 @@ Changelog
 =========
 
 
+- tkcalendar 1.3.1
+    * Fix bug in day selection when firstweekday is sunday
+
 - tkcalendar 1.3.0
 
     * No longer set locale globally to avoid conflicts between several instances, use babel module instead
