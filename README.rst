@@ -2,9 +2,12 @@
 tkcalendar
 ##########
 
-[![Build Status](https://travis-ci.org/j4321/tkcalendar.svg?branch=master)](https://travis-ci.org/j4321/tkcalendar)
-[![Build status](https://ci.appveyor.com/api/projects/status/9a5bi9ewvccdmo3a/branch/master?svg=true)](https://ci.appveyor.com/project/j4321/tkcalendar/branch/master)
-[![codecov](https://codecov.io/gh/j4321/tkcalendar/branch/master/graph/badge.svg)](https://codecov.io/gh/j4321/tkcalendar)
+.. image:: https://travis-ci.org/j4321/tkcalendar.svg?branch=master
+  :target: https://travis-ci.org/j4321/tkcalendar
+.. image:: https://ci.appveyor.com/api/projects/status/9a5bi9ewvccdmo3a/branch/master?svg=true
+  :target: https://ci.appveyor.com/project/j4321/tkcalendar/branch/master
+.. image:: https://codecov.io/gh/j4321/tkcalendar/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/j4321/tkcalendar
 
 tkcalendar is a python module that provides the Calendar and DateEntry widgets for Tkinter.
 The DateEntry widget is similar to a Combobox, but the drop-down is not a list but a Calendar to select a date.
