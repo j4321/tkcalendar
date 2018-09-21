@@ -718,38 +718,53 @@ class Calendar(ttk.Frame):
 
         self._display_selection()
 
+    def _get_day_coords(self, date):
+        year = date.year
+        if year == self._date.year:
+            _, w, d = date.isocalendar()
+            _, wn, dn = self._date.isocalendar()
+            if self['firstweekday'] == 'sunday':
+                d %= 7
+                if d == 0:
+                    w += 1
+                if dn == 7:
+                    wn += 1
+            else:
+                d -= 1
+            w -= wn
+            w %= max(52, wn)
+            if 0 <= w and w < 6:
+                return w, d
+            else:
+                return None, None
+        else:
+            return None, None
+
     def _display_selection(self):
         """Highlight selected day."""
         if self._sel_date is not None:
-            year = self._sel_date.year
-            if year == self._date.year:
-                _, w, d = self._sel_date.isocalendar()
-                wn = self._date.isocalendar()[1]
-                w -= wn
-                w %= max(52, wn)
-                if 0 <= w and w < 6:
-                    self._calendar[w][d - 1].configure(style='sel.%s.TLabel' % self._style_prefixe)
+            w, d = self._get_day_coords(self._sel_date)
+            if w is not None:
+                self._calendar[w][d].configure(style='sel.%s.TLabel' % self._style_prefixe)
 
     def _reset_day(self, date):
         """Restore usual week day colors."""
-        year, month = date.year, date.month
-        if year == self._date.year:
-            _, w, d = date.isocalendar()
-            wn = self._date.isocalendar()[1]
-            w -= wn
-            w %= max(52, wn)
-            if w >= 0 and w < 6:
-                self.tooltip_wrapper.remove_tooltip(self._calendar[w][d - 1])
-                if month == date.month:
-                    if d < 6:
-                        self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
-                    else:
-                        self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
+        month = date.month
+        w, d = self._get_day_coords(date)
+        if w is not None:
+            self.tooltip_wrapper.remove_tooltip(self._calendar[w][d])
+            week_end = [0, 6] if self['firstweekday'] == 'sunday' else [5, 6]
+            if month == date.month:
+                if d in week_end:
+                    self._calendar[w][d].configure(style='we.%s.TLabel' % self._style_prefixe)
                 else:
-                    if d < 6:
-                        self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
-                    else:
-                        self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+                    self._calendar[w][d].configure(style='normal.%s.TLabel' % self._style_prefixe)
+            else:
+                if d in week_end:
+                    self._calendar[w][d].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+
+                else:
+                    self._calendar[w][d].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
 
     def _remove_selection(self):
         """Remove highlight of selected day."""
@@ -757,43 +772,35 @@ class Calendar(ttk.Frame):
             if self._sel_date in self._calevent_dates:
                 self._show_event(self._sel_date)
             else:
-                year, month = self._sel_date.year, self._sel_date.month
-                if year == self._date.year:
-                    _, w, d = self._sel_date.isocalendar()
-                    wn = self._date.isocalendar()[1]
-                    w -= wn
-                    w %= max(52, wn)
-                    if w >= 0 and w < 6:
-                        if month == self._date.month:
-                            if d < 6:
-                                self._calendar[w][d - 1].configure(style='normal.%s.TLabel' % self._style_prefixe)
-                            else:
-                                self._calendar[w][d - 1].configure(style='we.%s.TLabel' % self._style_prefixe)
+                w, d = self._get_day_coords(self._sel_date)
+                if w is not None:
+                    week_end = [0, 6] if self['firstweekday'] == 'sunday' else [5, 6]
+                    if self._sel_date.month == self._date.month:
+                        if d in week_end:
+                            self._calendar[w][d].configure(style='we.%s.TLabel' % self._style_prefixe)
                         else:
-                            if d < 6:
-                                self._calendar[w][d - 1].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
-                            else:
-                                self._calendar[w][d - 1].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+                            self._calendar[w][d].configure(style='normal.%s.TLabel' % self._style_prefixe)
+                    else:
+                        if d in week_end:
+                            self._calendar[w][d].configure(style='we_om.%s.TLabel' % self._style_prefixe)
+                        else:
+                            self._calendar[w][d].configure(style='normal_om.%s.TLabel' % self._style_prefixe)
 
     def _show_event(self, date):
         """Display events on date if visible."""
-        if date.year == self._date.year:
-            _, w, d = date.isocalendar()
-            wn = self._date.isocalendar()[1]
-            w -= wn
-            w %= max(52, wn)
-            if w >= 0 and w < 6:
-                label = self._calendar[w][d - 1]
-                ev_ids = self._calevent_dates[date]
-                i = len(ev_ids) - 1
-                while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
-                    i -= 1
-                if i >= 0:
-                    tag = self.calevents[ev_ids[i]]['tags'][-1]
-                    label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
-                text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
-                self.tooltip_wrapper.remove_tooltip(label)
-                self.tooltip_wrapper.add_tooltip(label, text)
+        w, d = self._get_day_coords(date)
+        if w is not None:
+            label = self._calendar[w][d]
+            ev_ids = self._calevent_dates[date]
+            i = len(ev_ids) - 1
+            while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
+                i -= 1
+            if i >= 0:
+                tag = self.calevents[ev_ids[i]]['tags'][-1]
+                label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
+            text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
+            self.tooltip_wrapper.remove_tooltip(label)
+            self.tooltip_wrapper.add_tooltip(label, text)
 
     # --- callbacks
     def _next_month(self):
@@ -1196,3 +1203,9 @@ class Calendar(ttk.Frame):
         """
         for item, value in kw.items():
             self[item] = value
+
+
+if __name__ == '__main__':
+    cal = Calendar(firstweekday='sunday')
+    # cal = Calendar()
+    cal.pack()
