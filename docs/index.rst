@@ -6,7 +6,7 @@
 tkcalendar
 ==========
 
-|Release| |Linux| |Travis| |Codecov| |License| |Doc|
+|Release| |Travis| |Appveyor| |Codecov| |Windows| |Linux| |Mac| |License| |Doc|
 
 tkcalendar is a python module that provides the Calendar and DateEntry widgets for Tkinter.
 The DateEntry widget is similar to a Combobox, but the drop-down is not a list but a Calendar to select a date.
