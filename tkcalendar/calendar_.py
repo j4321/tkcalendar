@@ -161,6 +161,9 @@ class Calendar(ttk.Frame):
         A ``<<CalendarSelected>>`` event is generated each time the user
         selects a day with the mouse.
 
+        A ``<<CalendarMonthChanged>>`` event is generated each time the user
+        changes the displayed month.
+
         Calendar Events
         ---------------
 
@@ -809,24 +812,28 @@ class Calendar(ttk.Frame):
         self._date = self._date + \
             self.timedelta(days=calendar.monthrange(year, month)[1])
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     def _prev_month(self):
         """Display the previous month."""
         self._date = self._date - self.timedelta(days=1)
         self._date = self._date.replace(day=1)
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     def _next_year(self):
         """Display the next year."""
         year = self._date.year
         self._date = self._date.replace(year=year + 1)
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     def _prev_year(self):
         """Display the previous year."""
         year = self._date.year
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     # --- bindings
     def _on_click(self, event):
@@ -899,6 +906,10 @@ class Calendar(ttk.Frame):
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
+
+    def get_displayed_month(self):
+        """Return the currently displayed month in the form of a (month, year) tuple."""
+        return self._date.month, self._date.year
 
     def get_date(self):
         """Return selected date as string."""

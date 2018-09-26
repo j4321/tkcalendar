@@ -134,7 +134,10 @@ Tooltip options (for calevents)
 Virtual Events
 ~~~~~~~~~~~~~~
 
-    A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
+    * A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
+
+    * A ``<<CalendarMonthChanged>>`` event is generated each time the user changes the displayed month.
+
 
 Widget methods
 ~~~~~~~~~~~~~~
@@ -205,6 +208,9 @@ Widget-Specific methods
             If only *tag* is given, return event ids of all events with tag.
 
             If both options are None, return all event ids.
+
+    get_displayed_month() :
+        Return the currently displayed month in the form of a (month, year) tuple.
 
     selection_get() :
         If selectmode is 'day', return the selected date as a ``datetime.date``
