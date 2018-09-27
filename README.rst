@@ -340,11 +340,13 @@ Changelog
 =========
 
 - tkcalendar 1.4.0
+
     * Add ``<<CalendarMonthChanged>>`` virtual event to the Calendar widget
     * Add ``get_displayed_month`` method to the Calendar widget
     * Add showothermonthdays option to show/hide the last and first days of the previous and next months
 
 - tkcalendar 1.3.1
+
     * Fix bug in day selection when firstweekday is sunday
 
 - tkcalendar 1.3.0
