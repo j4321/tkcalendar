@@ -46,6 +46,7 @@ class TestCalendar(BaseWidgetTest):
         widget.pack()
         self.window.update()
         self.assertEqual(widget.selection_get(), date(2018, 2, 5))
+        self.assertEqual(widget.get_displayed_month(), (2, 2018))
         w, d = widget._get_day_coords(date(2018, 2, 5))
         self.assertEqual(widget._calendar[w][d].cget('text'), '5')
         widget.destroy()
@@ -182,6 +183,7 @@ class TestCalendar(BaseWidgetTest):
                    'locale',
                    'firstweekday',
                    'showweeknumbers',
+                   'showothermonthdays',
                    'selectbackground',
                    'selectforeground',
                    'disabledselectbackground',
@@ -220,10 +222,18 @@ class TestCalendar(BaseWidgetTest):
         self.window.update()
         self.assertEqual(widget["cursor"], "watch")
         self.assertTrue(widget["showweeknumbers"])
+        self.assertNotEqual(widget._week_nbs[0].grid_info(), {})
         widget.config(showweeknumbers=False)
         self.window.update()
         self.assertFalse(widget["showweeknumbers"])
+        self.assertEqual(widget._week_nbs[0].grid_info(), {})
         self.assertFalse(widget._week_nbs[0].winfo_ismapped())
+        self.assertNotEqual(widget._calendar[-1][-1].cget('text'), '')
+        self.assertTrue(widget["showothermonthdays"])
+        widget.config(showothermonthdays=False)
+        self.window.update()
+        self.assertFalse(widget["showothermonthdays"])
+        self.assertEqual(widget._calendar[-1][-1].cget('text'), '')
         widget.config(font="Arial 20 bold")
         self.window.update()
         self.assertEqual(widget["font"], "Arial 20 bold")
@@ -374,3 +384,35 @@ class TestCalendar(BaseWidgetTest):
         widget.calevent_remove('all')
         self.assertEqual(widget.get_calevents(), ())
 
+    def test_calendar_virtual_events(self):
+        widget = Calendar(self.window)
+        widget.pack()
+        self.window.update()
+
+        self.event_triggered = False
+
+        def binding(event):
+            self.event_triggered = True
+
+        widget.bind('<<CalendarSelected>>', binding)
+        widget._on_click(TestEvent(widget=widget._calendar[2][1]))
+        self.window.update()
+        self.assertTrue(self.event_triggered)
+
+        widget.bind('<<CalendarMonthChanged>>', binding)
+        self.event_triggered = False
+        widget._l_month.invoke()
+        self.window.update()
+        self.assertTrue(self.event_triggered)
+        self.event_triggered = False
+        widget._r_month.invoke()
+        self.window.update()
+        self.assertTrue(self.event_triggered)
+        self.event_triggered = False
+        widget._l_year.invoke()
+        self.window.update()
+        self.assertTrue(self.event_triggered)
+        self.event_triggered = False
+        widget._r_year.invoke()
+        self.window.update()
+        self.assertTrue(self.event_triggered)

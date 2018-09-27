@@ -87,8 +87,11 @@ Widget keyword options
     firstweekday : "monday" or "sunday"
         first day of the week
 
-    showweeknumbers : boolean (default is True)
+    showweeknumbers : bool (default is True)
         whether to display week numbers.
+
+    showothermonthdays : bool (default is True)
+        whether to display the last days of the previous month and the first of the next month.
 
     locale : str
         locale to use, e.g. 'en_US'
@@ -336,6 +339,10 @@ Widget methods
 Changelog
 =========
 
+- tkcalendar 1.4.0
+    * Add ``<<CalendarMonthChanged>>`` virtual event to the Calendar widget
+    * Add ``get_displayed_month`` method to the Calendar widget
+    * Add showothermonthdays option to show/hide the last and first days of the previous and next months
 
 - tkcalendar 1.3.1
     * Fix bug in day selection when firstweekday is sunday
