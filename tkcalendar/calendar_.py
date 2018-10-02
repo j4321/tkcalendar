@@ -86,70 +86,70 @@ class Calendar(ttk.Frame):
         Style Options
         -------------
 
-        background :
+        background : str
             background color of calendar border and month/year name
 
-        foreground :
+        foreground : str
             foreground color of month/year name
 
-        bordercolor :
+        bordercolor : str
             day border color
 
-        headersbackground :
+        headersbackground : str
             background color of day names and week numbers
 
-        headersforeground :
+        headersforeground : str
             foreground color of day names and week numbers
 
-        selectbackground :
+        selectbackground : str
             background color of selected day
 
-        selectforeground :
+        selectforeground : str
             foreground color of selected day
 
-        disabledselectbackground :
+        disabledselectbackground : str
             background color of selected day in disabled state
 
-        disabledselectforeground :
+        disabledselectforeground : str
             foreground color of selected day in disabled state
 
-        normalbackground :
+        normalbackground : str
             background color of normal week days
 
-        normalforeground :
+        normalforeground : str
             foreground color of normal week days
 
-        weekendbackground :
+        weekendbackground : str
             background color of week-end days
 
-        weekendforeground :
+        weekendforeground : str
             foreground color of week-end days
 
-        othermonthforeground :
+        othermonthforeground : str
             foreground color of normal week days belonging to the previous/next month
 
-        othermonthbackground :
+        othermonthbackground : str
             background color of normal week days belonging to the previous/next month
 
-        othermonthweforeground :
+        othermonthweforeground : str
             foreground color of week-end days belonging to the previous/next month
 
-        othermonthwebackground :
+        othermonthwebackground : str
             background color of week-end days belonging to the previous/next month
 
-        disableddaybackground :
+        disableddaybackground : str
             background color of days in disabled state
 
-        disableddayforeground :
+        disableddayforeground : str
             foreground color of days in disabled state
 
         Tooltip Options (for calevents)
         -------------------------------
 
-        tooltipforeground :
+        tooltipforeground : str
             tooltip text color
 
-        tooltipbackground :
+        tooltipbackground : str
             tooltip background color
 
         tooltipalpha : float
@@ -980,12 +980,17 @@ class Calendar(ttk.Frame):
 
         Options:
 
-            date: datetime.date or datetime.datetime instance.
-            text: text to put in the tooltip associated to date.
-            tags: list of tags to apply to the event. The last tag determines
-                  the way the event is displayed. If there are several events on
-                  the same day, the lowest one (on the tooltip list) which has
-                  tags determines the colors of the day.
+            date : datetime.date or datetime.datetime instance.
+                event date
+                
+            text : str
+                text to put in the tooltip associated to date.
+                
+            tags : list
+                list of tags to apply to the event. The last tag determines
+                the way the event is displayed. If there are several events on
+                the same day, the lowest one (on the tooltip list) which has
+                tags determines the colors of the day.
         """
         if isinstance(date, Calendar.datetime):
             date = date.date()
@@ -1111,8 +1116,9 @@ class Calendar(ttk.Frame):
         """
         Raise event ev_id in tooltip event list.
 
-            above: put ev_id above given one, if above is None, put it on top
-                   of tooltip event list.
+            above : str
+                put ev_id above given one, if above is None, put it on top
+                of tooltip event list.
 
         The day's colors are determined by the last tag of the lowest event
         which has tags.
@@ -1139,8 +1145,9 @@ class Calendar(ttk.Frame):
         """
         Lower event ev_id in tooltip event list.
 
-            below: put ev_id below given one, if below is None, put it at the
-                   bottom of tooltip event list.
+            below : str
+                put ev_id below given one, if below is None, put it at the
+                bottom of tooltip event list.
 
         The day's colors are determined by the last tag of the lowest event
         which has tags.
