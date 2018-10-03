@@ -9,7 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='tkcalendar',
-      version='1.3.1',
+      version='1.4.0',
       description='Calendar and DateEntry widgets for Tkinter',
       long_description=long_description,
       url='https://github.com/j4321/tkcalendar',
@@ -30,7 +30,7 @@ setup(name='tkcalendar',
                    'Programming Language :: Python :: 3.6',
                    'Operating System :: OS Independent'],
       keywords=['tkinter', 'calendar', 'date'],
-      requires=["sys", "locale", "calendar", "tkinter", "babel"],
+      install_requires=["babel"],
       py_modules=["tkcalendar.calendar_",
                   "tkcalendar.dateentry",
                   "tkcalendar.tooltip"],

@@ -1,10 +1,10 @@
 Documentation
 =============
 
-**Note**: This documentation only lists the methods specific to the ``Calendar`` 
-and ``DateEntry`` widgets, but these widgets also possess the `methods common to 
+**Note**: This documentation only lists the methods specific to the ``Calendar``
+and ``DateEntry`` widgets, but these widgets also possess the `methods common to
 all tkinter widgets <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/universal.html>`_.
-and the `one common to all ttk widgets <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`_. 
+and the `one common to all ttk widgets <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/ttk-Widget.html>`_.
 In addition, the ``DateEntry`` also have all the `methods of the Entry widget  <http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/entry.html>`_.
 
 Calendar
@@ -12,9 +12,9 @@ Calendar
 
 .. autoclass:: tkcalendar.Calendar
     :members: calevent_cget, calevent_configure, calevent_create, calevent_lower, calevent_raise, calevent_remove, format_date, get_calevents, get_date, keys, selection_get, selection_set, tag_cget, tag_config, tag_delete, tag_names
-    
+
     .. py:method:: __init__(master=None, **kw)
-    
+
        Construct a Calendar with parent master.
 
        **Standard Options**
@@ -45,8 +45,11 @@ Calendar
        firstweekday : str
           first day of the week: "monday" or "sunday"
 
-       showweeknumbers : bool 
+       showweeknumbers : bool
           whether to display week numbers (default is True).
+
+       showothermonthdays : bool
+          whether to display the last days of the previous month and the first of the next month  (default is True).
 
        locale : str
           locale to use, e.g. 'en_US'
@@ -132,8 +135,10 @@ Calendar
 
        **Virtual Event**
 
-       A ``<<CalendarSelected>>`` event is generated each time the user
-       selects a day with the mouse.
+           * A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
+
+           * A ``<<CalendarMonthChanged>>`` event is generated each time the user changes the displayed month.
+
 
        **Calendar Events**
 
@@ -150,9 +155,9 @@ DateEntry
 
 .. autoclass:: tkcalendar.DateEntry
     :members:
-    
+
     .. py:method:: __init__(master=None, **kw)
-    
+
        Create an entry with a drop-down calendar to select a date.
 
        When the entry looses focus, if the user input is not a valid date,

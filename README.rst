@@ -87,8 +87,11 @@ Widget keyword options
     firstweekday : "monday" or "sunday"
         first day of the week
 
-    showweeknumbers : boolean (default is True)
+    showweeknumbers : bool (default is True)
         whether to display week numbers.
+
+    showothermonthdays : bool (default is True)
+        whether to display the last days of the previous month and the first of the next month.
 
     locale : str
         locale to use, e.g. 'en_US'
@@ -175,7 +178,9 @@ Widget keyword options
 Virtual Events
 ~~~~~~~~~~~~~~
 
-    A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
+    * A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
+
+    * A ``<<CalendarMonthChanged>>`` event is generated each time the user changes the displayed month.
 
 Widget methods
 ~~~~~~~~~~~~~~
@@ -244,6 +249,9 @@ Widget methods
                 If only *tag* is given, return event ids of all events with tag.
 
                 If both options are None, return all event ids.
+
+        get_displayed_month() :
+            Return the currently displayed month in the form of a (month, year) tuple.
 
         selection_get() :
             If selectmode is 'day', return the selected date as a ``datetime.date``
@@ -331,8 +339,14 @@ Widget methods
 Changelog
 =========
 
+- tkcalendar 1.4.0
+
+    * Add ``<<CalendarMonthChanged>>`` virtual event to the Calendar widget
+    * Add ``get_displayed_month`` method to the Calendar widget
+    * Add showothermonthdays option to show/hide the last and first days of the previous and next months
 
 - tkcalendar 1.3.1
+
     * Fix bug in day selection when firstweekday is sunday
 
 - tkcalendar 1.3.0

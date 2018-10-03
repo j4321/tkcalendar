@@ -68,8 +68,11 @@ class Calendar(ttk.Frame):
         firstweekday : "monday" or "sunday"
             first day of the week
 
-        showweeknumbers : boolean (default is True)
+        showweeknumbers : bool (default is True)
             whether to display week numbers.
+
+        showothermonthdays : bool (default is True)
+            whether to display the last days of the previous month and the first of the next month.
 
         locale : str
             locale to use, e.g. 'en_US'
@@ -160,6 +163,9 @@ class Calendar(ttk.Frame):
 
         A ``<<CalendarSelected>>`` event is generated each time the user
         selects a day with the mouse.
+
+        A ``<<CalendarMonthChanged>>`` event is generated each time the user
+        changes the displayed month.
 
         Calendar Events
         ---------------
@@ -258,6 +264,7 @@ class Calendar(ttk.Frame):
                    'textvariable',
                    'locale',
                    'showweeknumbers',
+                   'showothermonthdays',
                    'firstweekday',
                    'selectbackground',
                    'selectforeground',
@@ -297,6 +304,7 @@ class Calendar(ttk.Frame):
                             'textvariable': self._textvariable,
                             'firstweekday': firstweekday,
                             'showweeknumbers': showweeknumbers,
+                            'showothermonthdays': kw.pop('showothermonthdays', True),
                             'selectbackground': active_bg,
                             'selectforeground': 'white',
                             'disabledselectbackground': dis_active_bg,
@@ -560,6 +568,8 @@ class Calendar(ttk.Frame):
             elif key is "tooltipdelay":
                 self.tooltip_wrapper.configure(delay=value)
             self._properties[key] = value
+            if key is 'showothermonthdays':
+                self._display_calendar()
 
     def _textvariable_trace(self, *args):
         """Connect StringVar value with selected date."""
@@ -665,11 +675,62 @@ class Calendar(ttk.Frame):
         self._header_month.configure(text=header.title())
         self._header_year.configure(text=str(year))
 
-        # update calendar shown dates
-        cal = self._cal.monthdatescalendar(year, month)
-
         # remove previous tooltips
         self.tooltip_wrapper.remove_all()
+
+        # update calendar shown dates
+        if self['showothermonthdays']:
+            self._display_days_with_othermonthdays()
+        else:
+            self._display_days_without_othermonthdays()
+
+        self._display_selection()
+
+    def _display_days_without_othermonthdays(self):
+        year, month = self._date.year, self._date.month
+
+        cal = self._cal.monthdays2calendar(year, month)
+        while len(cal) < 6:
+            cal.append([(0, i) for i in range(7)])
+
+        week_days = {i: 'normal.%s.TLabel' % self._style_prefixe for i in range(7)}  # style names depending on the type of day
+        offset = (self['firstweekday'] == 'sunday') * 6
+        week_days[(5 - offset) % 7] = 'we.%s.TLabel' % self._style_prefixe
+        week_days[(6 - offset) % 7] = 'we.%s.TLabel' % self._style_prefixe
+        _, week_nb, d = self._date.isocalendar()
+        if d == 7 and self['firstweekday'] == 'sunday':
+            week_nb += 1
+        modulo = max(week_nb, 52)
+        for i_week in range(6):
+            if i_week == 0 or cal[i_week][0][0]:
+                self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % modulo + 1))
+            else:
+                self._week_nbs[i_week].configure(text='')
+            for i_day in range(7):
+                day_number, week_day = cal[i_week][i_day]
+                style = week_days[i_day]
+                label = self._calendar[i_week][i_day]
+                if day_number:
+                    txt = str(day_number)
+                    label.configure(text=txt, style=style)
+                    date = self.date(year, month, day_number)
+                    if date in self._calevent_dates:
+                        ev_ids = self._calevent_dates[date]
+                        i = len(ev_ids) - 1
+                        while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
+                            i -= 1
+                        if i >= 0:
+                            tag = self.calevents[ev_ids[i]]['tags'][-1]
+                            label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
+                        text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
+                        self.tooltip_wrapper.add_tooltip(label, text)
+                else:
+                    label.configure(text='', style=style)
+
+    def _display_days_with_othermonthdays(self):
+        year, month = self._date.year, self._date.month
+
+        cal = self._cal.monthdatescalendar(year, month)
 
         next_m = month + 1
         y = year
@@ -685,8 +746,7 @@ class Calendar(ttk.Frame):
             if len(cal) < 6:
                 cal.append(self._cal.monthdatescalendar(y, next_m)[i + 1])
 
-        # style names depending on the type of day
-        week_days = {i: 'normal' for i in range(7)}
+        week_days = {i: 'normal' for i in range(7)}  # style names depending on the type of day
         offset = (self['firstweekday'] == 'sunday') * 6
         week_days[(5 - offset) % 7] = 'we'
         week_days[(6 - offset) % 7] = 'we'
@@ -715,8 +775,6 @@ class Calendar(ttk.Frame):
                         label.configure(style='tag_%s.%s.TLabel' % (tag, self._style_prefixe))
                     text = '\n'.join(['➢ {}'.format(self.calevents[ev]['text']) for ev in ev_ids])
                     self.tooltip_wrapper.add_tooltip(label, text)
-
-        self._display_selection()
 
     def _get_day_coords(self, date):
         year = date.year
@@ -809,24 +867,28 @@ class Calendar(ttk.Frame):
         self._date = self._date + \
             self.timedelta(days=calendar.monthrange(year, month)[1])
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     def _prev_month(self):
         """Display the previous month."""
         self._date = self._date - self.timedelta(days=1)
         self._date = self._date.replace(day=1)
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     def _next_year(self):
         """Display the next year."""
         year = self._date.year
         self._date = self._date.replace(year=year + 1)
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     def _prev_year(self):
         """Display the previous year."""
         year = self._date.year
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
+        self.event_generate('<<CalendarMonthChanged>>')
 
     # --- bindings
     def _on_click(self, event):
@@ -899,6 +961,10 @@ class Calendar(ttk.Frame):
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
+
+    def get_displayed_month(self):
+        """Return the currently displayed month in the form of a (month, year) tuple."""
+        return self._date.month, self._date.year
 
     def get_date(self):
         """Return selected date as string."""
