@@ -24,6 +24,7 @@ Project page: https://github.com/j4321/tkcalendar
    example
    documentation
    changelog
+   genindex
 
 
 .. |Release| image:: https://badge.fury.io/py/tkcalendar.svg
