@@ -1,15 +1,15 @@
 #! /usr/bin/python3
 # -*- coding:Utf-8 -*-
 """
-MyNotes - System tray unread mail checker
+tkcalendar - System tray unread mail checker
 Copyright 2016-2018 Juliette Monsel <j_4321@protonmail.com>
 
-MyNotes is free software: you can redistribute it and/or modify
+tkcalendar is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-MyNotes is distributed in the hope that it will be useful,
+tkcalendar is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -52,7 +52,6 @@ class Tooltip(tk.Toplevel):
         self.attributes('-alpha', kwargs.pop('alpha', 0.8))
         if platform == 'linux':
             self.attributes('-type', 'tooltip')
-
 
         if not Tooltip._initialized:
             # default tooltip style
