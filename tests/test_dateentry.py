@@ -11,7 +11,8 @@ from pynput.mouse import Controller
 class TestDateEntry(BaseWidgetTest):
     def test_dateentry_init(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
-                           foreground='white', borderwidth=2)
+                           foreground='white', borderwidth=2, justify='center',
+                           style='my.DateEntry')
         widget.pack()
         self.window.update()
         widget.destroy()

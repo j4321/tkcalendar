@@ -74,6 +74,8 @@ class DateEntry(ttk.Entry):
         kw['selectmode'] = 'day'
         entry_kw = {}
 
+        style = kw.pop('style', 'DateEntry')
+
         for key in self.entry_kw:
             entry_kw[key] = kw.pop(key, self.entry_kw[key])
         entry_kw['font'] = kw.get('font', None)
@@ -98,7 +100,7 @@ class DateEntry(ttk.Entry):
         # style
         self.style = ttk.Style(self)
         self._setup_style()
-        self.configure(style='DateEntry')
+        self.configure(style=style)
 
         # add validation to Entry so that only date in the locale '%x' format
         # are accepted
