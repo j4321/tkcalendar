@@ -1,8 +1,6 @@
 HowTos
 ======
 
-This section answers some questions that were asked about tkcalendar.
-
 Widget styling
 --------------
 
@@ -27,6 +25,7 @@ a ttk style:
     from tkcalendar import DateEntry
 
     style = ttk.Style()
+    # style.theme_use('clam')  # -> uncomment this line if the styling does not work
     style.configure('my.DateEntry',
                     fieldbackground='light green',
                     background='dark green',
@@ -38,6 +37,9 @@ a ttk style:
 
     tk.mainloop()
 
+If the style of the DateEntry does not change, then it might be because of the
+used ttk theme. Changing the theme with `style.theme_use('clam')` should solve
+the issue.
 
 PyInstaller
 -----------

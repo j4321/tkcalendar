@@ -155,3 +155,7 @@ texinfo_documents = [
      author, 'tkcalendar', 'Calendar and DateEntry widgets for Tkinter.',
      'Miscellaneous'),
 ]
+
+
+# -- Extension configuration -------------------------------------------------
+autosummary_generate = True

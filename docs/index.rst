@@ -23,7 +23,7 @@ Project page: https://github.com/j4321/tkcalendar
    installation
    documentation
    example
-   wiki
+   howtos
    changelog
    genindex
 
