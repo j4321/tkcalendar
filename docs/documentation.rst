@@ -13,6 +13,7 @@ Calendar
 --------
 
 .. autoclass:: tkcalendar.Calendar
+    :show-inheritance:
     :members: calevent_cget, calevent_configure, calevent_create, calevent_lower, calevent_raise, calevent_remove, format_date, get_calevents, get_date, keys, selection_get, selection_set, tag_cget, tag_config, tag_delete, tag_names
 
     .. py:method:: __init__(master=None, **kw)
@@ -157,6 +158,7 @@ DateEntry
 
 .. autoclass:: tkcalendar.DateEntry
     :members:
+    :show-inheritance:
 
     .. py:method:: __init__(master=None, **kw)
 

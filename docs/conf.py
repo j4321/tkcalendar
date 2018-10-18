@@ -152,6 +152,6 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'tkcalendar', 'tkcalendar Documentation',
-     author, 'tkcalendar', 'One line description of project.',
+     author, 'tkcalendar', 'Calendar and DateEntry widgets for Tkinter.',
      'Miscellaneous'),
 ]
