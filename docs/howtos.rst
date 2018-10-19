@@ -38,40 +38,29 @@ a ttk style:
     tk.mainloop()
 
 If the style of the DateEntry does not change, then it might be because of the
-used ttk theme. Changing the theme with `style.theme_use('clam')` should solve
+used ttk theme. Changing the theme with ``style.theme_use('clam')`` should solve
 the issue.
 
 PyInstaller
 -----------
 
 When bundling an application with `PyInstaller <http://www.pyinstaller.org/>`_,
-some of tkcalendar's dependencies are not detected so it is necessary to use
-the ``--hidden-import`` option to specify them:
-
-.. rubric:: Python 3
-
-::
-
-    $ pyinstaller --hidden-import tkinter.ttk --hidden-import tkinter.font myscript.py
-
-.. rubric:: Python 2
+there seem to be an issue (`#32 <https://github.com/j4321/tkcalendar/issues/32>`_)
+with the detection of the babel dependency of tkcalendar.
+This can be fixed by using the ``--hidden-import`` option:
 
 ::
 
-    $ pyinstaller --hidden-import ttk --hidden-import tkFont myscript.py
+    $ pyinstaller --hidden-import babel.numbers myscript.py
 
-Or this can be done inside the *.spec* file with
 
-.. rubric:: Python 3
+or by editing the *.spec* file:
 
-::
-
-    hiddenimports=["tkinter.ttk", "tkinter.font"]
-
-.. rubric:: Python 2
 
 ::
 
-    hiddenimports=["ttk", "tkFont"]
+    hiddenimports=["babel.numbers"]
+
+
 
     
