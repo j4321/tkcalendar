@@ -777,8 +777,9 @@ class Calendar(ttk.Frame):
                     self.tooltip_wrapper.add_tooltip(label, text)
 
     def _get_day_coords(self, date):
-        year = date.year
-        if year == self._date.year:
+        y1, y2 = date.year, self._date.year
+        m1, m2 = date.month, self._date.month
+        if y1 == y2 or (y1 - y2 == 1 and m1 == 1 and m2 == 12) or (y2 - y1 == 1 and m2 == 1 and m1 == 12):
             _, w, d = date.isocalendar()
             _, wn, dn = self._date.isocalendar()
             if self['firstweekday'] == 'sunday':
@@ -791,7 +792,7 @@ class Calendar(ttk.Frame):
                 d -= 1
             w -= wn
             w %= max(52, wn)
-            if 0 <= w and w < 6:
+            if 0 <= w < 6:
                 return w, d
             else:
                 return None, None
@@ -982,10 +983,10 @@ class Calendar(ttk.Frame):
 
             date : datetime.date or datetime.datetime instance.
                 event date
-                
+
             text : str
                 text to put in the tooltip associated to date.
-                
+
             tags : list
                 list of tags to apply to the event. The last tag determines
                 the way the event is displayed. If there are several events on
@@ -1280,5 +1281,5 @@ class Calendar(ttk.Frame):
 
 if __name__ == '__main__':
     cal = Calendar(firstweekday='sunday')
-    # cal = Calendar()
     cal.pack()
+    cal.calevent_create(cal.date(2019, 1, 2), 'test', tags=['test'])
