@@ -339,6 +339,13 @@ Widget methods
 Changelog
 =========
 
+- tkcalendar 1.4.1
+
+    * Display events for January days showing on December and conversely
+    * Don't display events or selection for other months' days when
+      showothermonthdays is False
+
+
 - tkcalendar 1.4.0
 
     * Add ``<<CalendarMonthChanged>>`` virtual event to the Calendar widget
