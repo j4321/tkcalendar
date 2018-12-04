@@ -10,7 +10,7 @@ All styling is done using options, see the :ref:`documentation <doc>`.
 
 .. rubric:: DateEntry
 
-``DateEntry`` inherits from ``ttk.Entry`` therefore the styling is done using
+:class:`~tkcalendar.DateEntry` inherits from :class:`ttk.Entry` therefore the styling is done using
 a ttk style:
 
 .. code:: python
@@ -37,7 +37,7 @@ a ttk style:
 
     tk.mainloop()
 
-If the style of the DateEntry does not change, then it might be because of the
+If the style of the :class:`~tkcalendar.DateEntry` does not change, then it might be because of the
 used ttk theme. Changing the theme with ``style.theme_use('clam')`` should solve
 the issue.
 
@@ -60,7 +60,3 @@ or by editing the *.spec* file:
 ::
 
     hiddenimports=["babel.numbers"]
-
-
-
-    

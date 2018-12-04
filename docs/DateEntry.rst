@@ -17,14 +17,14 @@ Class
 
        **Keyword Options**
 
-       - ``ttk.Entry`` options:
+       - :class:`ttk.Entry` options:
        
            class, cursor, style, takefocus, xscrollcommand, exportselection, justify, show, state, textvariable, width.
            
-       - ``Calendar`` options: see the :ref:`documentation <doc>`.
+       - :class:`Calendar` options: see the :ref:`documentation <doc>`.
 
 
 Virtual Events
 --------------
 
-A ``<<DateEntrySelected>>`` event is generated each time the user selects a date.
+A :obj:`\<\<DateEntrySelected\>\>` event is generated each time the user selects a date.

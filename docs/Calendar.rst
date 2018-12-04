@@ -14,7 +14,7 @@ Class
 
     .. py:method:: __init__(master=None, **kw)
 
-       Construct a Calendar with parent master.
+       Construct a :class:`Calendar` with parent master.
 
        **Standard Options**
 
@@ -135,9 +135,9 @@ Class
 Virtual Events
 --------------
 
-* A ``<<CalendarSelected>>`` event is generated each time the user selects a day with the mouse.
+* A :obj:`\<\<CalendarSelected\>\>` event is generated each time the user selects a day with the mouse.
 
-* A ``<<CalendarMonthChanged>>`` event is generated each time the user changes the displayed month.
+* A :obj:`<\<\CalendarMonthChanged\>\>` event is generated each time the user changes the displayed month.
 
 .. _calevent:
 
@@ -145,6 +145,6 @@ Calendar Events
 ---------------
 
 Special events (e.g. birthdays, ..) can be managed using the
-``calevent_..`` methods. The way they are displayed in the calendar is
+:meth:`calevent_..` methods. The way they are displayed in the calendar is
 determined with tags. An id is attributed to each event upon creation
 and can be used to edit the event (*ev_id* argument).
