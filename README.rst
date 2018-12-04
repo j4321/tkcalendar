@@ -342,7 +342,7 @@ Changelog
 - tkcalendar 1.4.0
 
     * Add ``<<CalendarMonthChanged>>`` virtual event to the Calendar widget
-    * Add ``get_displayed_month`` method to the Calendar widget
+    * Add ``get_displayed_month()`` method to the Calendar widget
     * Add showothermonthdays option to show/hide the last and first days of the previous and next months
     * Display events for January days showing on December and conversely
 
