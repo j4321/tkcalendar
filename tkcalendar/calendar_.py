@@ -804,7 +804,9 @@ class Calendar(ttk.Frame):
         if self._sel_date is not None:
             w, d = self._get_day_coords(self._sel_date)
             if w is not None:
-                self._calendar[w][d].configure(style='sel.%s.TLabel' % self._style_prefixe)
+                label = self._calendar[w][d]
+                if label.cget('text'):
+                    label.configure(style='sel.%s.TLabel' % self._style_prefixe)
 
     def _reset_day(self, date):
         """Restore usual week day colors."""
@@ -850,6 +852,9 @@ class Calendar(ttk.Frame):
         w, d = self._get_day_coords(date)
         if w is not None:
             label = self._calendar[w][d]
+            if not label.cget('text'):
+                # this is an other month's day and showothermonth is False
+                return
             ev_ids = self._calevent_dates[date]
             i = len(ev_ids) - 1
             while i >= 0 and not self.calevents[ev_ids[i]]['tags']:
@@ -1277,9 +1282,3 @@ class Calendar(ttk.Frame):
         """
         for item, value in kw.items():
             self[item] = value
-
-
-if __name__ == '__main__':
-    cal = Calendar(firstweekday='sunday')
-    cal.pack()
-    cal.calevent_create(cal.date(2019, 1, 2), 'test', tags=['test'])
