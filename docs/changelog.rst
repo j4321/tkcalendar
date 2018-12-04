@@ -18,7 +18,7 @@ tkcalendar 1.4.0
 .. rubric:: Bug fixes
 
 - Fix handling of *style* option in DateEntry
-- Display events for January days showing on December and conversely
+- Fix display of events for January days showing on December and conversely
 
 tkcalendar 1.3.1
 ----------------
