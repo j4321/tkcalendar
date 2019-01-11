@@ -3,6 +3,20 @@ Changelog
 
 .. currentmodule:: tkcalendar
 
+tkcalendar 1.5.0
+----------------
+
+.. rubric:: New Calendar options
+
+- *disabledforeground* and *disabledbackground*: colors of calendar border and
+  month/year name in disabled state
+  
+- *maxdate* and *mindate*: set an allowed date range for date selection
+
+.. rubric:: New feature
+
+* :meth:`Calendar.see` method: make sure given date is visible
+
 tkcalendar 1.4.0
 ----------------
 

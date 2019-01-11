@@ -21,7 +21,7 @@ Class
        cursor : str
            cursor to display when the pointer is in the widget
 
-       font : str or Tkinter Font instance
+       font : str or Tkinter Font
            font of the calendar
 
        borderwidth : int
@@ -44,6 +44,12 @@ Class
        firstweekday : str
           first day of the week: "monday" or "sunday"
 
+       mindate : datetime.date or datetime.datetime (default is None)
+            minimum allowed date
+
+       maxdate : datetime.date or datetime.datetime (default is None)
+            maximum allowed date
+
        showweeknumbers : bool
           whether to display week numbers (default is True).
 
@@ -65,7 +71,13 @@ Class
           background color of calendar border and month/year name
 
        foreground : str
-          foreground color of month/year name
+          foreground color of month/year name 
+
+       disabledbackground : str
+          background color of calendar border and month/year name in disabled state
+
+       disabledforeground : str
+          foreground color of month/year name in disabled state
 
        bordercolor : str
           day border color

@@ -68,11 +68,11 @@ class Calendar(ttk.Frame):
         firstweekday : "monday" or "sunday"
             first day of the week
 
-        mindate : datetime.date (default None)
+        mindate : datetime.date or datetime.datetime (default is None)
             minimum allowed date
 
-        maxdate : datetime.date (default None)
-            maxdate allowed date
+        maxdate : datetime.date or datetime.datetime (default is None)
+            maximum allowed date
 
         showweeknumbers : bool (default is True)
             whether to display week numbers.
@@ -1139,7 +1139,7 @@ class Calendar(ttk.Frame):
 
         Options:
 
-            date : datetime.date or datetime.datetime instance.
+            date : datetime.date or datetime.datetime
                 event date
 
             text : str

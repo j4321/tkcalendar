@@ -87,6 +87,12 @@ Widget keyword options
     firstweekday : "monday" or "sunday"
         first day of the week
 
+    mindate : datetime.date or datetime.datetime (default is None)
+        minimum allowed date
+
+    maxdate : datetime.date or datetime.datetime (default is None)
+        maximum allowed date
+
     showweeknumbers : bool (default is True)
         whether to display week numbers.
 
@@ -109,6 +115,12 @@ Widget keyword options
 
     foreground :
         foreground color of month/year name
+
+    disabledbackground : str
+        background color of calendar border and month/year name in disabled state
+
+    disabledforeground : str
+        foreground color of month/year name in disabled state
 
     bordercolor :
         day border color
@@ -339,6 +351,13 @@ Widget methods
 Changelog
 =========
 
+- tkcalendar 1.5.0
+
+    * Add *disabledforeground* and *disabledbackground* options to further customize
+      the disabled state appearance of the Calendar
+    * Add *maxdate* and *mindate* options to set an allowed date range for date selection
+    * Add Calendar.see() method to make sure a date is visible
+
 - tkcalendar 1.4.0
 
     * Add ``<<CalendarMonthChanged>>`` virtual event to the Calendar widget
@@ -353,8 +372,8 @@ Changelog
 - tkcalendar 1.3.0
 
     * No longer set locale globally to avoid conflicts between several instances, use babel module instead
-    * Add option showwekknumbers to show/hide week numbers
-    * Add option firstweekday to choose first week day between 'monday' and 'sunday'
+    * Add option *showwekknumbers* to show/hide week numbers
+    * Add option *firstweekday* to choose first week day between 'monday' and 'sunday'
     * Make DateEntry compatible with more ttk themes, especially OSX default theme
     * Add possibility to display special events (like birthdays, ..) in the calendar.
       The events are displayed with colors defined by tags and the event description is displayed in a tooltip
@@ -368,11 +387,11 @@ Changelog
 
     * Add textvariable option to Calendar
     * Add state ('normal' or 'disabled') option to Calendar
-    * Add options disabledselectbackground, disabledselectforeground,
-      disableddaybackground and disableddayforeground to configure colors
+    * Add options *disabledselectbackground*, *disabledselectforeground*,
+      *disableddaybackground* and *disableddayforeground* to configure colors
       when Calendar is disabled
     * Fix DateEntry behavior in readonly mode
-    * Make Calendar.selection_get always return a ``datetime.date``
+    * Make Calendar.selection_get() always return a ``datetime.date``
 
 - tkcalendar 1.1.5
 
