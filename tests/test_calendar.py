@@ -22,7 +22,7 @@ Test
 
 from tests import BaseWidgetTest, TestEvent, tk, ttk, format_date
 from tkcalendar import Calendar
-from datetime import date
+from datetime import date, datetime
 
 
 class TestCalendar(BaseWidgetTest):
@@ -181,6 +181,8 @@ class TestCalendar(BaseWidgetTest):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'mindate',
+                   'maxdate',
                    'firstweekday',
                    'showweeknumbers',
                    'showothermonthdays',
@@ -193,6 +195,8 @@ class TestCalendar(BaseWidgetTest):
                    'background',
                    'foreground',
                    'bordercolor',
+                   'disabledbackground',
+                   'disabledforeground',
                    'othermonthforeground',
                    'othermonthbackground',
                    'othermonthweforeground',
@@ -247,6 +251,49 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget["firstweekday"], 'sunday')
         with self.assertRaises(ValueError):
             widget.config(firstweekday="a")
+
+        widget["mindate"] = datetime(2018, 9, 10)
+        self.assertEqual(widget["mindate"], date(2018, 9, 10))
+        widget.selection_set(date(2018, 9, 23))
+        self.window.update()
+        i, j = widget._get_day_coords(date(2018, 9, 2))
+        self.assertIn('disabled', widget._calendar[i][j].state())
+        i, j = widget._get_day_coords(date(2018, 9, 21))
+        self.assertNotIn('disabled', widget._calendar[i][j].state())
+        self.assertIn('disabled', widget._l_month.state())
+        self.assertIn('disabled', widget._l_year.state())
+        with self.assertRaises(TypeError):
+            widget.config(mindate="a")
+        self.assertEqual(widget["mindate"], date(2018, 9, 10))
+        widget["mindate"] = None
+        self.window.update()
+        self.assertIsNone(widget["mindate"])
+        i, j = widget._get_day_coords(date(2018, 9, 2))
+        self.assertNotIn('disabled', widget._calendar[i][j].state())
+        self.assertNotIn('disabled', widget._l_month.state())
+        self.assertNotIn('disabled', widget._l_year.state())
+
+        widget["maxdate"] = datetime(2018, 9, 10)
+        self.assertEqual(widget["maxdate"], date(2018, 9, 10))
+        widget.selection_set(date(2018, 9, 2))
+        self.window.update()
+        i, j = widget._get_day_coords(date(2018, 9, 22))
+        self.assertIn('disabled', widget._calendar[i][j].state())
+        i, j = widget._get_day_coords(date(2018, 9, 4))
+        self.assertNotIn('disabled', widget._calendar[i][j].state())
+        self.assertIn('disabled', widget._r_month.state())
+        self.assertIn('disabled', widget._r_year.state())
+        with self.assertRaises(TypeError):
+            widget.config(maxdate="a")
+        self.assertEqual(widget["maxdate"], date(2018, 9, 10))
+        widget["maxdate"] = None
+        self.window.update()
+        self.assertIsNone(widget["maxdate"])
+        i, j = widget._get_day_coords(date(2018, 9, 22))
+        self.assertNotIn('disabled', widget._calendar[i][j].state())
+        self.assertNotIn('disabled', widget._r_month.state())
+        self.assertNotIn('disabled', widget._r_year.state())
+
         widget.config(selectmode="none")
         self.window.update()
         self.assertEqual(widget["selectmode"], "none")
@@ -262,10 +309,10 @@ class TestCalendar(BaseWidgetTest):
             widget.config(locale="en_US.UTF-8")
         with self.assertRaises(AttributeError):
             widget.config(test="test")
-        dic = {op: "yellow" for op in options[8:-4]}
+        dic = {op: "yellow" for op in options[12:-4]}
         widget.configure(**dic)
         self.window.update()
-        for op in options[8:-4]:
+        for op in options[12:-4]:
             self.assertEqual(widget.cget(op), "yellow")
         widget.config(tooltipalpha=0.5)
         self.assertEqual(widget["tooltipalpha"], 0.5)
