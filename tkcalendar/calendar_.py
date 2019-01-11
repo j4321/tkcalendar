@@ -571,6 +571,19 @@ class Calendar(ttk.Frame):
                 self.style.configure('R.%s.TButton' % self._style_prefixe, arrowcolor=value)
                 self.style.configure('L.%s.TButton' % self._style_prefixe, arrowcolor=value)
                 self.style.configure('main.%s.TLabel' % self._style_prefixe, foreground=value)
+            elif key is "disabledbackground":
+                self.style.map('%s.TButton' % self._style_prefixe,
+                               background=[('active', '!disabled', self.style.lookup('TEntry', 'selectbackground', ('focus',))),
+                                           ('disabled', key)],)
+                self.style.map('main.%s.TFrame' % self._style_prefixe,
+                               background=[('disabled', key)])
+                self.style.map('main.%s.TLabel' % self._style_prefixe,
+                               background=[('disabled', key)])
+            elif key is "disabledforeground":
+                self.style.map('%s.TButton' % self._style_prefixe,
+                               arrowcolor=[('disabled', key)])
+                self.style.map('main.%s.TLabel' % self._style_prefixe,
+                               foreground=[('disabled', key)])
             elif key is "cursor":
                 ttk.Frame.configure(self, cursor=value)
             elif key is "tooltipbackground":
@@ -671,8 +684,7 @@ class Calendar(ttk.Frame):
                        darkcolor=[('active', active_bg)],
                        lightcolor=[('active', active_bg)])
         self.style.map('main.%s.TFrame' % self._style_prefixe,
-                       background=[('disabled', dis_bg)],
-                       foreground=[('disabled', dis_fg)])
+                       background=[('disabled', dis_bg)])
         self.style.map('main.%s.TLabel' % self._style_prefixe,
                        background=[('disabled', dis_bg)],
                        foreground=[('disabled', dis_fg)])
