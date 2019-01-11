@@ -546,16 +546,22 @@ class Calendar(ttk.Frame):
                         raise TypeError("expected %s for the 'maxdate' option." % self.date)
                     if self._date > value:
                         self._date = self._date.replace(year=value.year, month=value.month)
-                        self.event_generate('<<CalendarMonthChanged>>')
+                self._r_month.state(['!disabled'])
+                self._r_year.state(['!disabled'])
+                self._l_month.state(['!disabled'])
+                self._l_year.state(['!disabled'])
             elif key is "mindate":
                 if value is not None:
                     if isinstance(value, self.datetime):
                         value = value.date()
                     elif not isinstance(value, self.date):
                         raise TypeError("expected %s for the 'mindate' option." % self.date)
-                    if self._date < value.replace(day=1):
+                    if self._date < value:
                         self._date = self._date.replace(year=value.year, month=value.month)
-                        self.event_generate('<<CalendarMonthChanged>>')
+                self._r_month.state(['!disabled'])
+                self._r_year.state(['!disabled'])
+                self._l_month.state(['!disabled'])
+                self._l_year.state(['!disabled'])
             elif key is "font":
                 font = Font(self, value)
                 prop = font.actual()
@@ -1112,6 +1118,8 @@ class Calendar(ttk.Frame):
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
+                self._check_next()
+                self._check_prev()
 
     def get_displayed_month(self):
         """Return the currently displayed month in the form of a (month, year) tuple."""
