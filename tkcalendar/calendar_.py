@@ -92,6 +92,12 @@ class Calendar(ttk.Frame):
         foreground : str
             foreground color of month/year name
 
+        disabledbackground : str
+            background color of calendar border and month/year name in disabled state
+
+        disabledforeground : str
+            foreground color of month/year name in disabled state
+
         bordercolor : str
             day border color
 
@@ -199,7 +205,7 @@ class Calendar(ttk.Frame):
         try:
             bd = int(kw.pop('borderwidth', 2))
         except ValueError:
-            raise ValueError('expected integer for the borderwidth option.')
+            raise ValueError("expected integer for the 'borderwidth' option.")
 
         firstweekday = kw.pop('firstweekday', 'monday')
         if firstweekday not in ["monday", "sunday"]:
@@ -274,6 +280,8 @@ class Calendar(ttk.Frame):
                    'normalforeground',
                    'background',
                    'foreground',
+                   'disabledbackground',
+                   'disabledforeground',
                    'bordercolor',
                    'othermonthforeground',
                    'othermonthbackground',
@@ -313,6 +321,8 @@ class Calendar(ttk.Frame):
                             'normalforeground': 'black',
                             'background': 'gray30',
                             'foreground': 'white',
+                            'disabledbackground': 'gray30',
+                            'disabledforeground': 'gray70',
                             'bordercolor': 'gray70',
                             'othermonthforeground': 'gray45',
                             'othermonthbackground': 'gray93',
@@ -341,9 +351,9 @@ class Calendar(ttk.Frame):
 
         # --- init calendar
         # --- *-- header: month - year
-        header = ttk.Frame(self, style='main.%s.TFrame' % self._style_prefixe)
+        self._header = ttk.Frame(self, style='main.%s.TFrame' % self._style_prefixe)
 
-        f_month = ttk.Frame(header,
+        f_month = ttk.Frame(self._header,
                             style='main.%s.TFrame' % self._style_prefixe)
         self._l_month = ttk.Button(f_month,
                                    style='L.%s.TButton' % self._style_prefixe,
@@ -357,7 +367,7 @@ class Calendar(ttk.Frame):
         self._header_month.pack(side='left', padx=4)
         self._r_month.pack(side='left', fill="y")
 
-        f_year = ttk.Frame(header, style='main.%s.TFrame' % self._style_prefixe)
+        f_year = ttk.Frame(self._header, style='main.%s.TFrame' % self._style_prefixe)
         self._l_year = ttk.Button(f_year, style='L.%s.TButton' % self._style_prefixe,
                                   command=self._prev_year)
         self._header_year = ttk.Label(f_year, width=4, anchor='center',
@@ -411,7 +421,7 @@ class Calendar(ttk.Frame):
                     label.bind("<1>", self._on_click)
 
         # --- *-- pack main elements
-        header.pack(fill="x", padx=2, pady=2)
+        self._header.pack(fill="x", padx=2, pady=2)
         self._cal_frame.pack(fill="both", expand=True, padx=bd, pady=bd)
 
         self.config(state=state)
@@ -490,6 +500,12 @@ class Calendar(ttk.Frame):
                     raise ValueError("bad state '%s': must be disabled or normal" % value)
                 else:
                     state = '!' * (value == 'normal') + 'disabled'
+                    self.state((state,))
+                    self._header.state((state,))
+                    for child in self._header.children.values():
+                        child.state((state,))
+                    self._header_month.state((state,))
+                    self._header_year.state((state,))
                     self._l_year.state((state,))
                     self._r_year.state((state,))
                     self._l_month.state((state,))
@@ -606,14 +622,16 @@ class Calendar(ttk.Frame):
         sel_fg = self._properties.get('selectforeground')
         dis_sel_bg = self._properties.get('disabledselectbackground')
         dis_sel_fg = self._properties.get('disabledselectforeground')
-        dis_bg = self._properties.get('disableddaybackground')
-        dis_fg = self._properties.get('disableddayforeground')
+        dis_day_bg = self._properties.get('disableddaybackground')
+        dis_day_fg = self._properties.get('disableddayforeground')
         cal_bg = self._properties.get('normalbackground')
         cal_fg = self._properties.get('normalforeground')
         hd_bg = self._properties.get("headersbackground")
         hd_fg = self._properties.get("headersforeground")
         bg = self._properties.get('background')
         fg = self._properties.get('foreground')
+        dis_bg = self._properties.get('disabledbackground')
+        dis_fg = self._properties.get('disabledforeground')
         bc = self._properties.get('bordercolor')
         om_fg = self._properties.get('othermonthforeground')
         om_bg = self._properties.get('othermonthbackground')
@@ -638,32 +656,32 @@ class Calendar(ttk.Frame):
         self.style.configure('we.%s.TLabel' % self._style_prefixe, background=we_bg,
                              foreground=we_fg)
         size = max(self._header_font.actual()["size"], 10)
-        self.style.configure('R.%s.TButton' % self._style_prefixe, background=bg,
+        self.style.configure('%s.TButton' % self._style_prefixe, background=bg,
                              arrowcolor=fg, arrowsize=size, bordercolor=bg,
-                             relief="flat", lightcolor=bg, darkcolor=bg)
-        self.style.configure('L.%s.TButton' % self._style_prefixe, background=bg,
-                             arrowsize=size, arrowcolor=fg, bordercolor=bg,
                              relief="flat", lightcolor=bg, darkcolor=bg)
         self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
                              background=self._properties['tooltipbackground'],
                              foreground=self._properties['tooltipforeground'])
 
-        self.style.map('R.%s.TButton' % self._style_prefixe, background=[('active', active_bg)],
+        self.style.map('%s.TButton' % self._style_prefixe,
+                       background=[('active', '!disabled', active_bg), ('disabled', dis_bg)],
                        bordercolor=[('active', active_bg)],
                        relief=[('active', 'flat')],
+                       arrowcolor=[('disabled', dis_fg)],
                        darkcolor=[('active', active_bg)],
                        lightcolor=[('active', active_bg)])
-        self.style.map('L.%s.TButton' % self._style_prefixe, background=[('active', active_bg)],
-                       bordercolor=[('active', active_bg)],
-                       relief=[('active', 'flat')],
-                       darkcolor=[('active', active_bg)],
-                       lightcolor=[('active', active_bg)])
+        self.style.map('main.%s.TFrame' % self._style_prefixe,
+                       background=[('disabled', dis_bg)],
+                       foreground=[('disabled', dis_fg)])
+        self.style.map('main.%s.TLabel' % self._style_prefixe,
+                       background=[('disabled', dis_bg)],
+                       foreground=[('disabled', dis_fg)])
         self.style.map('sel.%s.TLabel' % self._style_prefixe,
                        background=[('disabled', dis_sel_bg)],
                        foreground=[('disabled', dis_sel_fg)])
         self.style.map(self._style_prefixe + '.TLabel',
-                       background=[('disabled', dis_bg)],
-                       foreground=[('disabled', dis_fg)])
+                       background=[('disabled', dis_day_bg)],
+                       foreground=[('disabled', dis_day_fg)])
 
     # --- display
     def _display_calendar(self):
