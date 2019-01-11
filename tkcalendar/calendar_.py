@@ -455,8 +455,7 @@ class Calendar(ttk.Frame):
 
         self._setup_style()
         self._display_calendar()
-        self._check_next()
-        self._check_prev()
+        self._check_date_range()
 
         if self._textvariable is not None:
             try:
@@ -649,8 +648,7 @@ class Calendar(ttk.Frame):
             self._properties[key] = value
             if key in ['showothermonthdays', 'maxdate', 'mindate']:
                 self._display_calendar()
-                self._check_prev()
-                self._check_next()
+                self._check_date_range()
 
     def _textvariable_trace(self, *args):
         """Connect StringVar value with selected date."""
@@ -971,8 +969,9 @@ class Calendar(ttk.Frame):
             self.tooltip_wrapper.add_tooltip(label, text)
 
     # --- callbacks
-    def _check_next(self):
-        """Disable/enable buttons depending on allowed date range after next button press"""
+    def _check_date_range(self):
+        """Disable/enable buttons depending on allowed date range"""
+        # TODO: put back on right date range if not (issue with see and selection_set)
         maxdate = self['maxdate']
         mindate = self['mindate']
         if maxdate is not None:
@@ -980,38 +979,33 @@ class Calendar(ttk.Frame):
                 self._r_year.state(['disabled'])
                 if self._date.month == maxdate.month:
                     self._r_month.state(['disabled'])
-            elif maxdate.year - self._date.year == 1 and self._date.month > maxdate.month:
-                self._r_year.state(['disabled'])
-        if mindate is not None:
-            if self._date.year - mindate.year > 1:
-                self._l_year.state(['!disabled'])
-                self._l_month.state(['!disabled'])
-            elif self._date.year - mindate.year == 1 and self._date.month >= mindate.month:
-                self._l_year.state(['!disabled'])
-                self._l_month.state(['!disabled'])
-            elif self._date.month != mindate.month:
-                self._l_month.state(['!disabled'])
-
-    def _check_prev(self):
-        """Disable/enable buttons depending on allowed date range after prev button press"""
-        mindate = self['mindate']
-        maxdate = self['maxdate']
+                else:
+                    self._r_month.state(['!disabled'])
+            elif maxdate.year - self._date.year > 1:
+                self._r_year.state(['!disabled'])
+                self._r_month.state(['!disabled'])
+            elif maxdate.year - self._date.year == 1:
+                if self._date.month > maxdate.month:
+                    self._r_year.state(['disabled'])
+                else:
+                    self._r_year.state(['!disabled'])
+                    self._r_month.state(['!disabled'])
         if mindate is not None:
             if self._date.year == mindate.year:
                 self._l_year.state(['disabled'])
                 if self._date.month == mindate.month:
                     self._l_month.state(['disabled'])
-            elif self._date.year - mindate.year == 1 and self._date.month < mindate.month:
-                self._l_year.state(['disabled'])
-        if maxdate is not None:
-            if maxdate.year - self._date.year > 1:
-                self._r_year.state(['!disabled'])
-                self._r_month.state(['!disabled'])
-            elif maxdate.year - self._date.year == 1 and self._date.month <= maxdate.month:
-                self._r_year.state(['!disabled'])
-                self._r_month.state(['!disabled'])
-            elif self._date.month != maxdate.month:
-                self._r_month.state(['!disabled'])
+                else:
+                    self._l_month.state(['!disabled'])
+            if self._date.year - mindate.year > 1:
+                self._l_year.state(['!disabled'])
+                self._l_month.state(['!disabled'])
+            elif self._date.year - mindate.year == 1:
+                if self._date.month >= mindate.month:
+                    self._l_year.state(['!disabled'])
+                    self._l_month.state(['!disabled'])
+                else:
+                    self._l_year.state(['disabled'])
 
     def _next_month(self):
         """Display the next month."""
@@ -1020,7 +1014,7 @@ class Calendar(ttk.Frame):
             self.timedelta(days=calendar.monthrange(year, month)[1])
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_next()
+        self._check_date_range()
 
     def _prev_month(self):
         """Display the previous month."""
@@ -1028,7 +1022,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(day=1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_prev()
+        self._check_date_range()
 
     def _next_year(self):
         """Display the next year."""
@@ -1036,7 +1030,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year + 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_next()
+        self._check_date_range()
 
     def _prev_year(self):
         """Display the previous year."""
@@ -1044,7 +1038,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_prev()
+        self._check_date_range()
 
     # --- bindings
     def _on_click(self, event):
@@ -1076,6 +1070,23 @@ class Calendar(ttk.Frame):
     def parse_date(self, date):
         """Parse string date in the locale format and return the corresponding datetime.date."""
         return parse_date(date, self._properties['locale'])
+
+    def see(self, date):
+        """
+        Display the month in which date is.
+
+
+            date : datetime.date or datetime.datetime
+                date to be made visible
+        """
+        if isinstance(date, self.datetime):
+            date = date.date()
+        elif not isinstance(date, self.date):
+            raise TypeError("expected %s for the 'date' argument." % self.date)
+
+        self._date = self._date.replace(month=date.month, year=date.year)
+        self._display_calendar()
+        self._check_date_range()
 
     # --- selection handling
     def selection_get(self):
@@ -1118,8 +1129,7 @@ class Calendar(ttk.Frame):
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
-                self._check_next()
-                self._check_prev()
+                self._check_date_range()
 
     def get_displayed_month(self):
         """Return the currently displayed month in the form of a (month, year) tuple."""
