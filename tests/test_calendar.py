@@ -70,6 +70,30 @@ class TestCalendar(BaseWidgetTest):
             self.window.update()
             widget.destroy()
 
+        with self.assertRaises(TypeError):
+            widget = Calendar(self.window, maxdate="e")
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        widget = Calendar(self.window, mindate=datetime(2013, 5, 22, 10, 5),
+                          maxdate=datetime.today())
+        widget.pack()
+        self.window.update()
+        widget.destroy()
+
+        with self.assertRaises(TypeError):
+            widget = Calendar(self.window, mindate="e")
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        with self.assertRaises(ValueError):
+            widget = Calendar(self.window, firstweekday="e")
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
         widget = Calendar(self.window, font="Arial 14", selectmode='day',
                           cursor="hand1", year=2018, month=2, day=5)
         widget.pack()
@@ -124,6 +148,11 @@ class TestCalendar(BaseWidgetTest):
         widget._on_click(TestEvent(widget=l))
         self.window.update()
         self.assertEqual(widget.selection_get(), date(2015, 12, 12))
+        widget.config(state='normal')
+        self.assertEqual(widget._date, date(2015, 12, 1))
+        widget.see(date(2017, 3, 11))
+        self.window.update()
+        self.assertEqual(widget._date, date(2017, 3, 1))
 
     def test_calendar_textvariable(self):
         var = tk.StringVar(self.window)

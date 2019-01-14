@@ -10,7 +10,7 @@ except ImportError:
 def example1():
     def print_sel():
         print(cal.selection_get())
-        cal['mindate'] = datetime.date(year=2017, month=1, day=21)
+        cal.see(datetime.date(year=2016, month=2, day=5))
 
     top = tk.Toplevel(root)
 

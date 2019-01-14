@@ -255,7 +255,7 @@ class Calendar(ttk.Frame):
 
         # --- date limits
         maxdate = kw.pop('maxdate', None)
-        mindate = kw.pop('maxdate', None)
+        mindate = kw.pop('mindate', None)
         if maxdate is not None:
             if isinstance(maxdate, self.datetime):
                 maxdate = maxdate.date()
@@ -264,7 +264,7 @@ class Calendar(ttk.Frame):
         if mindate is not None:
             if isinstance(mindate, self.datetime):
                 mindate = mindate.date()
-            elif not isinstance(maxdate, self.date):
+            elif not isinstance(mindate, self.date):
                 raise TypeError("expected %s for the 'mindate' option." % self.date)
 
         # --- selectmode
