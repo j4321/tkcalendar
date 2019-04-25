@@ -357,6 +357,7 @@ Changelog
       the disabled state appearance of the Calendar
     * Add *maxdate* and *mindate* options to set an allowed date range for date selection
     * Add ``Calendar.see()`` method to make sure a date is visible
+    * Make ``Calendar.selection_clear()`` actually clear the selection
 
 - tkcalendar 1.4.0
 
@@ -449,6 +450,7 @@ Example
 
 .. code:: python
 
+    from tkcalendar import Calendar, DateEntry
     try:
         import tkinter as tk
         from tkinter import ttk
@@ -456,17 +458,24 @@ Example
         import Tkinter as tk
         import ttk
 
-    from tkcalendar import Calendar, DateEntry
 
     def example1():
         def print_sel():
             print(cal.selection_get())
+            cal.see(datetime.date(year=2016, month=2, day=5))
 
         top = tk.Toplevel(root)
 
-        cal = Calendar(top, font="Arial 14", selectmode='day', locale='en_US',
-                       cursor="hand1", year=2018, month=2, day=5)
+        import datetime
+        today = datetime.date.today()
 
+        mindate = datetime.date(year=2018, month=1, day=21)
+        maxdate = today + datetime.timedelta(days=5)
+        print(mindate, maxdate)
+
+        cal = Calendar(top, font="Arial 14", selectmode='day', locale='en_US',
+                       mindate=mindate, maxdate=maxdate, disabledforeground='red',
+                       cursor="hand1", year=2018, month=2, day=5)
         cal.pack(fill="both", expand=True)
         ttk.Button(top, text="ok", command=print_sel).pack()
 
@@ -504,6 +513,7 @@ Example
     ttk.Button(root, text='DateEntry', command=example3).pack(padx=10, pady=10)
 
     root.mainloop()
+
 
 
 .. |Release| image:: https://badge.fury.io/py/tkcalendar.svg

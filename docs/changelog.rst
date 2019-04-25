@@ -13,9 +13,14 @@ tkcalendar 1.5.0
   
 - *maxdate* and *mindate*: set an allowed date range for date selection
 
-.. rubric:: New feature
+.. rubric:: New features
 
-* :meth:`Calendar.see` method: make sure given date is visible
+- :meth:`Calendar.see` method: make sure given date is visible
+
+.. rubric:: Bug fixes
+
+- Make :meth:`Calendar.selection_clear` actually clear the selection
+
 
 tkcalendar 1.4.0
 ----------------
