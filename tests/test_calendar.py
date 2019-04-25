@@ -89,6 +89,13 @@ class TestCalendar(BaseWidgetTest):
             widget.destroy()
 
         with self.assertRaises(ValueError):
+            widget = Calendar(self.window, mindate=date(2018, 4, 5),
+                              maxdate=date(2018, 4, 4))
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        with self.assertRaises(ValueError):
             widget = Calendar(self.window, firstweekday="e")
             widget.pack()
             self.window.update()
@@ -114,6 +121,31 @@ class TestCalendar(BaseWidgetTest):
             widget.pack()
             self.window.update()
             widget.destroy()
+
+    def test_calendar_selection(self):
+        widget = Calendar(self.window, month=3, year=2011, day=10,
+                          maxdate=date(2013, 1, 1), mindate=date(2010, 1, 1))
+        widget.pack()
+        self.assertEqual(widget.selection_get(), date(2011, 3, 10))
+
+        widget.selection_set(date(2012, 4, 11))
+        self.assertEqual(widget.selection_get(), date(2012, 4, 11))
+        self.assertEqual(widget._date, date(2012, 4, 1))
+        widget.selection_set(datetime(2012, 5, 11))
+        self.assertEqual(widget.selection_get(), date(2012, 5, 11))
+        self.assertNotIsInstance(widget.selection_get(), datetime)
+        self.assertIsInstance(widget.selection_get(), date)
+        widget.selection_set(datetime(2012, 5, 21).strftime('%x'))
+        self.assertEqual(widget.selection_get(), date(2012, 5, 21))
+        self.assertNotIsInstance(widget.selection_get(), datetime)
+        self.assertIsInstance(widget.selection_get(), date)
+
+        widget.selection_set(date(2018, 4, 11))
+        self.assertEqual(widget.selection_get(), date(2013, 1, 1))
+        widget.selection_set(date(2001, 4, 11))
+        self.assertEqual(widget.selection_get(), date(2010, 1, 1))
+        widget.selection_clear()
+        self.assertIsNone(widget.selection_get())
 
     def test_calendar_buttons_functions(self):
         widget = Calendar(self.window)
