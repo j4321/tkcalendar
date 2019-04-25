@@ -356,7 +356,7 @@ Changelog
     * Add *disabledforeground* and *disabledbackground* options to further customize
       the disabled state appearance of the Calendar
     * Add *maxdate* and *mindate* options to set an allowed date range for date selection
-    * Add Calendar.see() method to make sure a date is visible
+    * Add ``Calendar.see()`` method to make sure a date is visible
 
 - tkcalendar 1.4.0
 
