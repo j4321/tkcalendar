@@ -1141,9 +1141,10 @@ class Calendar(ttk.Frame):
                         self._sel_date = self.parse_date(date)
                     except Exception:
                         raise ValueError("%r is not a valid date." % date)
-                if self._sel_date < self['mindate']:
+                print(date, self._sel_date)
+                if self['mindate'] is not None and self._sel_date < self['mindate']:
                     self._sel_date = self['mindate']
-                elif self._sel_date > self['maxdate']:
+                elif self['maxdate'] is not None and self._sel_date > self['maxdate']:
                     self._sel_date = self['maxdate']
                 if self._textvariable is not None:
                     self._textvariable.set(self.format_date(self._sel_date))
