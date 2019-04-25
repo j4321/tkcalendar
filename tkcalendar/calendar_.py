@@ -268,6 +268,8 @@ class Calendar(ttk.Frame):
                 mindate = mindate.date()
             elif not isinstance(mindate, self.date):
                 raise TypeError("expected %s for the 'mindate' option." % self.date)
+        if (mindate is not None) and (maxdate is not None) and (mindate > maxdate):
+            raise ValueError("mindate should be smaller than maxdate.")
 
         # --- selectmode
         selectmode = kw.pop("selectmode", "day")
@@ -458,6 +460,7 @@ class Calendar(ttk.Frame):
         self._setup_style()
         self._display_calendar()
         self._check_date_range()
+        self._check_sel_date()
 
         if self._textvariable is not None:
             try:
@@ -545,7 +548,12 @@ class Calendar(ttk.Frame):
                         value = value.date()
                     elif not isinstance(value, self.date):
                         raise TypeError("expected %s for the 'maxdate' option." % self.date)
-                    if self._date > value:
+
+                    mindate = self['mindate']
+                    if mindate is not None and mindate > value:
+                        self._properties['mindate'] = value
+                        self._date = self._date.replace(year=value.year, month=value.month)
+                    elif self._date > value:
                         self._date = self._date.replace(year=value.year, month=value.month)
                 self._r_month.state(['!disabled'])
                 self._r_year.state(['!disabled'])
@@ -557,7 +565,11 @@ class Calendar(ttk.Frame):
                         value = value.date()
                     elif not isinstance(value, self.date):
                         raise TypeError("expected %s for the 'mindate' option." % self.date)
-                    if self._date < value:
+                    maxdate = self['maxdate']
+                    if maxdate is not None and maxdate < value:
+                        self._properties['maxdate'] = value
+                        self._date = self._date.replace(year=value.year, month=value.month)
+                    elif self._date < value:
                         self._date = self._date.replace(year=value.year, month=value.month)
                 self._r_month.state(['!disabled'])
                 self._r_year.state(['!disabled'])
@@ -650,6 +662,7 @@ class Calendar(ttk.Frame):
             self._properties[key] = value
             if key in ['showothermonthdays', 'maxdate', 'mindate']:
                 self._display_calendar()
+                self._check_sel_date()
                 self._check_date_range()
 
     def _textvariable_trace(self, *args):
@@ -970,7 +983,18 @@ class Calendar(ttk.Frame):
             self.tooltip_wrapper.remove_tooltip(label)
             self.tooltip_wrapper.add_tooltip(label, text)
 
-    # --- callbacks
+    def _check_sel_date(self):
+
+        if self._sel_date is not None:
+            maxdate = self['maxdate']
+            mindate = self['mindate']
+            if maxdate is not None and self._sel_date > maxdate:
+                self._sel_date = maxdate
+                self._display_selection()
+            elif mindate is not None and self._sel_date < mindate:
+                self._sel_date = mindate
+                self._display_selection()
+
     def _check_date_range(self):
         """Disable/enable buttons depending on allowed date range"""
         maxdate = self['maxdate']
@@ -1022,6 +1046,7 @@ class Calendar(ttk.Frame):
                 self._l_year.state(['!disabled'])
                 self._l_month.state(['!disabled'])
 
+    # --- callbacks
     def _next_month(self):
         """Display the next month."""
         year, month = self._date.year, self._date.month
@@ -1458,13 +1483,4 @@ class Calendar(ttk.Frame):
         for item, value in kw.items():
             self[item] = value
 
-    def config(self, **kw):
-        """
-        Configure resources of a widget.
-
-        The values for resources are specified as keyword
-        arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
-        """
-        for item, value in kw.items():
-            self[item] = value
+    config = configure
