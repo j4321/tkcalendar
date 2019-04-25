@@ -973,41 +973,54 @@ class Calendar(ttk.Frame):
     # --- callbacks
     def _check_date_range(self):
         """Disable/enable buttons depending on allowed date range"""
-        # TODO: put back on right date range if not (issue with see and selection_set)
         maxdate = self['maxdate']
         mindate = self['mindate']
+
         if maxdate is not None:
-            if self._date.year == maxdate.year:
+            max_year, max_month = maxdate.year, maxdate.month
+            if self._date > maxdate:
+                self._date = self._date.replace(year=max_year, month=max_month)
+                self._display_calendar()
+
+            dy = max_year - self._date.year
+            if dy == 0:
                 self._r_year.state(['disabled'])
-                if self._date.month == maxdate.month:
+                if self._date.month == max_month:
                     self._r_month.state(['disabled'])
                 else:
                     self._r_month.state(['!disabled'])
-            elif maxdate.year - self._date.year > 1:
-                self._r_year.state(['!disabled'])
-                self._r_month.state(['!disabled'])
-            elif maxdate.year - self._date.year == 1:
-                if self._date.month > maxdate.month:
+            elif dy == 1:
+                if self._date.month > max_month:
                     self._r_year.state(['disabled'])
                 else:
                     self._r_year.state(['!disabled'])
                     self._r_month.state(['!disabled'])
+            else:  # dy > 1
+                self._r_year.state(['!disabled'])
+                self._r_month.state(['!disabled'])
+
         if mindate is not None:
-            if self._date.year == mindate.year:
+            min_year, min_month = mindate.year, mindate.month
+            if self._date < mindate:
+                self._date = self._date.replace(year=min_year, month=min_month)
+                self._display_calendar()
+
+            dy = self._date.year - min_year
+            if dy == 0:
                 self._l_year.state(['disabled'])
-                if self._date.month == mindate.month:
+                if self._date.month == min_month:
                     self._l_month.state(['disabled'])
                 else:
                     self._l_month.state(['!disabled'])
-            if self._date.year - mindate.year > 1:
-                self._l_year.state(['!disabled'])
-                self._l_month.state(['!disabled'])
-            elif self._date.year - mindate.year == 1:
-                if self._date.month >= mindate.month:
+            elif dy == 1:
+                if self._date.month >= min_month:
                     self._l_year.state(['!disabled'])
                     self._l_month.state(['!disabled'])
                 else:
                     self._l_year.state(['disabled'])
+            else:  # dy > 1
+                self._l_year.state(['!disabled'])
+                self._l_month.state(['!disabled'])
 
     def _next_month(self):
         """Display the next month."""
@@ -1119,15 +1132,22 @@ class Calendar(ttk.Frame):
                 if self._textvariable is not None:
                     self._textvariable.set('')
             else:
-                if isinstance(date, self.date):
+                if isinstance(date, self.datetime):
+                    self._sel_date = date.date()
+                elif isinstance(date, self.date):
                     self._sel_date = date
                 else:
                     try:
                         self._sel_date = self.parse_date(date)
                     except Exception:
                         raise ValueError("%r is not a valid date." % date)
+                if self._sel_date < self['mindate']:
+                    self._sel_date = self['mindate']
+                elif self._sel_date > self['maxdate']:
+                    self._sel_date = self['maxdate']
                 if self._textvariable is not None:
                     self._textvariable.set(self.format_date(self._sel_date))
+
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
