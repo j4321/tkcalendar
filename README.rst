@@ -264,7 +264,15 @@ Widget methods
 
         get_displayed_month() :
             Return the currently displayed month in the form of a (month, year) tuple.
+            
+        see(date) : 
+            Display the month in which *date* is. 
+            
+                *date*: datetime.date or datetime.datetime instance.
 
+        selection_clear() :
+            Clear the selection. 
+            
         selection_get() :
             If selectmode is 'day', return the selected date as a ``datetime.date``
             instance, otherwise return ``None``.
