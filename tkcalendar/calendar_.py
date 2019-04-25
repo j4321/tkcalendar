@@ -25,15 +25,17 @@ Calendar widget
 
 
 import calendar
-from babel.dates import format_date, parse_date, get_day_names, get_month_names
+from locale import getdefaultlocale
 try:
     from tkinter import ttk
     from tkinter.font import Font
 except ImportError:
     import ttk
     from tkFont import Font
+
+from babel.dates import format_date, parse_date, get_day_names, get_month_names
+
 from tkcalendar.tooltip import TooltipWrapper
-from locale import getdefaultlocale
 
 
 class Calendar(ttk.Frame):
@@ -441,7 +443,7 @@ class Calendar(ttk.Frame):
                                   font=self._font, anchor="center")
                 self._calendar[-1].append(label)
                 label.grid(row=i, column=j, padx=(0, 1), pady=(0, 1), sticky="nsew")
-                if selectmode is "day":
+                if selectmode == "day":
                     label.bind("<1>", self._on_click)
 
         # --- *-- pack main elements
@@ -473,21 +475,21 @@ class Calendar(ttk.Frame):
     def __setitem__(self, key, value):
         if key not in self._properties:
             raise AttributeError("Calendar object has no attribute %s." % key)
-        elif key is "locale":
+        elif key == "locale":
             raise AttributeError("This attribute cannot be modified.")
         else:
-            if key is "selectmode":
-                if value is "none":
+            if key == "selectmode":
+                if value == "none":
                     for week in self._calendar:
                         for day in week:
                             day.unbind("<1>")
-                elif value is "day":
+                elif value == "day":
                     for week in self._calendar:
                         for day in week:
                             day.bind("<1>", self._on_click)
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
-            elif key is 'textvariable':
+            elif key == 'textvariable':
                 try:
                     if self._textvariable is not None:
                         self._textvariable.trace_remove('write', self._textvariable_trace_id)
@@ -500,27 +502,27 @@ class Calendar(ttk.Frame):
                         value.trace('w', self._textvariable_trace)
                 self._textvariable = value
                 value.set(value.get())
-            elif key is 'showweeknumbers':
+            elif key == 'showweeknumbers':
                 if value:
                     for wlabel in self._week_nbs:
                         wlabel.grid()
                 else:
                     for wlabel in self._week_nbs:
                         wlabel.grid_remove()
-            elif key is 'firstweekday':
+            elif key == 'firstweekday':
                 if value not in ["monday", "sunday"]:
                     raise ValueError("'firstweekday' option should be 'monday' or 'sunday'.")
                 self._cal.firstweekday = (value == 'sunday') * 6
                 for label, day in zip(self._week_days, self._cal.iterweekdays()):
                     label.configure(text=self._day_names[day % 7])
                 self._display_calendar()
-            elif key is 'borderwidth':
+            elif key == 'borderwidth':
                 try:
                     bd = int(value)
                     self._cal_frame.pack_configure(padx=bd, pady=bd)
                 except ValueError:
                     raise ValueError('expected integer for the borderwidth option.')
-            elif key is 'state':
+            elif key == 'state':
                 if value not in ['normal', 'disabled']:
                     raise ValueError("bad state '%s': must be disabled or normal" % value)
                 else:
@@ -537,7 +539,7 @@ class Calendar(ttk.Frame):
                     self._r_month.state((state,))
                     for child in self._cal_frame.children.values():
                         child.state((state,))
-            elif key is "maxdate":
+            elif key == "maxdate":
                 if value is not None:
                     if isinstance(value, self.datetime):
                         value = value.date()
@@ -549,7 +551,7 @@ class Calendar(ttk.Frame):
                 self._r_year.state(['!disabled'])
                 self._l_month.state(['!disabled'])
                 self._l_year.state(['!disabled'])
-            elif key is "mindate":
+            elif key == "mindate":
                 if value is not None:
                     if isinstance(value, self.datetime):
                         value = value.date()
@@ -561,7 +563,7 @@ class Calendar(ttk.Frame):
                 self._r_year.state(['!disabled'])
                 self._l_month.state(['!disabled'])
                 self._l_year.state(['!disabled'])
-            elif key is "font":
+            elif key == "font":
                 font = Font(self, value)
                 prop = font.actual()
                 self._font.configure(**prop)
@@ -570,44 +572,44 @@ class Calendar(ttk.Frame):
                 size = max(prop["size"], 10)
                 self.style.configure('R.%s.TButton' % self._style_prefixe, arrowsize=size)
                 self.style.configure('L.%s.TButton' % self._style_prefixe, arrowsize=size)
-            elif key is "normalbackground":
+            elif key == "normalbackground":
                 self.style.configure('cal.%s.TFrame' % self._style_prefixe, background=value)
                 self.style.configure('normal.%s.TLabel' % self._style_prefixe, background=value)
                 self.style.configure('normal_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "normalforeground":
+            elif key == "normalforeground":
                 self.style.configure('normal.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "bordercolor":
+            elif key == "bordercolor":
                 self.style.configure('cal.%s.TFrame' % self._style_prefixe, background=value)
-            elif key is "othermonthforeground":
+            elif key == "othermonthforeground":
                 self.style.configure('normal_om.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "othermonthbackground":
+            elif key == "othermonthbackground":
                 self.style.configure('normal_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "othermonthweforeground":
+            elif key == "othermonthweforeground":
                 self.style.configure('we_om.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "othermonthwebackground":
+            elif key == "othermonthwebackground":
                 self.style.configure('we_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "selectbackground":
+            elif key == "selectbackground":
                 self.style.configure('sel.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "selectforeground":
+            elif key == "selectforeground":
                 self.style.configure('sel.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "disabledselectbackground":
+            elif key == "disabledselectbackground":
                 self.style.map('sel.%s.TLabel' % self._style_prefixe, background=[('disabled', value)])
-            elif key is "disabledselectforeground":
+            elif key == "disabledselectforeground":
                 self.style.map('sel.%s.TLabel' % self._style_prefixe, foreground=[('disabled', value)])
-            elif key is "disableddaybackground":
+            elif key == "disableddaybackground":
                 self.style.map('%s.TLabel' % self._style_prefixe, background=[('disabled', value)])
-            elif key is "disableddayforeground":
+            elif key == "disableddayforeground":
                 self.style.map('%s.TLabel' % self._style_prefixe, foreground=[('disabled', value)])
-            elif key is "weekendbackground":
+            elif key == "weekendbackground":
                 self.style.configure('we.%s.TLabel' % self._style_prefixe, background=value)
                 self.style.configure('we_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "weekendforeground":
+            elif key == "weekendforeground":
                 self.style.configure('we.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "headersbackground":
+            elif key == "headersbackground":
                 self.style.configure('headers.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "headersforeground":
+            elif key == "headersforeground":
                 self.style.configure('headers.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "background":
+            elif key == "background":
                 self.style.configure('main.%s.TFrame' % self._style_prefixe, background=value)
                 self.style.configure('main.%s.TLabel' % self._style_prefixe, background=value)
                 self.style.configure('R.%s.TButton' % self._style_prefixe, background=value,
@@ -616,11 +618,11 @@ class Calendar(ttk.Frame):
                 self.style.configure('L.%s.TButton' % self._style_prefixe, background=value,
                                      bordercolor=value,
                                      lightcolor=value, darkcolor=value)
-            elif key is "foreground":
+            elif key == "foreground":
                 self.style.configure('R.%s.TButton' % self._style_prefixe, arrowcolor=value)
                 self.style.configure('L.%s.TButton' % self._style_prefixe, arrowcolor=value)
                 self.style.configure('main.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "disabledbackground":
+            elif key == "disabledbackground":
                 self.style.map('%s.TButton' % self._style_prefixe,
                                background=[('active', '!disabled', self.style.lookup('TEntry', 'selectbackground', ('focus',))),
                                            ('disabled', value)],)
@@ -628,22 +630,22 @@ class Calendar(ttk.Frame):
                                background=[('disabled', value)])
                 self.style.map('main.%s.TLabel' % self._style_prefixe,
                                background=[('disabled', value)])
-            elif key is "disabledforeground":
+            elif key == "disabledforeground":
                 self.style.map('%s.TButton' % self._style_prefixe,
                                arrowcolor=[('disabled', value)])
                 self.style.map('main.%s.TLabel' % self._style_prefixe,
                                foreground=[('disabled', value)])
-            elif key is "cursor":
+            elif key == "cursor":
                 ttk.Frame.configure(self, cursor=value)
-            elif key is "tooltipbackground":
+            elif key == "tooltipbackground":
                 self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
                                      background=value)
-            elif key is "tooltipforeground":
+            elif key == "tooltipforeground":
                 self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
                                      foreground=value)
-            elif key is "tooltipalpha":
+            elif key == "tooltipalpha":
                 self.tooltip_wrapper.configure(alpha=value)
-            elif key is "tooltipdelay":
+            elif key == "tooltipdelay":
                 self.tooltip_wrapper.configure(delay=value)
             self._properties[key] = value
             if key in ['showothermonthdays', 'maxdate', 'mindate']:
@@ -652,7 +654,7 @@ class Calendar(ttk.Frame):
 
     def _textvariable_trace(self, *args):
         """Connect StringVar value with selected date."""
-        if self._properties.get("selectmode") is "day":
+        if self._properties.get("selectmode") == "day":
             date = self._textvariable.get()
             if not date:
                 self._remove_selection()
@@ -1043,7 +1045,7 @@ class Calendar(ttk.Frame):
     # --- bindings
     def _on_click(self, event):
         """Select the day on which the user clicked."""
-        if self._properties['state'] is 'normal':
+        if self._properties['state'] == 'normal':
             label = event.widget
             if "disabled" not in label.state():
                 day = label.cget("text")
@@ -1092,10 +1094,10 @@ class Calendar(ttk.Frame):
     def selection_get(self):
         """
         Return currently selected date (datetime.date instance).
-        Always return None if selectmode is "none".
+        Always return None if selectmode == "none".
         """
 
-        if self._properties.get("selectmode") is "day":
+        if self._properties.get("selectmode") == "day":
             return self._sel_date
         else:
             return None
@@ -1108,9 +1110,9 @@ class Calendar(ttk.Frame):
         instance or a string corresponding to the date format "%x"
         in the Calendar locale.
 
-        Do nothing if selectmode is "none".
+        Do nothing if selectmode == "none".
         """
-        if self._properties.get("selectmode") is "day" and self._properties['state'] is 'normal':
+        if self._properties.get("selectmode") == "day" and self._properties['state'] == 'normal':
             if date is None:
                 self._remove_selection()
                 self._sel_date = None

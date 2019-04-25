@@ -19,14 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Tooltip and TooltipWrapper
 """
-
+from sys import platform
 try:
     import tkinter as tk
     from tkinter import ttk
 except ImportError:
     import Tkinter as tk
     import ttk
-from sys import platform
 
 
 class Tooltip(tk.Toplevel):
