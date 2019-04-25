@@ -1129,9 +1129,17 @@ class Calendar(ttk.Frame):
         self._check_date_range()
 
     # --- selection handling
+    def selection_clear(self):
+        """Clear the selection."""
+        self._remove_selection()
+        self._sel_date = None
+        if self._textvariable is not None:
+            self._textvariable.set('')
+
     def selection_get(self):
         """
         Return currently selected date (datetime.date instance).
+
         Always return None if selectmode == "none".
         """
 
@@ -1144,18 +1152,15 @@ class Calendar(ttk.Frame):
         """
         Set the selection to date.
 
-        date can be either a datetime.date
-        instance or a string corresponding to the date format "%x"
-        in the Calendar locale.
+            date : datetime.date, datetime.datetime or str
+                    date to be made visible. If given as a string, it should be
+                    in the format corresponding to the calendar locale.
 
         Do nothing if selectmode == "none".
         """
         if self._properties.get("selectmode") == "day" and self._properties['state'] == 'normal':
             if date is None:
-                self._remove_selection()
-                self._sel_date = None
-                if self._textvariable is not None:
-                    self._textvariable.set('')
+                self.selection_clear()
             else:
                 if isinstance(date, self.datetime):
                     self._sel_date = date.date()
