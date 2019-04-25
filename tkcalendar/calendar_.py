@@ -25,15 +25,17 @@ Calendar widget
 
 
 import calendar
-from babel.dates import format_date, parse_date, get_day_names, get_month_names
+from locale import getdefaultlocale
 try:
     from tkinter import ttk
     from tkinter.font import Font
 except ImportError:
     import ttk
     from tkFont import Font
+
+from babel.dates import format_date, parse_date, get_day_names, get_month_names
+
 from tkcalendar.tooltip import TooltipWrapper
-from locale import getdefaultlocale
 
 
 class Calendar(ttk.Frame):
@@ -68,6 +70,12 @@ class Calendar(ttk.Frame):
         firstweekday : "monday" or "sunday"
             first day of the week
 
+        mindate : datetime.date or datetime.datetime (default is None)
+            minimum allowed date
+
+        maxdate : datetime.date or datetime.datetime (default is None)
+            maximum allowed date
+
         showweeknumbers : bool (default is True)
             whether to display week numbers.
 
@@ -91,6 +99,12 @@ class Calendar(ttk.Frame):
 
         foreground : str
             foreground color of month/year name
+
+        disabledbackground : str
+            background color of calendar border and month/year name in disabled state
+
+        disabledforeground : str
+            foreground color of month/year name in disabled state
 
         bordercolor : str
             day border color
@@ -199,7 +213,7 @@ class Calendar(ttk.Frame):
         try:
             bd = int(kw.pop('borderwidth', 2))
         except ValueError:
-            raise ValueError('expected integer for the borderwidth option.')
+            raise ValueError("expected integer for the 'borderwidth' option.")
 
         firstweekday = kw.pop('firstweekday', 'monday')
         if firstweekday not in ["monday", "sunday"]:
@@ -241,6 +255,22 @@ class Calendar(ttk.Frame):
 
         self._date = self.date(year, month, 1)  # (year, month) displayed by the calendar
 
+        # --- date limits
+        maxdate = kw.pop('maxdate', None)
+        mindate = kw.pop('mindate', None)
+        if maxdate is not None:
+            if isinstance(maxdate, self.datetime):
+                maxdate = maxdate.date()
+            elif not isinstance(maxdate, self.date):
+                raise TypeError("expected %s for the 'maxdate' option." % self.date)
+        if mindate is not None:
+            if isinstance(mindate, self.datetime):
+                mindate = mindate.date()
+            elif not isinstance(mindate, self.date):
+                raise TypeError("expected %s for the 'mindate' option." % self.date)
+        if (mindate is not None) and (maxdate is not None) and (mindate > maxdate):
+            raise ValueError("mindate should be smaller than maxdate.")
+
         # --- selectmode
         selectmode = kw.pop("selectmode", "day")
         if selectmode not in ("none", "day"):
@@ -263,6 +293,8 @@ class Calendar(ttk.Frame):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'maxdate',
+                   'mindate',
                    'showweeknumbers',
                    'showothermonthdays',
                    'firstweekday',
@@ -274,6 +306,8 @@ class Calendar(ttk.Frame):
                    'normalforeground',
                    'background',
                    'foreground',
+                   'disabledbackground',
+                   'disabledforeground',
                    'bordercolor',
                    'othermonthforeground',
                    'othermonthbackground',
@@ -303,6 +337,8 @@ class Calendar(ttk.Frame):
                             "selectmode": selectmode,
                             'textvariable': self._textvariable,
                             'firstweekday': firstweekday,
+                            'mindate': mindate,
+                            'maxdate': maxdate,
                             'showweeknumbers': showweeknumbers,
                             'showothermonthdays': kw.pop('showothermonthdays', True),
                             'selectbackground': active_bg,
@@ -313,6 +349,8 @@ class Calendar(ttk.Frame):
                             'normalforeground': 'black',
                             'background': 'gray30',
                             'foreground': 'white',
+                            'disabledbackground': 'gray30',
+                            'disabledforeground': 'gray70',
                             'bordercolor': 'gray70',
                             'othermonthforeground': 'gray45',
                             'othermonthbackground': 'gray93',
@@ -341,9 +379,9 @@ class Calendar(ttk.Frame):
 
         # --- init calendar
         # --- *-- header: month - year
-        header = ttk.Frame(self, style='main.%s.TFrame' % self._style_prefixe)
+        self._header = ttk.Frame(self, style='main.%s.TFrame' % self._style_prefixe)
 
-        f_month = ttk.Frame(header,
+        f_month = ttk.Frame(self._header,
                             style='main.%s.TFrame' % self._style_prefixe)
         self._l_month = ttk.Button(f_month,
                                    style='L.%s.TButton' % self._style_prefixe,
@@ -357,7 +395,7 @@ class Calendar(ttk.Frame):
         self._header_month.pack(side='left', padx=4)
         self._r_month.pack(side='left', fill="y")
 
-        f_year = ttk.Frame(header, style='main.%s.TFrame' % self._style_prefixe)
+        f_year = ttk.Frame(self._header, style='main.%s.TFrame' % self._style_prefixe)
         self._l_year = ttk.Button(f_year, style='L.%s.TButton' % self._style_prefixe,
                                   command=self._prev_year)
         self._header_year = ttk.Label(f_year, width=4, anchor='center',
@@ -407,11 +445,11 @@ class Calendar(ttk.Frame):
                                   font=self._font, anchor="center")
                 self._calendar[-1].append(label)
                 label.grid(row=i, column=j, padx=(0, 1), pady=(0, 1), sticky="nsew")
-                if selectmode is "day":
+                if selectmode == "day":
                     label.bind("<1>", self._on_click)
 
         # --- *-- pack main elements
-        header.pack(fill="x", padx=2, pady=2)
+        self._header.pack(fill="x", padx=2, pady=2)
         self._cal_frame.pack(fill="both", expand=True, padx=bd, pady=bd)
 
         self.config(state=state)
@@ -421,6 +459,8 @@ class Calendar(ttk.Frame):
 
         self._setup_style()
         self._display_calendar()
+        self._check_date_range()
+        self._check_sel_date()
 
         if self._textvariable is not None:
             try:
@@ -438,21 +478,21 @@ class Calendar(ttk.Frame):
     def __setitem__(self, key, value):
         if key not in self._properties:
             raise AttributeError("Calendar object has no attribute %s." % key)
-        elif key is "locale":
+        elif key == "locale":
             raise AttributeError("This attribute cannot be modified.")
         else:
-            if key is "selectmode":
-                if value is "none":
+            if key == "selectmode":
+                if value == "none":
                     for week in self._calendar:
                         for day in week:
                             day.unbind("<1>")
-                elif value is "day":
+                elif value == "day":
                     for week in self._calendar:
                         for day in week:
                             day.bind("<1>", self._on_click)
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
-            elif key is 'textvariable':
+            elif key == 'textvariable':
                 try:
                     if self._textvariable is not None:
                         self._textvariable.trace_remove('write', self._textvariable_trace_id)
@@ -465,38 +505,77 @@ class Calendar(ttk.Frame):
                         value.trace('w', self._textvariable_trace)
                 self._textvariable = value
                 value.set(value.get())
-            elif key is 'showweeknumbers':
+            elif key == 'showweeknumbers':
                 if value:
                     for wlabel in self._week_nbs:
                         wlabel.grid()
                 else:
                     for wlabel in self._week_nbs:
                         wlabel.grid_remove()
-            elif key is 'firstweekday':
+            elif key == 'firstweekday':
                 if value not in ["monday", "sunday"]:
                     raise ValueError("'firstweekday' option should be 'monday' or 'sunday'.")
                 self._cal.firstweekday = (value == 'sunday') * 6
                 for label, day in zip(self._week_days, self._cal.iterweekdays()):
                     label.configure(text=self._day_names[day % 7])
                 self._display_calendar()
-            elif key is 'borderwidth':
+            elif key == 'borderwidth':
                 try:
                     bd = int(value)
                     self._cal_frame.pack_configure(padx=bd, pady=bd)
                 except ValueError:
                     raise ValueError('expected integer for the borderwidth option.')
-            elif key is 'state':
+            elif key == 'state':
                 if value not in ['normal', 'disabled']:
                     raise ValueError("bad state '%s': must be disabled or normal" % value)
                 else:
                     state = '!' * (value == 'normal') + 'disabled'
+                    self.state((state,))
+                    self._header.state((state,))
+                    for child in self._header.children.values():
+                        child.state((state,))
+                    self._header_month.state((state,))
+                    self._header_year.state((state,))
                     self._l_year.state((state,))
                     self._r_year.state((state,))
                     self._l_month.state((state,))
                     self._r_month.state((state,))
                     for child in self._cal_frame.children.values():
                         child.state((state,))
-            elif key is "font":
+            elif key == "maxdate":
+                if value is not None:
+                    if isinstance(value, self.datetime):
+                        value = value.date()
+                    elif not isinstance(value, self.date):
+                        raise TypeError("expected %s for the 'maxdate' option." % self.date)
+
+                    mindate = self['mindate']
+                    if mindate is not None and mindate > value:
+                        self._properties['mindate'] = value
+                        self._date = self._date.replace(year=value.year, month=value.month)
+                    elif self._date > value:
+                        self._date = self._date.replace(year=value.year, month=value.month)
+                self._r_month.state(['!disabled'])
+                self._r_year.state(['!disabled'])
+                self._l_month.state(['!disabled'])
+                self._l_year.state(['!disabled'])
+            elif key == "mindate":
+                if value is not None:
+                    if isinstance(value, self.datetime):
+                        value = value.date()
+                    elif not isinstance(value, self.date):
+                        raise TypeError("expected %s for the 'mindate' option." % self.date)
+                    maxdate = self['maxdate']
+                    if maxdate is not None and maxdate < value:
+                        self._properties['maxdate'] = value
+                        self._date = self._date.replace(year=value.year, month=value.month)
+                    elif self._date < value:
+                        self._date = self._date.replace(year=value.year, month=value.month)
+                self._r_month.state(['!disabled'])
+                self._r_year.state(['!disabled'])
+                self._l_month.state(['!disabled'])
+                self._l_year.state(['!disabled'])
+            elif key == "font":
                 font = Font(self, value)
                 prop = font.actual()
                 self._font.configure(**prop)
@@ -505,44 +584,44 @@ class Calendar(ttk.Frame):
                 size = max(prop["size"], 10)
                 self.style.configure('R.%s.TButton' % self._style_prefixe, arrowsize=size)
                 self.style.configure('L.%s.TButton' % self._style_prefixe, arrowsize=size)
-            elif key is "normalbackground":
+            elif key == "normalbackground":
                 self.style.configure('cal.%s.TFrame' % self._style_prefixe, background=value)
                 self.style.configure('normal.%s.TLabel' % self._style_prefixe, background=value)
                 self.style.configure('normal_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "normalforeground":
+            elif key == "normalforeground":
                 self.style.configure('normal.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "bordercolor":
+            elif key == "bordercolor":
                 self.style.configure('cal.%s.TFrame' % self._style_prefixe, background=value)
-            elif key is "othermonthforeground":
+            elif key == "othermonthforeground":
                 self.style.configure('normal_om.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "othermonthbackground":
+            elif key == "othermonthbackground":
                 self.style.configure('normal_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "othermonthweforeground":
+            elif key == "othermonthweforeground":
                 self.style.configure('we_om.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "othermonthwebackground":
+            elif key == "othermonthwebackground":
                 self.style.configure('we_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "selectbackground":
+            elif key == "selectbackground":
                 self.style.configure('sel.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "selectforeground":
+            elif key == "selectforeground":
                 self.style.configure('sel.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "disabledselectbackground":
+            elif key == "disabledselectbackground":
                 self.style.map('sel.%s.TLabel' % self._style_prefixe, background=[('disabled', value)])
-            elif key is "disabledselectforeground":
+            elif key == "disabledselectforeground":
                 self.style.map('sel.%s.TLabel' % self._style_prefixe, foreground=[('disabled', value)])
-            elif key is "disableddaybackground":
+            elif key == "disableddaybackground":
                 self.style.map('%s.TLabel' % self._style_prefixe, background=[('disabled', value)])
-            elif key is "disableddayforeground":
+            elif key == "disableddayforeground":
                 self.style.map('%s.TLabel' % self._style_prefixe, foreground=[('disabled', value)])
-            elif key is "weekendbackground":
+            elif key == "weekendbackground":
                 self.style.configure('we.%s.TLabel' % self._style_prefixe, background=value)
                 self.style.configure('we_om.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "weekendforeground":
+            elif key == "weekendforeground":
                 self.style.configure('we.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "headersbackground":
+            elif key == "headersbackground":
                 self.style.configure('headers.%s.TLabel' % self._style_prefixe, background=value)
-            elif key is "headersforeground":
+            elif key == "headersforeground":
                 self.style.configure('headers.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "background":
+            elif key == "background":
                 self.style.configure('main.%s.TFrame' % self._style_prefixe, background=value)
                 self.style.configure('main.%s.TLabel' % self._style_prefixe, background=value)
                 self.style.configure('R.%s.TButton' % self._style_prefixe, background=value,
@@ -551,29 +630,44 @@ class Calendar(ttk.Frame):
                 self.style.configure('L.%s.TButton' % self._style_prefixe, background=value,
                                      bordercolor=value,
                                      lightcolor=value, darkcolor=value)
-            elif key is "foreground":
+            elif key == "foreground":
                 self.style.configure('R.%s.TButton' % self._style_prefixe, arrowcolor=value)
                 self.style.configure('L.%s.TButton' % self._style_prefixe, arrowcolor=value)
                 self.style.configure('main.%s.TLabel' % self._style_prefixe, foreground=value)
-            elif key is "cursor":
+            elif key == "disabledbackground":
+                self.style.map('%s.TButton' % self._style_prefixe,
+                               background=[('active', '!disabled', self.style.lookup('TEntry', 'selectbackground', ('focus',))),
+                                           ('disabled', value)],)
+                self.style.map('main.%s.TFrame' % self._style_prefixe,
+                               background=[('disabled', value)])
+                self.style.map('main.%s.TLabel' % self._style_prefixe,
+                               background=[('disabled', value)])
+            elif key == "disabledforeground":
+                self.style.map('%s.TButton' % self._style_prefixe,
+                               arrowcolor=[('disabled', value)])
+                self.style.map('main.%s.TLabel' % self._style_prefixe,
+                               foreground=[('disabled', value)])
+            elif key == "cursor":
                 ttk.Frame.configure(self, cursor=value)
-            elif key is "tooltipbackground":
+            elif key == "tooltipbackground":
                 self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
                                      background=value)
-            elif key is "tooltipforeground":
+            elif key == "tooltipforeground":
                 self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
                                      foreground=value)
-            elif key is "tooltipalpha":
+            elif key == "tooltipalpha":
                 self.tooltip_wrapper.configure(alpha=value)
-            elif key is "tooltipdelay":
+            elif key == "tooltipdelay":
                 self.tooltip_wrapper.configure(delay=value)
             self._properties[key] = value
-            if key is 'showothermonthdays':
+            if key in ['showothermonthdays', 'maxdate', 'mindate']:
                 self._display_calendar()
+                self._check_sel_date()
+                self._check_date_range()
 
     def _textvariable_trace(self, *args):
         """Connect StringVar value with selected date."""
-        if self._properties.get("selectmode") is "day":
+        if self._properties.get("selectmode") == "day":
             date = self._textvariable.get()
             if not date:
                 self._remove_selection()
@@ -606,14 +700,16 @@ class Calendar(ttk.Frame):
         sel_fg = self._properties.get('selectforeground')
         dis_sel_bg = self._properties.get('disabledselectbackground')
         dis_sel_fg = self._properties.get('disabledselectforeground')
-        dis_bg = self._properties.get('disableddaybackground')
-        dis_fg = self._properties.get('disableddayforeground')
+        dis_day_bg = self._properties.get('disableddaybackground')
+        dis_day_fg = self._properties.get('disableddayforeground')
         cal_bg = self._properties.get('normalbackground')
         cal_fg = self._properties.get('normalforeground')
         hd_bg = self._properties.get("headersbackground")
         hd_fg = self._properties.get("headersforeground")
         bg = self._properties.get('background')
         fg = self._properties.get('foreground')
+        dis_bg = self._properties.get('disabledbackground')
+        dis_fg = self._properties.get('disabledforeground')
         bc = self._properties.get('bordercolor')
         om_fg = self._properties.get('othermonthforeground')
         om_bg = self._properties.get('othermonthbackground')
@@ -638,32 +734,31 @@ class Calendar(ttk.Frame):
         self.style.configure('we.%s.TLabel' % self._style_prefixe, background=we_bg,
                              foreground=we_fg)
         size = max(self._header_font.actual()["size"], 10)
-        self.style.configure('R.%s.TButton' % self._style_prefixe, background=bg,
+        self.style.configure('%s.TButton' % self._style_prefixe, background=bg,
                              arrowcolor=fg, arrowsize=size, bordercolor=bg,
-                             relief="flat", lightcolor=bg, darkcolor=bg)
-        self.style.configure('L.%s.TButton' % self._style_prefixe, background=bg,
-                             arrowsize=size, arrowcolor=fg, bordercolor=bg,
                              relief="flat", lightcolor=bg, darkcolor=bg)
         self.style.configure('%s.tooltip.TLabel' % self._style_prefixe,
                              background=self._properties['tooltipbackground'],
                              foreground=self._properties['tooltipforeground'])
 
-        self.style.map('R.%s.TButton' % self._style_prefixe, background=[('active', active_bg)],
+        self.style.map('%s.TButton' % self._style_prefixe,
+                       background=[('active', '!disabled', active_bg), ('disabled', dis_bg)],
                        bordercolor=[('active', active_bg)],
                        relief=[('active', 'flat')],
+                       arrowcolor=[('disabled', dis_fg)],
                        darkcolor=[('active', active_bg)],
                        lightcolor=[('active', active_bg)])
-        self.style.map('L.%s.TButton' % self._style_prefixe, background=[('active', active_bg)],
-                       bordercolor=[('active', active_bg)],
-                       relief=[('active', 'flat')],
-                       darkcolor=[('active', active_bg)],
-                       lightcolor=[('active', active_bg)])
+        self.style.map('main.%s.TFrame' % self._style_prefixe,
+                       background=[('disabled', dis_bg)])
+        self.style.map('main.%s.TLabel' % self._style_prefixe,
+                       background=[('disabled', dis_bg)],
+                       foreground=[('disabled', dis_fg)])
         self.style.map('sel.%s.TLabel' % self._style_prefixe,
                        background=[('disabled', dis_sel_bg)],
                        foreground=[('disabled', dis_sel_fg)])
         self.style.map(self._style_prefixe + '.TLabel',
-                       background=[('disabled', dis_bg)],
-                       foreground=[('disabled', dis_fg)])
+                       background=[('disabled', dis_day_bg)],
+                       foreground=[('disabled', dis_day_fg)])
 
     # --- display
     def _display_calendar(self):
@@ -685,6 +780,26 @@ class Calendar(ttk.Frame):
             self._display_days_without_othermonthdays()
 
         self._display_selection()
+        maxdate = self['maxdate']
+        mindate = self['mindate']
+
+        if maxdate is not None:
+            mi, mj = self._get_day_coords(maxdate)
+            if mi is not None:
+                for j in range(mj, 7):
+                    self._calendar[mi][j].state(['disabled'])
+                for i in range(mi + 1, 6):
+                    for j in range(7):
+                        self._calendar[i][j].state(['disabled'])
+
+        if mindate is not None:
+            mi, mj = self._get_day_coords(mindate)
+            if mi is not None:
+                for j in range(mj):
+                    self._calendar[mi][j].state(['disabled'])
+                for i in range(mi):
+                    for j in range(7):
+                        self._calendar[i][j].state(['disabled'])
 
     def _display_days_without_othermonthdays(self):
         year, month = self._date.year, self._date.month
@@ -710,6 +825,7 @@ class Calendar(ttk.Frame):
                 day_number, week_day = cal[i_week][i_day]
                 style = week_days[i_day]
                 label = self._calendar[i_week][i_day]
+                label.state(['!disabled'])
                 if day_number:
                     txt = str(day_number)
                     label.configure(text=txt, style=style)
@@ -762,6 +878,7 @@ class Calendar(ttk.Frame):
             for i_day in range(7):
                 style = week_days[i_day] + months[cal[i_week][i_day].month]
                 label = self._calendar[i_week][i_day]
+                label.state(['!disabled'])
                 txt = str(cal[i_week][i_day].day)
                 label.configure(text=txt, style=style)
                 if cal[i_week][i_day] in self._calevent_dates:
@@ -866,6 +983,69 @@ class Calendar(ttk.Frame):
             self.tooltip_wrapper.remove_tooltip(label)
             self.tooltip_wrapper.add_tooltip(label, text)
 
+    def _check_sel_date(self):
+
+        if self._sel_date is not None:
+            maxdate = self['maxdate']
+            mindate = self['mindate']
+            if maxdate is not None and self._sel_date > maxdate:
+                self._sel_date = maxdate
+                self._display_selection()
+            elif mindate is not None and self._sel_date < mindate:
+                self._sel_date = mindate
+                self._display_selection()
+
+    def _check_date_range(self):
+        """Disable/enable buttons depending on allowed date range"""
+        maxdate = self['maxdate']
+        mindate = self['mindate']
+
+        if maxdate is not None:
+            max_year, max_month = maxdate.year, maxdate.month
+            if self._date > maxdate:
+                self._date = self._date.replace(year=max_year, month=max_month)
+                self._display_calendar()
+
+            dy = max_year - self._date.year
+            if dy == 0:
+                self._r_year.state(['disabled'])
+                if self._date.month == max_month:
+                    self._r_month.state(['disabled'])
+                else:
+                    self._r_month.state(['!disabled'])
+            elif dy == 1:
+                if self._date.month > max_month:
+                    self._r_year.state(['disabled'])
+                else:
+                    self._r_year.state(['!disabled'])
+                    self._r_month.state(['!disabled'])
+            else:  # dy > 1
+                self._r_year.state(['!disabled'])
+                self._r_month.state(['!disabled'])
+
+        if mindate is not None:
+            min_year, min_month = mindate.year, mindate.month
+            if self._date < mindate:
+                self._date = self._date.replace(year=min_year, month=min_month)
+                self._display_calendar()
+
+            dy = self._date.year - min_year
+            if dy == 0:
+                self._l_year.state(['disabled'])
+                if self._date.month == min_month:
+                    self._l_month.state(['disabled'])
+                else:
+                    self._l_month.state(['!disabled'])
+            elif dy == 1:
+                if self._date.month >= min_month:
+                    self._l_year.state(['!disabled'])
+                    self._l_month.state(['!disabled'])
+                else:
+                    self._l_year.state(['disabled'])
+            else:  # dy > 1
+                self._l_year.state(['!disabled'])
+                self._l_month.state(['!disabled'])
+
     # --- callbacks
     def _next_month(self):
         """Display the next month."""
@@ -874,6 +1054,7 @@ class Calendar(ttk.Frame):
             self.timedelta(days=calendar.monthrange(year, month)[1])
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
+        self._check_date_range()
 
     def _prev_month(self):
         """Display the previous month."""
@@ -881,6 +1062,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(day=1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
+        self._check_date_range()
 
     def _next_year(self):
         """Display the next year."""
@@ -888,6 +1070,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year + 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
+        self._check_date_range()
 
     def _prev_year(self):
         """Display the previous year."""
@@ -895,28 +1078,30 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
+        self._check_date_range()
 
     # --- bindings
     def _on_click(self, event):
         """Select the day on which the user clicked."""
-        if self._properties['state'] is 'normal':
+        if self._properties['state'] == 'normal':
             label = event.widget
-            day = label.cget("text")
-            style = label.cget("style")
-            if style in ['normal_om.%s.TLabel' % self._style_prefixe, 'we_om.%s.TLabel' % self._style_prefixe]:
-                if label in self._calendar[0]:
-                    self._prev_month()
-                else:
-                    self._next_month()
-            if day:
-                day = int(day)
-                year, month = self._date.year, self._date.month
-                self._remove_selection()
-                self._sel_date = self.date(year, month, day)
-                self._display_selection()
-                if self._textvariable is not None:
-                    self._textvariable.set(self.format_date(self._sel_date))
-                self.event_generate("<<CalendarSelected>>")
+            if "disabled" not in label.state():
+                day = label.cget("text")
+                style = label.cget("style")
+                if style in ['normal_om.%s.TLabel' % self._style_prefixe, 'we_om.%s.TLabel' % self._style_prefixe]:
+                    if label in self._calendar[0]:
+                        self._prev_month()
+                    else:
+                        self._next_month()
+                if day:
+                    day = int(day)
+                    year, month = self._date.year, self._date.month
+                    self._remove_selection()
+                    self._sel_date = self.date(year, month, day)
+                    self._display_selection()
+                    if self._textvariable is not None:
+                        self._textvariable.set(self.format_date(self._sel_date))
+                    self.event_generate("<<CalendarSelected>>")
 
     def format_date(self, date=None):
         """Convert date (datetime.date) to a string in the locale (short format)."""
@@ -926,14 +1111,39 @@ class Calendar(ttk.Frame):
         """Parse string date in the locale format and return the corresponding datetime.date."""
         return parse_date(date, self._properties['locale'])
 
+    def see(self, date):
+        """
+        Display the month in which date is.
+
+
+            date : datetime.date or datetime.datetime
+                date to be made visible
+        """
+        if isinstance(date, self.datetime):
+            date = date.date()
+        elif not isinstance(date, self.date):
+            raise TypeError("expected %s for the 'date' argument." % self.date)
+
+        self._date = self._date.replace(month=date.month, year=date.year)
+        self._display_calendar()
+        self._check_date_range()
+
     # --- selection handling
+    def selection_clear(self):
+        """Clear the selection."""
+        self._remove_selection()
+        self._sel_date = None
+        if self._textvariable is not None:
+            self._textvariable.set('')
+
     def selection_get(self):
         """
         Return currently selected date (datetime.date instance).
-        Always return None if selectmode is "none".
+
+        Always return None if selectmode == "none".
         """
 
-        if self._properties.get("selectmode") is "day":
+        if self._properties.get("selectmode") == "day":
             return self._sel_date
         else:
             return None
@@ -942,31 +1152,37 @@ class Calendar(ttk.Frame):
         """
         Set the selection to date.
 
-        date can be either a datetime.date
-        instance or a string corresponding to the date format "%x"
-        in the Calendar locale.
+            date : datetime.date, datetime.datetime or str
+                    date to be made visible. If given as a string, it should be
+                    in the format corresponding to the calendar locale.
 
-        Do nothing if selectmode is "none".
+        Do nothing if selectmode == "none".
         """
-        if self._properties.get("selectmode") is "day" and self._properties['state'] is 'normal':
+        if self._properties.get("selectmode") == "day" and self._properties['state'] == 'normal':
             if date is None:
-                self._remove_selection()
-                self._sel_date = None
-                if self._textvariable is not None:
-                    self._textvariable.set('')
+                self.selection_clear()
             else:
-                if isinstance(date, self.date):
+                if isinstance(date, self.datetime):
+                    self._sel_date = date.date()
+                elif isinstance(date, self.date):
                     self._sel_date = date
                 else:
                     try:
                         self._sel_date = self.parse_date(date)
                     except Exception:
                         raise ValueError("%r is not a valid date." % date)
+                print(date, self._sel_date)
+                if self['mindate'] is not None and self._sel_date < self['mindate']:
+                    self._sel_date = self['mindate']
+                elif self['maxdate'] is not None and self._sel_date > self['maxdate']:
+                    self._sel_date = self['maxdate']
                 if self._textvariable is not None:
                     self._textvariable.set(self.format_date(self._sel_date))
+
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
+                self._check_date_range()
 
     def get_displayed_month(self):
         """Return the currently displayed month in the form of a (month, year) tuple."""
@@ -986,7 +1202,7 @@ class Calendar(ttk.Frame):
 
         Options:
 
-            date : datetime.date or datetime.datetime instance.
+            date : datetime.date or datetime.datetime
                 event date
 
             text : str
@@ -1272,13 +1488,4 @@ class Calendar(ttk.Frame):
         for item, value in kw.items():
             self[item] = value
 
-    def config(self, **kw):
-        """
-        Configure resources of a widget.
-
-        The values for resources are specified as keyword
-        arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
-        """
-        for item, value in kw.items():
-            self[item] = value
+    config = configure

@@ -10,12 +10,20 @@ except ImportError:
 def example1():
     def print_sel():
         print(cal.selection_get())
+        cal.see(datetime.date(year=2016, month=2, day=5))
 
     top = tk.Toplevel(root)
 
-    cal = Calendar(top, font="Arial 14", selectmode='day', locale='en_US',
-                   cursor="hand1", year=2018, month=2, day=5)
+    import datetime
+    today = datetime.date.today()
 
+    mindate = datetime.date(year=2018, month=1, day=21)
+    maxdate = today + datetime.timedelta(days=5)
+    print(mindate, maxdate)
+
+    cal = Calendar(top, font="Arial 14", selectmode='day', locale='en_US',
+                   mindate=mindate, maxdate=maxdate, disabledforeground='red',
+                   cursor="hand1", year=2018, month=2, day=5)
     cal.pack(fill="both", expand=True)
     ttk.Button(top, text="ok", command=print_sel).pack()
 
