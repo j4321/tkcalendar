@@ -43,6 +43,10 @@ Class
 
        firstweekday : str
           first day of the week: "monday" or "sunday"
+          
+       weekenddays : list
+          days to be displayed as week-end days given as a list of integers corresponding to the number of the day in the week (e.g. [6, 7] for the last two days of the week).
+
 
        mindate : datetime.date or datetime.datetime (default is None)
             minimum allowed date

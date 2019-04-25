@@ -13,6 +13,8 @@ tkcalendar 1.5.0
   
 - *maxdate* and *mindate*: set an allowed date range for date selection
 
+- *weekenddays*: choose the days colored as week-end days (Fix `#37 <https://github.com/j4321/tkcalendar/issues/37>`_)
+
 .. rubric:: New features
 
 - :meth:`Calendar.see` method: make sure given date is visible
