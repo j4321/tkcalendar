@@ -25,3 +25,5 @@ tkcalendar module providing Calendar and DateEntry widgets
 
 from tkcalendar.dateentry import DateEntry
 from tkcalendar.calendar_ import Calendar
+
+__version__ = '1.5.0'
