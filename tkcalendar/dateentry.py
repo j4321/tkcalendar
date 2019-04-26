@@ -103,7 +103,7 @@ class DateEntry(ttk.Entry):
         self._setup_style()
         self.configure(style=style)
 
-        # add validation to Entry so that only date in the locale '%x' format
+        # add validation to Entry so that only dates in the locale's format
         # are accepted
         validatecmd = self.register(self._validate_date)
         self.configure(validate='focusout',
@@ -234,8 +234,13 @@ class DateEntry(ttk.Entry):
     def _validate_date(self):
         """Date entry validation: only dates in locale '%x' format are accepted."""
         try:
-            self._date = self.parse_date(self.get())
-            return True
+            date = self.parse_date(self.get())
+            self._date = self._calendar.check_date_range(date)
+            if self._date != date:
+                self._set_text(self.format_date(self._date))
+                return False
+            else:
+                return True
         except (ValueError, IndexError):
             self._set_text(self.format_date(self._date))
             return False

@@ -471,7 +471,7 @@ class Calendar(ttk.Frame):
 
         self._setup_style()
         self._display_calendar()
-        self._check_date_range()
+        self._btns_date_range()
         self._check_sel_date()
 
         if self._textvariable is not None:
@@ -677,7 +677,7 @@ class Calendar(ttk.Frame):
                        'maxdate', 'mindate']:
                 self._display_calendar()
                 self._check_sel_date()
-                self._check_date_range()
+                self._btns_date_range()
 
     @staticmethod
     def _check_weekenddays(weekenddays):
@@ -1007,6 +1007,24 @@ class Calendar(ttk.Frame):
             self.tooltip_wrapper.remove_tooltip(label)
             self.tooltip_wrapper.add_tooltip(label, text)
 
+    def check_date_range(self, date):
+        """
+        Ensure that date is in the allowed date range.
+
+            date : datetime.date or datetime.datetime
+
+        Return date if date is in the allowed date range, return the closest
+        bound otherwise.
+        """
+        maxdate = self['maxdate']
+        mindate = self['mindate']
+        if maxdate is not None and date > maxdate:
+            return maxdate
+        elif mindate is not None and date < mindate:
+            return mindate
+        else:
+            return date
+
     def _check_sel_date(self):
 
         if self._sel_date is not None:
@@ -1019,8 +1037,8 @@ class Calendar(ttk.Frame):
                 self._sel_date = mindate
                 self._display_selection()
 
-    def _check_date_range(self):
-        """Disable/enable buttons depending on allowed date range"""
+    def _btns_date_range(self):
+        """Disable/enable buttons depending on allowed date range."""
         maxdate = self['maxdate']
         mindate = self['mindate']
 
@@ -1078,7 +1096,7 @@ class Calendar(ttk.Frame):
             self.timedelta(days=calendar.monthrange(year, month)[1])
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     def _prev_month(self):
         """Display the previous month."""
@@ -1086,7 +1104,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(day=1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     def _next_year(self):
         """Display the next year."""
@@ -1094,7 +1112,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year + 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     def _prev_year(self):
         """Display the previous year."""
@@ -1102,7 +1120,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     # --- bindings
     def _on_click(self, event):
@@ -1150,7 +1168,7 @@ class Calendar(ttk.Frame):
 
         self._date = self._date.replace(month=date.month, year=date.year)
         self._display_calendar()
-        self._check_date_range()
+        self._btns_date_range()
 
     # --- selection handling
     def selection_clear(self):
@@ -1205,7 +1223,7 @@ class Calendar(ttk.Frame):
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
-                self._check_date_range()
+                self._btns_date_range()
 
     def get_displayed_month(self):
         """Return the currently displayed month in the form of a (month, year) tuple."""
