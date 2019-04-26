@@ -339,15 +339,7 @@ class DateEntry(ttk.Entry):
         ttk.Entry.configure(self, **entry_kw)
         self._calendar.configure(**kw)
 
-    def config(self, **kw):
-        """
-        Configure resources of a widget.
-
-        The values for resources are specified as keyword
-        arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
-        """
-        self.configure(**kw)
+    config = configure
 
     def set_date(self, date):
         """
@@ -365,6 +357,7 @@ class DateEntry(ttk.Entry):
             except Exception:
                 raise ValueError("%r is not a valid date." % date)
         self._set_text(txt)
+        self._validate_date()
 
     def get_date(self):
         """Return the content of the DateEntry as a datetime.date instance."""

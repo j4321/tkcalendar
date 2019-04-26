@@ -98,6 +98,12 @@ class TestDateEntry(BaseWidgetTest):
         widget.set_date(date(2015, 12, 31))
         self.assertEqual(widget.get_date(), date(2015, 12, 31))
         self.assertEqual(widget.get(), format_date(date(2015, 12, 31), 'short'))
+        widget.set_date(date(2010, 12, 31))
+        self.assertEqual(widget.get_date(), date(2014, 1, 6))
+        widget.set_date(date(2020, 12, 31))
+        self.assertEqual(widget.get_date(), date(2019, 9, 8))
+        widget.set_date(date(2015, 12, 31))
+        self.assertEqual(widget.get_date(), date(2015, 12, 31))
 
         widget.delete(0, "end")
         widget.insert(0, format_date(date(2010, 12, 31), 'short'))
