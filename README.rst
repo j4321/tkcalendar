@@ -221,7 +221,7 @@ Widget methods
 
             Options:
 
-                *date*: datetime.date or datetime.datetime instance.
+                *date*: ``datetime.date`` or ``datetime.datetime`` instance.
 
                 *text*: text to put in the tooltip associated to date.
 
@@ -267,15 +267,23 @@ Widget methods
 
         get_displayed_month() :
             Return the currently displayed month in the form of a (month, year) tuple.
+            
+        see(date) : 
+            Display the month in which *date* is. 
+            
+                *date*: ``datetime.date`` or ``datetime.datetime`` instance.
 
+        selection_clear() :
+            Clear the selection. 
+            
         selection_get() :
             If selectmode is 'day', return the selected date as a ``datetime.date``
             instance, otherwise return ``None``.
 
         selection_set(self, date) :
-            If selectmode is 'day', set the selection to *date* where *date* can be either a ``datetime.date``
-             instance or a string corresponding to the date format ``"%x"`` in the ``Calendar``
-             locale. Does nothing if selectmode is ``"none"``.
+            If selectmode is 'day', set the selection to *date* where *date* can be either a ``datetime.date`` 
+            instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` 
+            locale. Does nothing if selectmode is ``"none"``.
 
         tag_cget(tag, option) :
             Return the value of the tag's option.
