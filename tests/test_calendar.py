@@ -424,7 +424,7 @@ class TestCalendar(BaseWidgetTest):
         widget.config(tooltipbackground='cyan')
         self.assertEqual(widget["tooltipbackground"], 'cyan')
 
-    def test_calevents(self):
+    def test_calendar_calevents(self):
         widget = Calendar(self.window)
         widget.pack()
         self.window.update()
@@ -562,3 +562,12 @@ class TestCalendar(BaseWidgetTest):
         widget._r_year.invoke()
         self.window.update()
         self.assertTrue(self.event_triggered)
+
+    def test_calendar_other_fcts(self):
+        widget = Calendar(self.window, mindate=date(2018, 1, 6), maxdate=date(2018, 9, 8))
+        widget.pack()
+        self.window.update()
+
+        self.assertEqual(widget.check_date_range(date(2018, 4, 11)), date(2018, 4, 11))
+        self.assertEqual(widget.check_date_range(date(2017, 4, 11)), date(2018, 1, 6))
+        self.assertEqual(widget.check_date_range(date(2018, 12, 1)), date(2018, 9, 8))

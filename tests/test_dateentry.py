@@ -86,7 +86,8 @@ class TestDateEntry(BaseWidgetTest):
 
     def test_dateentry_functions(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
-                           foreground='white', borderwidth=2)
+                           foreground='white', borderwidth=2,
+                           mindate=date(2014, 1, 6), maxdate=date(2019, 9, 8))
         widget.pack()
         self.window.update()
 
@@ -97,6 +98,19 @@ class TestDateEntry(BaseWidgetTest):
         widget.set_date(date(2015, 12, 31))
         self.assertEqual(widget.get_date(), date(2015, 12, 31))
         self.assertEqual(widget.get(), format_date(date(2015, 12, 31), 'short'))
+
+        widget.delete(0, "end")
+        widget.insert(0, format_date(date(2010, 12, 31), 'short'))
+        self.window.focus_force()
+        self.assertEqual(widget.get_date(), date(2014, 1, 6))
+        widget.delete(0, "end")
+        widget.insert(0, format_date(date(2020, 12, 31), 'short'))
+        self.window.focus_force()
+        self.assertEqual(widget.get_date(), date(2019, 9, 8))
+        widget.delete(0, "end")
+        widget.insert(0, format_date(date(2015, 12, 31), 'short'))
+        self.window.focus_force()
+        self.assertEqual(widget.get_date(), date(2015, 12, 31))
 
         widget.delete(0, "end")
         widget.insert(0, "abc")
