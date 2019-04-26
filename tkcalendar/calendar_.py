@@ -67,13 +67,17 @@ class Calendar(ttk.Frame):
         day : int
             initially selected day, if month or year is given but not day, no initial selection, otherwise, default is today.
 
-        firstweekday : "monday" or "sunday"
+        firstweekday : "monday" (default) or "sunday"
             first day of the week
 
-        mindate : datetime.date or datetime.datetime (default is None)
+        weekenddays : list
+            days to be displayed as week-end days given as a list of integers corresponding to the number of the day in the week
+            (e.g. [6, 7] for the last two days of the week).
+
+        mindate : None (default), datetime.date or datetime.datetime
             minimum allowed date
 
-        maxdate : datetime.date or datetime.datetime (default is None)
+        maxdate : None (default), datetime.date or datetime.datetime
             maximum allowed date
 
         showweeknumbers : bool (default is True)
@@ -220,6 +224,12 @@ class Calendar(ttk.Frame):
             raise ValueError("'firstweekday' option should be 'monday' or 'sunday'.")
         self._cal = calendar.TextCalendar((firstweekday == 'sunday') * 6)
 
+        weekenddays = kw.pop("weekenddays", None)
+        if not weekenddays:
+            l = list(self._cal.iterweekdays())
+            weekenddays = [l.index(5) + 1, l.index(6) + 1]  # saturday and sunday
+        self._check_weekenddays(weekenddays)
+
         # --- locale
         locale = kw.pop("locale", getdefaultlocale()[0])
         self._day_names = get_day_names('abbreviated', locale=locale)
@@ -298,6 +308,7 @@ class Calendar(ttk.Frame):
                    'showweeknumbers',
                    'showothermonthdays',
                    'firstweekday',
+                   'weekenddays',
                    'selectbackground',
                    'selectforeground',
                    'disabledselectbackground',
@@ -337,6 +348,7 @@ class Calendar(ttk.Frame):
                             "selectmode": selectmode,
                             'textvariable': self._textvariable,
                             'firstweekday': firstweekday,
+                            'weekenddays': weekenddays,
                             'mindate': mindate,
                             'maxdate': maxdate,
                             'showweeknumbers': showweeknumbers,
@@ -459,7 +471,7 @@ class Calendar(ttk.Frame):
 
         self._setup_style()
         self._display_calendar()
-        self._check_date_range()
+        self._btns_date_range()
         self._check_sel_date()
 
         if self._textvariable is not None:
@@ -518,7 +530,8 @@ class Calendar(ttk.Frame):
                 self._cal.firstweekday = (value == 'sunday') * 6
                 for label, day in zip(self._week_days, self._cal.iterweekdays()):
                     label.configure(text=self._day_names[day % 7])
-                self._display_calendar()
+            elif key == 'weekenddays':
+                self._check_weekenddays(value)
             elif key == 'borderwidth':
                 try:
                     bd = int(value)
@@ -660,10 +673,23 @@ class Calendar(ttk.Frame):
             elif key == "tooltipdelay":
                 self.tooltip_wrapper.configure(delay=value)
             self._properties[key] = value
-            if key in ['showothermonthdays', 'maxdate', 'mindate']:
+            if key in ['showothermonthdays', 'firstweekday', 'weekenddays',
+                       'maxdate', 'mindate']:
                 self._display_calendar()
                 self._check_sel_date()
-                self._check_date_range()
+                self._btns_date_range()
+
+    @staticmethod
+    def _check_weekenddays(weekenddays):
+        try:
+            if len(weekenddays) != 2:
+                raise ValueError("weekenddays should be a list of two days.")
+            else:
+                for d in weekenddays:
+                    if d not in range(1, 8):
+                        raise ValueError("weekenddays should contain integers between 1 and 7.")
+        except TypeError:
+            raise TypeError("weekenddays should be a list of two days.")
 
     def _textvariable_trace(self, *args):
         """Connect StringVar value with selected date."""
@@ -809,9 +835,8 @@ class Calendar(ttk.Frame):
             cal.append([(0, i) for i in range(7)])
 
         week_days = {i: 'normal.%s.TLabel' % self._style_prefixe for i in range(7)}  # style names depending on the type of day
-        offset = (self['firstweekday'] == 'sunday') * 6
-        week_days[(5 - offset) % 7] = 'we.%s.TLabel' % self._style_prefixe
-        week_days[(6 - offset) % 7] = 'we.%s.TLabel' % self._style_prefixe
+        week_days[self['weekenddays'][0] - 1] = 'we.%s.TLabel' % self._style_prefixe
+        week_days[self['weekenddays'][1] - 1] = 'we.%s.TLabel' % self._style_prefixe
         _, week_nb, d = self._date.isocalendar()
         if d == 7 and self['firstweekday'] == 'sunday':
             week_nb += 1
@@ -863,9 +888,8 @@ class Calendar(ttk.Frame):
                 cal.append(self._cal.monthdatescalendar(y, next_m)[i + 1])
 
         week_days = {i: 'normal' for i in range(7)}  # style names depending on the type of day
-        offset = (self['firstweekday'] == 'sunday') * 6
-        week_days[(5 - offset) % 7] = 'we'
-        week_days[(6 - offset) % 7] = 'we'
+        week_days[self['weekenddays'][0] - 1] = 'we'
+        week_days[self['weekenddays'][1] - 1] = 'we'
         prev_m = (month - 2) % 12 + 1
         months = {month: '.%s.TLabel' % self._style_prefixe,
                   next_m: '_om.%s.TLabel' % self._style_prefixe,
@@ -983,6 +1007,24 @@ class Calendar(ttk.Frame):
             self.tooltip_wrapper.remove_tooltip(label)
             self.tooltip_wrapper.add_tooltip(label, text)
 
+    def check_date_range(self, date):
+        """
+        Ensure that date is in the allowed date range.
+
+            date : datetime.date or datetime.datetime
+
+        Return date if date is in the allowed date range, return the closest
+        bound otherwise.
+        """
+        maxdate = self['maxdate']
+        mindate = self['mindate']
+        if maxdate is not None and date > maxdate:
+            return maxdate
+        elif mindate is not None and date < mindate:
+            return mindate
+        else:
+            return date
+
     def _check_sel_date(self):
 
         if self._sel_date is not None:
@@ -995,8 +1037,8 @@ class Calendar(ttk.Frame):
                 self._sel_date = mindate
                 self._display_selection()
 
-    def _check_date_range(self):
-        """Disable/enable buttons depending on allowed date range"""
+    def _btns_date_range(self):
+        """Disable/enable buttons depending on allowed date range."""
         maxdate = self['maxdate']
         mindate = self['mindate']
 
@@ -1054,7 +1096,7 @@ class Calendar(ttk.Frame):
             self.timedelta(days=calendar.monthrange(year, month)[1])
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     def _prev_month(self):
         """Display the previous month."""
@@ -1062,7 +1104,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(day=1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     def _next_year(self):
         """Display the next year."""
@@ -1070,7 +1112,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year + 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     def _prev_year(self):
         """Display the previous year."""
@@ -1078,7 +1120,7 @@ class Calendar(ttk.Frame):
         self._date = self._date.replace(year=year - 1)
         self._display_calendar()
         self.event_generate('<<CalendarMonthChanged>>')
-        self._check_date_range()
+        self._btns_date_range()
 
     # --- bindings
     def _on_click(self, event):
@@ -1126,7 +1168,7 @@ class Calendar(ttk.Frame):
 
         self._date = self._date.replace(month=date.month, year=date.year)
         self._display_calendar()
-        self._check_date_range()
+        self._btns_date_range()
 
     # --- selection handling
     def selection_clear(self):
@@ -1171,7 +1213,6 @@ class Calendar(ttk.Frame):
                         self._sel_date = self.parse_date(date)
                     except Exception:
                         raise ValueError("%r is not a valid date." % date)
-                print(date, self._sel_date)
                 if self['mindate'] is not None and self._sel_date < self['mindate']:
                     self._sel_date = self['mindate']
                 elif self['maxdate'] is not None and self._sel_date > self['maxdate']:
@@ -1182,7 +1223,7 @@ class Calendar(ttk.Frame):
                 self._date = self._sel_date.replace(day=1)
                 self._display_calendar()
                 self._display_selection()
-                self._check_date_range()
+                self._btns_date_range()
 
     def get_displayed_month(self):
         """Return the currently displayed month in the form of a (month, year) tuple."""

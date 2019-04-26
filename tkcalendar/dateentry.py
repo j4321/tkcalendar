@@ -103,7 +103,7 @@ class DateEntry(ttk.Entry):
         self._setup_style()
         self.configure(style=style)
 
-        # add validation to Entry so that only date in the locale '%x' format
+        # add validation to Entry so that only dates in the locale's format
         # are accepted
         validatecmd = self.register(self._validate_date)
         self.configure(validate='focusout',
@@ -234,8 +234,13 @@ class DateEntry(ttk.Entry):
     def _validate_date(self):
         """Date entry validation: only dates in locale '%x' format are accepted."""
         try:
-            self._date = self.parse_date(self.get())
-            return True
+            date = self.parse_date(self.get())
+            self._date = self._calendar.check_date_range(date)
+            if self._date != date:
+                self._set_text(self.format_date(self._date))
+                return False
+            else:
+                return True
         except (ValueError, IndexError):
             self._set_text(self.format_date(self._date))
             return False
@@ -334,15 +339,7 @@ class DateEntry(ttk.Entry):
         ttk.Entry.configure(self, **entry_kw)
         self._calendar.configure(**kw)
 
-    def config(self, **kw):
-        """
-        Configure resources of a widget.
-
-        The values for resources are specified as keyword
-        arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
-        """
-        self.configure(**kw)
+    config = configure
 
     def set_date(self, date):
         """
@@ -360,6 +357,7 @@ class DateEntry(ttk.Entry):
             except Exception:
                 raise ValueError("%r is not a valid date." % date)
         self._set_text(txt)
+        self._validate_date()
 
     def get_date(self):
         """Return the content of the DateEntry as a datetime.date instance."""

@@ -71,6 +71,36 @@ class TestCalendar(BaseWidgetTest):
             widget.destroy()
 
         with self.assertRaises(TypeError):
+            widget = Calendar(self.window, weekenddays=7)
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        with self.assertRaises(ValueError):
+            widget = Calendar(self.window, weekenddays="e")
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        with self.assertRaises(ValueError):
+            widget = Calendar(self.window, weekenddays=[1])
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        with self.assertRaises(ValueError):
+            widget = Calendar(self.window, weekenddays=['a', 'b'])
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        with self.assertRaises(ValueError):
+            widget = Calendar(self.window, weekenddays=[12, 3])
+            widget.pack()
+            self.window.update()
+            widget.destroy()
+
+        with self.assertRaises(TypeError):
             widget = Calendar(self.window, maxdate="e")
             widget.pack()
             self.window.update()
@@ -245,6 +275,7 @@ class TestCalendar(BaseWidgetTest):
                    'mindate',
                    'maxdate',
                    'firstweekday',
+                   'weekenddays',
                    'showweeknumbers',
                    'showothermonthdays',
                    'selectbackground',
@@ -312,6 +343,13 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget["firstweekday"], 'sunday')
         with self.assertRaises(ValueError):
             widget.config(firstweekday="a")
+
+        widget.config(weekenddays=[5, 7])
+        self.window.update()
+        we_style = 'we.%s.TLabel' % widget._style_prefixe
+        normal_style = 'normal.%s.TLabel' % widget._style_prefixe
+        for i in range(7):
+            self.assertEqual(widget._calendar[0][i].cget('style'), we_style if (i + 1) in [5, 7] else normal_style)
 
         widget["mindate"] = datetime(2018, 9, 10)
         self.assertEqual(widget["mindate"], date(2018, 9, 10))
@@ -386,7 +424,7 @@ class TestCalendar(BaseWidgetTest):
         widget.config(tooltipbackground='cyan')
         self.assertEqual(widget["tooltipbackground"], 'cyan')
 
-    def test_calevents(self):
+    def test_calendar_calevents(self):
         widget = Calendar(self.window)
         widget.pack()
         self.window.update()
@@ -524,3 +562,12 @@ class TestCalendar(BaseWidgetTest):
         widget._r_year.invoke()
         self.window.update()
         self.assertTrue(self.event_triggered)
+
+    def test_calendar_other_fcts(self):
+        widget = Calendar(self.window, mindate=date(2018, 1, 6), maxdate=date(2018, 9, 8))
+        widget.pack()
+        self.window.update()
+
+        self.assertEqual(widget.check_date_range(date(2018, 4, 11)), date(2018, 4, 11))
+        self.assertEqual(widget.check_date_range(date(2017, 4, 11)), date(2018, 1, 6))
+        self.assertEqual(widget.check_date_range(date(2018, 12, 1)), date(2018, 9, 8))
