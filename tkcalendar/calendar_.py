@@ -227,7 +227,7 @@ class Calendar(ttk.Frame):
         weekenddays = kw.pop("weekenddays", None)
         if not weekenddays:
             l = list(self._cal.iterweekdays())
-            weekenddays = [l.index(5), l.index(6)]  # saturday and sunday
+            weekenddays = [l.index(5) + 1, l.index(6) + 1]  # saturday and sunday
         self._check_weekenddays(weekenddays)
 
         # --- locale
