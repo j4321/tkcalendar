@@ -261,7 +261,7 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual('', var.get())
 
     def test_calendar_get_set(self):
-        widget = Calendar(self.window, foreground="red")
+        widget = Calendar(self.window, foreground="red", year=2010, month=1, day=3)
         widget.pack()
         self.window.update()
 
@@ -531,7 +531,7 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget.get_calevents(), ())
 
     def test_calendar_virtual_events(self):
-        widget = Calendar(self.window)
+        widget = Calendar(self.window, year=2010, month=1, day=3)
         widget.pack()
         self.window.update()
 
