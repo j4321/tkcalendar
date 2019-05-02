@@ -22,6 +22,7 @@ tkcalendar 1.5.0
 .. rubric:: Bug fixes
 
 - Make :meth:`Calendar.selection_clear` actually clear the selection
+- Fix :obj:`ValueError` when retrieving default locale
 
 
 tkcalendar 1.4.0

@@ -370,6 +370,7 @@ Changelog
     * Add *weekenddays* option to choose the days colored as week-end days (Fix `#37 <https://github.com/j4321/tkcalendar/issues/37>`_)
     * Add ``Calendar.see()`` method to make sure a date is visible
     * Make ``Calendar.selection_clear()`` actually clear the selection
+    * Fix ``ValueError`` when retrieving default locale
 
 - tkcalendar 1.4.0
 
