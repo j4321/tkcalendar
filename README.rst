@@ -18,7 +18,12 @@ Requirements
 ============
 
 - Linux, Windows, OSX
-- Python 2 or 3 with tkinter + ttk (default for Windows but not for Linux) and babel
+- Python 2 or 3
+
+And the python packages:
+
+- tkinter (included in the python distribution for Windows)
+- `babel <https://pypi.org/project/babel/>`_
 
 
 Installation
