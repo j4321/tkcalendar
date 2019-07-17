@@ -232,6 +232,8 @@ class Calendar(ttk.Frame):
 
         # --- locale
         locale = kw.pop("locale", default_locale())
+        if locale is None:
+            locale = 'en'
         self._day_names = get_day_names('abbreviated', locale=locale)
         self._month_names = get_month_names('wide', locale=locale)
 
