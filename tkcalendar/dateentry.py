@@ -99,6 +99,7 @@ class DateEntry(ttk.Entry):
         self.parse_date = self._calendar.parse_date
 
         # style
+        self._theme_name = ''   # to detect theme changes
         self.style = ttk.Style(self)
         self._setup_style()
         self.configure(style=style)
@@ -121,8 +122,6 @@ class DateEntry(ttk.Entry):
             except ValueError:
                 self._date = today
         self._set_text(self.format_date(self._date))
-
-        self._theme_change = True
 
         # --- bindings
         # reconfigure style if theme changed
@@ -149,12 +148,15 @@ class DateEntry(ttk.Entry):
         self.configure(**{key: value})
 
     def _setup_style(self, event=None):
-        """Style configuration."""
+        """Style configuration to make the DateEntry look like a Combobbox."""
         self.style.layout('DateEntry', self.style.layout('TCombobox'))
-        fieldbg = self.style.map('TCombobox', 'fieldbackground')
         self.update_idletasks()
-
-        self.style.map('DateEntry', fieldbackground=fieldbg)
+        conf = self.style.configure('TCombobox')
+        if conf:
+            self.style.configure('DateEntry', **conf)
+        maps = self.style.map('TCombobox')
+        if maps:
+            self.style.map('DateEntry', **maps)
         try:
             self.after_cancel(self._determine_downarrow_name_after_id)
         except ValueError:
@@ -163,7 +165,7 @@ class DateEntry(ttk.Entry):
         self._determine_downarrow_name_after_id = self.after(10, self._determine_downarrow_name)
 
     def _determine_downarrow_name(self, event=None):
-        """Determine downarrow button bbox."""
+        """Determine downarrow button name."""
         try:
             self.after_cancel(self._determine_downarrow_name_after_id)
         except ValueError:
@@ -192,13 +194,11 @@ class DateEntry(ttk.Entry):
                     self.configure(cursor='xterm')
 
     def _on_theme_change(self):
-        if self._theme_change:
-            self._theme_change = False
+        theme = self.style.theme_use()
+        if self._theme_name != theme:
+            # the theme has changed, update the DateEntry style to look like a combobox
+            self._theme_name = theme
             self._setup_style()
-            self.after(50, self._set_theme_change)
-
-    def _set_theme_change(self):
-        self._theme_change = True
 
     def _on_b1_press(self, event):
         """Trigger self.drop_down on downarrow button press and set widget state to ['pressed', 'active']."""
