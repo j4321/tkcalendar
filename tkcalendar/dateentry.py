@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 tkcalendar - Calendar and DateEntry widgets for Tkinter
-Copyright 2017-2018 Juliette Monsel <j_4321@protonmail.com>
+Copyright 2017-2019 Juliette Monsel <j_4321@protonmail.com>
 with contributions from:
   - Neal Probert (https://github.com/nprobert)
   - arahorn28 (https://github.com/arahorn28)

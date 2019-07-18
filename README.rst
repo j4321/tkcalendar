@@ -91,7 +91,7 @@ Widget keyword options
 
     firstweekday : "monday" or "sunday"
         first day of the week
-        
+
     weekenddays : list
         days to be displayed as week-end days given as a list of integers corresponding to the number of the day in the week (e.g. [6, 7] for the last two days of the week).
 
@@ -272,22 +272,22 @@ Widget methods
 
         get_displayed_month() :
             Return the currently displayed month in the form of a (month, year) tuple.
-            
-        see(date) : 
-            Display the month in which *date* is. 
-            
+
+        see(date) :
+            Display the month in which *date* is.
+
                 *date*: ``datetime.date`` or ``datetime.datetime`` instance.
 
         selection_clear() :
-            Clear the selection. 
-            
+            Clear the selection.
+
         selection_get() :
             If selectmode is 'day', return the selected date as a ``datetime.date``
             instance, otherwise return ``None``.
 
         selection_set(self, date) :
-            If selectmode is 'day', set the selection to *date* where *date* can be either a ``datetime.date`` 
-            instance or a string corresponding to the date format ``"%x"`` in the ``Calendar`` 
+            If selectmode is 'day', set the selection to *date* where *date* can be either a ``datetime.date``
+            instance or a string corresponding to the date format ``"%x"`` in the ``Calendar``
             locale. Does nothing if selectmode is ``"none"``.
 
         tag_cget(tag, option) :
@@ -372,11 +372,12 @@ Changelog
     * Add *disabledforeground* and *disabledbackground* options to further customize
       the disabled state appearance of the Calendar
     * Add *maxdate* and *mindate* options to set an allowed date range for date selection
-    * Add *weekenddays* option to choose the days colored as week-end days (Fix `#37 <https://github.com/j4321/tkcalendar/issues/37>`_)
+    * Add *weekenddays* option to choose the days colored as week-end days (`#37 <https://github.com/j4321/tkcalendar/issues/37>`_)
     * Add ``Calendar.see()`` method to make sure a date is visible
     * Make ``Calendar.selection_clear()`` actually clear the selection
     * Fix ``ValueError`` when retrieving default locale
-    * Fix date parsing error in Swedish locale and some others. (Fix `#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
+    * Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
+    * Improve compliance with ttk themes by making the DateEntry look like a Combobox (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
 
 - tkcalendar 1.4.0
 
