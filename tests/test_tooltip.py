@@ -6,6 +6,7 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
+from pynput.mouse import Controller
 
 
 class TestTooltip(BaseWidgetTest):
@@ -48,42 +49,41 @@ class TestTooltipWrapper(BaseWidgetTest):
     def test_tooltipwrapper(self):
         b1 = ttk.Button(self.window, text='Button 1')
         b2 = tk.Button(self.window, text='Button 2')
-        b3 = ttk.Button(self.window, text='Button 2')
         b1.pack()
         b2.pack()
-        b3.pack()
         self.window.update()
-        tw = TooltipWrapper(self.window)
+        tw = TooltipWrapper(self.window, delay=1)
         tw.add_tooltip(b1, "tooltip 1")
         tw.add_tooltip(b2, "tooltip 2")
-        tw.add_tooltip(b3, "tooltip 3")
         self.window.update()
-        b1.event_generate('<Enter>', x=0, y=0)
-        self.window.update()
-        self.assertEqual(tw.current_widget, b1)
-        tw.display_tooltip()
-        self.assertTrue(tw.tooltip.winfo_ismapped())
-        b1.event_generate('<Leave>', x=0, y=0)
-        self.window.update()
-        self.assertIsNone(tw.current_widget)
-        tw.display_tooltip()
-        self.window.update()
-        self.assertFalse(tw.tooltip.winfo_ismapped())
-        b2.event_generate('<Enter>', x=0, y=0)
-        self.window.update()
-        self.assertEqual(tw.current_widget, b2)
-        tw.display_tooltip()
-        self.assertTrue(tw.tooltip.winfo_ismapped())
-        tw.tooltip.event_generate('<Leave>', x=0, y=0)
-        self.window.update()
-        self.assertFalse(tw.tooltip.winfo_ismapped())
-        b2.event_generate('<Leave>', x=0, y=0)
-        self.window.update()
-        tw.remove_tooltip(self.window)
-        tw.remove_tooltip(b1)
-        self.window.update()
-        b1.event_generate('<Enter>', x=0, y=0)
-        self.window.update()
-        self.assertIsNone(tw.current_widget)
-        tw.remove_all()
-        self.assertFalse(tw.widgets)
+
+        mouse = Controller()
+
+        def removal_tests():
+            tw.remove_tooltip(self.window)
+            tw.remove_tooltip(b1)
+            self.window.update()
+            b1.event_generate('<Enter>', x=0, y=0)
+            self.window.update()
+            self.assertIsNone(tw.current_widget)
+            tw.remove_all()
+            self.assertFalse(tw.widgets)
+
+        def test_leave(button):
+            x = self.window.winfo_rootx() + self.window.winfo_width() + 5
+            y = self.window.winfo_rooty() + self.window.winfo_height() + 5
+            mouse.position = x, y
+            self.window.update()
+            self.assertFalse(tw.tooltip.winfo_ismapped())
+            self.assertIsNone(tw.current_widget)
+
+        def test(button):
+            mouse.position = button.winfo_rootx() + 1, button.winfo_rooty() + 1
+            self.window.update()
+            self.assertEqual(tw.current_widget, button)
+            self.window.after(5, lambda: self.assertTrue(tw.tooltip.winfo_ismapped()))
+            self.window.after(7, test_leave)
+
+        test(b1)
+        self.window.after(20, lambda: test(b2))
+        self.window.after(40, removal_tests)
