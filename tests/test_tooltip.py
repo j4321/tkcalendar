@@ -6,7 +6,6 @@ try:
 except ImportError:
     import Tkinter as tk
     import ttk
-from pynput.mouse import Controller
 
 
 class TestTooltip(BaseWidgetTest):
@@ -57,8 +56,6 @@ class TestTooltipWrapper(BaseWidgetTest):
         tw.add_tooltip(b2, "tooltip 2")
         self.window.update()
 
-        mouse = Controller()
-
         def removal_tests():
             tw.remove_tooltip(self.window)
             tw.remove_tooltip(b1)
@@ -70,20 +67,18 @@ class TestTooltipWrapper(BaseWidgetTest):
             self.assertFalse(tw.widgets)
 
         def test_leave(button):
-            x = self.window.winfo_rootx() + self.window.winfo_width() + 5
-            y = self.window.winfo_rooty() + self.window.winfo_height() + 5
-            mouse.position = x, y
+            button.event_generate('<Leave>', x=0, y=0)
             self.window.update()
             self.assertFalse(tw.tooltip.winfo_ismapped())
             self.assertIsNone(tw.current_widget)
 
         def test(button):
-            mouse.position = button.winfo_rootx() + 1, button.winfo_rooty() + 1
+            button.event_generate('<Enter>', x=0, y=0)
             self.window.update()
-            self.assertEqual(tw.current_widget, button)
-            self.window.after(5, lambda: self.assertTrue(tw.tooltip.winfo_ismapped()))
-            self.window.after(7, test_leave)
+            self.window.after(5, self.assertEqual(tw.current_widget, button))
+            self.window.after(7, lambda: self.assertTrue(tw.tooltip.winfo_ismapped()))
+            self.window.after(9, test_leave)
 
         test(b1)
-        self.window.after(20, lambda: test(b2))
-        self.window.after(40, removal_tests)
+        self.window.after(11, lambda: test(b2))
+        self.window.after(22, removal_tests)
