@@ -5,6 +5,12 @@ matrix:
   - os: osx
     language: generic
     env: INSTALL_TYPE=macpython VERSION=3.6 VENV=venv
+  - os: osx
+    language: generic
+    env: INSTALL_TYPE=macpython VERSION=3.7 VENV=venv
+  - os: osx
+    language: generic
+    env: INSTALL_TYPE=macpython VERSION=2.7 VENV=venv
 required: sudo
 python:
   - "2.7"
