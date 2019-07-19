@@ -11,8 +11,8 @@ matrix:
 required: sudo
 python:
   - "2.7"
-  - "3.4"
   - "3.5"
+  - "3.6"
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then git clone https://github.com/MacPython/terryfy.git; source terryfy/travis_tools.sh; get_python_environment $INSTALL_TYPE $VERSION $VENV; fi
   - "export DISPLAY=:99.0"
