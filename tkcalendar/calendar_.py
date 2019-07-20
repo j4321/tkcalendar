@@ -17,7 +17,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 Calendar widget
@@ -25,7 +25,6 @@ Calendar widget
 
 
 import calendar
-from locale import getdefaultlocale
 try:
     from tkinter import ttk
     from tkinter.font import Font
@@ -33,6 +32,7 @@ except ImportError:
     import ttk
     from tkFont import Font
 
+from babel import default_locale
 from babel.dates import format_date, parse_date, get_day_names, get_month_names
 
 from tkcalendar.tooltip import TooltipWrapper
@@ -231,7 +231,9 @@ class Calendar(ttk.Frame):
         self._check_weekenddays(weekenddays)
 
         # --- locale
-        locale = kw.pop("locale", getdefaultlocale()[0])
+        locale = kw.pop("locale", default_locale())
+        if locale is None:
+            locale = 'en'
         self._day_names = get_day_names('abbreviated', locale=locale)
         self._month_names = get_month_names('wide', locale=locale)
 
