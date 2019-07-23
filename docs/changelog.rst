@@ -16,6 +16,7 @@ tkcalendar 1.5.0
   month/year name in disabled state
 - *maxdate* and *mindate*: set an allowed date range for date selection
 - *weekenddays*: choose the days colored as week-end days (`#37 <https://github.com/j4321/tkcalendar/issues/37>`_)
+- *date_pattern*: customize the date format
 
 .. rubric:: Bug fixes
 
