@@ -265,6 +265,16 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget.get_date(), var2.get())
         self.assertEqual('', var.get())
 
+        widget.destroy()
+        widget = Calendar(self.window, selectmode='day', locale='en_US',
+                          textvariable=var)
+        widget.pack()
+        self.window.update()
+        widget.selection_set(date(2018, 1, 2))
+        self.assertEqual('1/2/18', widget.get_date())
+        widget['date_pattern'] = 'MM/dd/yyyy'
+        self.assertEqual('01/02/2018', widget.get_date())
+
     def test_calendar_get_set(self):
         widget = Calendar(self.window, foreground="red", year=2010, month=1, day=3)
         widget.pack()
