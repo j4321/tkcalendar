@@ -277,6 +277,7 @@ class TestCalendar(BaseWidgetTest):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'date_pattern',
                    'mindate',
                    'maxdate',
                    'firstweekday',

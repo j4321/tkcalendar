@@ -89,6 +89,12 @@ class Calendar(ttk.Frame):
         locale : str
             locale to use, e.g. 'en_US'
 
+        date_pattern : str
+            date pattern used to format the date as a string (see babel's documentation for valid patterns).
+            The default pattern used is babel's short date format in the Calendar's locale.
+            Beware that using this option might result in a failure to parse the obtained
+            string back into a datetime.date object.
+
         selectmode : "none" or "day" (default)
             whether the user can change the selected day with a mouse click.
 
@@ -236,6 +242,7 @@ class Calendar(ttk.Frame):
             locale = 'en'
         self._day_names = get_day_names('abbreviated', locale=locale)
         self._month_names = get_month_names('wide', locale=locale)
+        date_pattern = kw.pop("date_pattern", "short")
 
         # --- date
         today = self.date.today()
@@ -305,6 +312,7 @@ class Calendar(ttk.Frame):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'date_pattern',
                    'maxdate',
                    'mindate',
                    'showweeknumbers',
@@ -347,6 +355,7 @@ class Calendar(ttk.Frame):
                             "borderwidth": bd,
                             "state": state,
                             "locale": locale,
+                            "date_pattern": date_pattern,
                             "selectmode": selectmode,
                             'textvariable': self._textvariable,
                             'firstweekday': firstweekday,
@@ -1149,7 +1158,7 @@ class Calendar(ttk.Frame):
 
     def format_date(self, date=None):
         """Convert date (datetime.date) to a string in the locale (short format)."""
-        return format_date(date, 'short', self._properties['locale'])
+        return format_date(date, self._properties['date_pattern'], self._properties['locale'])
 
     def parse_date(self, date):
         """Parse string date in the locale format and return the corresponding datetime.date."""
