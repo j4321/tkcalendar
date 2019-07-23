@@ -62,6 +62,14 @@ Class
 
        locale : str
           locale to use, e.g. 'en_US'
+          
+       date_pattern : str
+          date pattern used to format the date as a string, see :mod:`babel`'s `documentation <http://babel.pocoo.org/en/latest/dates.html#pattern-syntax>`_ for valid patterns.
+          The default pattern is "short", i.e. :mod:`babel`'s short date format in the calendar's locale.
+          
+          .. warning::
+		   
+              Using this option might result in a failure to parse the obtained string back into a :obj:`datetime.date` object and therefore cause errors in a :class:`~tkcalendar.DateEntry` widget.
 
        selectmode : str
           "none" or "day" (default): whether the user can change the selected day with a mouse click.
