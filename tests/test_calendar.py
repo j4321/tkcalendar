@@ -23,6 +23,7 @@ Test
 from tests import BaseWidgetTest, TestEvent, tk, ttk, format_date
 from tkcalendar import Calendar
 from datetime import date, datetime
+from babel import UnknownLocaleError
 
 
 class TestCalendar(BaseWidgetTest):
@@ -329,7 +330,14 @@ class TestCalendar(BaseWidgetTest):
         widget["foreground"] = "blue"
         self.window.update()
         self.assertEqual(widget["foreground"], "blue")
-
+        widget.config(locale='fr_FR')
+        self.assertEqual(widget['locale'], 'fr_FR')
+        self.assertEqual(widget._week_days[0].cget('text'), 'lun.')
+        widget.config(locale='en_US')
+        self.assertEqual(widget['locale'], 'en_US')
+        self.assertEqual(widget._week_days[0].cget('text'), 'Mon')
+        with self.assertRaises(UnknownLocaleError):
+            widget.config(locale="jp")
         widget.config(cursor="watch")
         self.window.update()
         self.assertEqual(widget["cursor"], "watch")
@@ -420,8 +428,6 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget.cget('state'), tk.NORMAL)
         with self.assertRaises(ValueError):
             widget.config(state="test")
-        with self.assertRaises(AttributeError):
-            widget.config(locale="en_US")
         widget['date_pattern'] = 'MM/dd/yyyy'
         self.window.update()
         self.assertEqual(widget["date_pattern"], 'MM/dd/yyyy')

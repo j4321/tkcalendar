@@ -518,12 +518,9 @@ class Calendar(ttk.Frame):
     def __setitem__(self, key, value):
         if key not in self._properties:
             raise AttributeError("Calendar object has no attribute %s." % key)
-        elif key == "locale":
-            raise AttributeError("This attribute cannot be modified.")
         elif key == 'date_pattern':
             date_pattern = self._get_date_pattern(value)
             self._properties[key] = date_pattern
-            return
         else:
             if key == "selectmode":
                 if value == "none":
@@ -536,6 +533,13 @@ class Calendar(ttk.Frame):
                             day.bind("<1>", self._on_click)
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
+            elif key == "locale":
+                self._day_names = get_day_names('abbreviated', locale=value)
+                self._month_names = get_month_names('wide', locale=value)
+                self._properties['date_pattern'] = self._get_date_pattern("short", value)
+                for i, l in enumerate(self._week_days):
+                    l.configure(text=self._day_names[i])
+                self._header_month.configure(text=self._month_names[self._date.month].title())
             elif key == 'textvariable':
                 try:
                     if self._textvariable is not None:

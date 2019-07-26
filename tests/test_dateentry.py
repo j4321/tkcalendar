@@ -46,7 +46,8 @@ class TestDateEntry(BaseWidgetTest):
 
     def test_dateentry_get_set(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
-                           foreground='white', borderwidth=2, font='Arial 9')
+                           locale='en_US', foreground='white', borderwidth=2,
+                           font='Arial 9', year=2019, month=7, day=3)
         widget.pack()
         self.window.update()
 
@@ -83,6 +84,13 @@ class TestDateEntry(BaseWidgetTest):
 
         style = ttk.Style(self.window)
         style.theme_use('clam')
+
+        self.assertEqual(widget["locale"], "en_US")
+        self.assertEqual(widget.get(), '7/3/19')
+        widget.config(locale="fr_FR")
+        self.window.update()
+        self.assertEqual(widget["locale"], "fr_FR")
+        self.assertEqual(widget.get(), '03/07/2019')
 
     def test_dateentry_functions(self):
         widget = DateEntry(self.window, width=12, background='darkblue',

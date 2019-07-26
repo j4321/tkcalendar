@@ -9,6 +9,7 @@ tkcalendar 1.5.0
 .. rubric:: New features
 
 - :meth:`Calendar.see` method: make sure given date is visible
+- Make *locale* option editable after the creation of the :class:`Calendar`
 
 .. rubric:: New options
 

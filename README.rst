@@ -376,6 +376,7 @@ Changelog
     * Add *date_pattern* option to customize the date format
     * Add ``Calendar.see()`` method to make sure a date is visible
     * Make ``Calendar.selection_clear()`` actually clear the selection
+    * Make *locale* option editable after the creation of the Calendar
     * Fix ``ValueError`` when retrieving default locale
     * Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
     * Improve compliance with ttk themes by making the ``DateEntry`` look like a ``ttk.Combobox`` (`#42 <https://github.com/j4321/tkcalendar/issues/42>`_)
