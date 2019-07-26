@@ -176,6 +176,11 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget.selection_get(), date(2010, 1, 1))
         widget.selection_clear()
         self.assertIsNone(widget.selection_get())
+        # test Swedish locale
+        widget.destroy()
+        widget = Calendar(self.window, locale='sv_SE')
+        widget.pack()
+        widget.selection_set(format_date(date(2012, 4, 11), 'short', 'sv_SE'))
 
     def test_calendar_buttons_functions(self):
         widget = Calendar(self.window)

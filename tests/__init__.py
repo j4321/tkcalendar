@@ -26,6 +26,6 @@ import babel.dates
 locale.setlocale(locale.LC_ALL, '')
 
 
-def format_date(date, length):
-    return babel.dates.format_date(date, length, locale=locale.getdefaultlocale()[0])
+def format_date(date, length, locale=locale.getdefaultlocale()[0]):
+    return babel.dates.format_date(date, length, locale)
 
