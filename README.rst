@@ -377,7 +377,7 @@ Changelog
     * Make ``Calendar.selection_clear()`` actually clear the selection
     * Fix ``ValueError`` when retrieving default locale
     * Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
-    * Improve compliance with ttk themes by making the DateEntry look like a Combobox (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
+    * Improve compliance with ttk themes by making the DateEntry look like a Combobox (`#42 <https://github.com/j4321/tkcalendar/issues/42>`_)
 
 - tkcalendar 1.4.0
 
