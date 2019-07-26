@@ -33,9 +33,9 @@ except ImportError:
     from tkFont import Font
 
 from babel import default_locale
-from babel.dates import format_date, parse_date, get_day_names, get_month_names
-
+from babel.dates import format_date, parse_date, get_day_names, get_month_names, get_date_format
 from tkcalendar.tooltip import TooltipWrapper
+import re
 
 
 class Calendar(ttk.Frame):
@@ -1153,7 +1153,29 @@ class Calendar(ttk.Frame):
 
     def parse_date(self, date):
         """Parse string date in the locale format and return the corresponding datetime.date."""
-        return parse_date(date, self._properties['locale'])
+        locale = self._properties['locale']
+        date_format = get_date_format(format='short', locale=locale).pattern.lower()
+        year_idx = date_format.index('y')
+        month_idx = date_format.index('m')
+        if month_idx < 0:
+            month_idx = date_format.index('l')
+        day_idx = date_format.index('d')
+
+        indexes = [(year_idx, 'Y'), (month_idx, 'M'), (day_idx, 'D')]
+        indexes.sort()
+        indexes = dict([(item[1], idx) for idx, item in enumerate(indexes)])
+
+        numbers = re.findall(r'(\d+)', date)
+        year = numbers[indexes['Y']]
+        if len(year) == 2:
+            year = 2000 + int(year)
+        else:
+            year = int(year)
+        month = int(numbers[indexes['M']])
+        day = int(numbers[indexes['D']])
+        if month > 12:
+            month, day = day, month
+        return self.date(year, month, day)
 
     def see(self, date):
         """
