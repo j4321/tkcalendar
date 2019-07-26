@@ -6,23 +6,23 @@ Changelog
 tkcalendar 1.5.0
 ----------------
 
-.. rubric:: New Calendar options
+.. rubric:: New features
+
+- :meth:`Calendar.see` method: make sure given date is visible
+
+.. rubric:: New options
 
 - *disabledforeground* and *disabledbackground*: colors of calendar border and
   month/year name in disabled state
 - *maxdate* and *mindate*: set an allowed date range for date selection
-- *weekenddays*: choose the days colored as week-end days (`#37 <https://github.com/j4321/tkcalendar/issues/37>`_).
-
-.. rubric:: New features
-
-- :meth:`Calendar.see` method: make sure given date is visible
+- *weekenddays*: choose the days colored as week-end days (`#37 <https://github.com/j4321/tkcalendar/issues/37>`_)
 
 .. rubric:: Bug fixes
 
 - Make :meth:`Calendar.selection_clear` actually clear the selection
 - Fix :obj:`ValueError` when retrieving default locale
-- Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_).
-- Improve compliance with ttk themes by make the DateEntry look like a Combobox (`#42 <https://github.com/j4321/tkcalendar/issues/42>`_.)
+- Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
+- Improve compliance with ttk themes by make the :class:`DateEntry` look like a :class:`ttk.Combobox` (`#42 <https://github.com/j4321/tkcalendar/issues/42>`_)
 
 tkcalendar 1.4.0
 ----------------
@@ -30,15 +30,15 @@ tkcalendar 1.4.0
 .. rubric:: New features
 
 - :obj:`\<\<CalendarMonthChanged\>\>` virtual event: event generated each time the user changes the displayed month
-- :meth:`Calendar.get_displayed_month` method: return the currently displayed month in the form of a (month, year) tuple.
+- :meth:`Calendar.get_displayed_month` method: return the currently displayed month in the form of a (month, year) tuple
 
-.. rubric:: New Calendar options
+.. rubric:: New options
 
 - *showothermonthdays*: show/hide the last and first days of the previous and next months
 
 .. rubric:: Bug fixes
 
-- Fix handling of *style* option in DateEntry
+- Fix handling of *style* option in :class:`DateEntry`
 - Fix display of events for January days showing on December and conversely
 
 tkcalendar 1.3.1
@@ -51,13 +51,13 @@ tkcalendar 1.3.1
 tkcalendar 1.3.0
 ----------------
 
-.. rubric:: New feature
+.. rubric:: New features
 
 - Add possibility to display special events (like birthdays, ..) in the calendar.
   The events are displayed with colors defined by tags and the event description is displayed in a tooltip
   (see :ref:`calevent`)
 
-.. rubric:: New Calendar options
+.. rubric:: New options
 
 - *showwekknumbers*: show/hide week numbers
 - *firstweekday*: first week day ('monday' or 'sunday')
@@ -70,21 +70,20 @@ tkcalendar 1.3.0
 tkcalendar 1.2.1
 ----------------
 
-.. rubric:: Bug fix
+.. rubric:: Bug fixes
 
 - Fix :obj:`ValueError` in :class:`DateEntry` with Python 3.6.5
 
 tkcalendar 1.2.0
 ----------------
 
-.. rubric:: New Calendar options
+.. rubric:: New options
 
 - *textvariable*: connect the currently selected date to the given :class:`StringVar`
 - *state*: 'normal' or 'disabled'
 - *disabledselectbackground*, *disabledselectforeground*,
   *disableddaybackground* and *disableddayforeground*: configure colors
-  when Calendar is disabled
-
+  when :class:`Calendar` is disabled
 
 .. rubric:: Bug fixes
 
@@ -94,7 +93,7 @@ tkcalendar 1.2.0
 tkcalendar 1.1.5
 ----------------
 
-.. rubric:: Bug fix
+.. rubric:: Bug fixes
 
 - Fix endless triggering of :obj:`\<\<ThemeChanged\>\>` event in :class:`DateEntry`
 
@@ -103,7 +102,7 @@ tkcalendar 1.1.4
 
 .. rubric:: Bug fixes
 
-- Fix error in january due to week 53
+- Fix error in January due to week 53
 - Fix :class:`DateEntry` for ttk themes other than 'clam'
 
 tkcalendar 1.1.3
@@ -132,17 +131,11 @@ tkcalendar 1.1.1
 tkcalendar 1.1.0
 ----------------
 
-.. rubric:: Bug fixes
-
-- Fix display of the first days of the next month
-
-- Increment year when going from December to January
-
 .. rubric:: New widget
 
-- :class:`DateEntry`, date selection entry with drop-down calendar
+- :class:`DateEntry`: date selection entry with drop-down calendar
 
-.. rubric:: New Calendar options
+.. rubric:: New options
 
 - *borderwidth*: width of the border around the calendar (integer)
 
@@ -150,10 +143,16 @@ tkcalendar 1.1.0
 
 - *othermonthweforeground*: foreground color for week-end days belonging to the previous/next month
 
-- *othermonthwebackground*: background color for week-end days belonging to the previous/next month
+- *othermonthwebackground*: back
+
+.. rubric:: Bug fixes
+
+- Fix display of the first days of the next month
+
+- Increment year when going from December to January
 
 
 tkcalendar 1.0.0
 ----------------
 
-Initial version
+- Initial version
