@@ -43,7 +43,7 @@ Class
 
        firstweekday : str
           first day of the week: "monday" or "sunday"
-          
+
        weekenddays : list
           days to be displayed as week-end days given as a list of integers corresponding to the number of the day in the week (e.g. [6, 7] for the last two days of the week).
 
@@ -62,14 +62,31 @@ Class
 
        locale : str
           locale to use, e.g. 'en_US'
-          
+
        date_pattern : str
-          date pattern used to format the date as a string, see :mod:`babel`'s `documentation <http://babel.pocoo.org/en/latest/dates.html#pattern-syntax>`_ for valid patterns.
-          The default pattern is "short", i.e. :mod:`babel`'s short date format in the calendar's locale.
-          
-          .. warning::
-		   
-              Using this option might result in a failure to parse the obtained string back into a :obj:`datetime.date` object and therefore cause errors in a :class:`~tkcalendar.DateEntry` widget.
+          date pattern used to format the date as a string.
+
+          The default pattern used is :mod:`babel`'s short date format in the
+          Calendar's locale.
+
+          A valid pattern is a combination of 'd', 'm' and 'y' separated by
+          non letter characters to indicate the way and order the year, month
+          and day should be displayed.
+
+          =  ==========================================================================
+          d  'd' for the day of month number without padding, 'dd' for a two digits day
+
+          m  'm' for the month number without padding, 'mm' for a two digits month
+
+          y  'yy' for the two last digits of the year, any other number of 'y's for the
+             full year with an extra padding of zero if it hasless digits than the
+             number of 'y's.
+          =  ==========================================================================
+
+          Examples for :obj:`datetime.date(2019, 7, 1)`
+
+          - 'y-mm-dd' → '2019-07-01'
+          - 'm/d/yy' → '7/1/19'
 
        selectmode : str
           "none" or "day" (default): whether the user can change the selected day with a mouse click.
@@ -83,7 +100,7 @@ Class
           background color of calendar border and month/year name
 
        foreground : str
-          foreground color of month/year name 
+          foreground color of month/year name
 
        disabledbackground : str
           background color of calendar border and month/year name in disabled state
