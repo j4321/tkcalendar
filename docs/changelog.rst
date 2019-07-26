@@ -10,9 +10,7 @@ tkcalendar 1.5.0
 
 - *disabledforeground* and *disabledbackground*: colors of calendar border and
   month/year name in disabled state
-  
 - *maxdate* and *mindate*: set an allowed date range for date selection
-
 - *weekenddays*: choose the days colored as week-end days (Fix `#37 <https://github.com/j4321/tkcalendar/issues/37>`_)
 
 .. rubric:: New features
@@ -23,7 +21,7 @@ tkcalendar 1.5.0
 
 - Make :meth:`Calendar.selection_clear` actually clear the selection
 - Fix :obj:`ValueError` when retrieving default locale
-
+- Fix date parsing error in Swedish locale and some others. (Fix `#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
 
 tkcalendar 1.4.0
 ----------------

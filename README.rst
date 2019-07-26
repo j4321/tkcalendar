@@ -376,6 +376,7 @@ Changelog
     * Add ``Calendar.see()`` method to make sure a date is visible
     * Make ``Calendar.selection_clear()`` actually clear the selection
     * Fix ``ValueError`` when retrieving default locale
+    * Fix date parsing error in Swedish locale and some others. (Fix `#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
 
 - tkcalendar 1.4.0
 
