@@ -46,7 +46,7 @@ tkcalendar 1.3.1
 
 .. rubric:: Bug fixes
 
-- Fix bug in day selection when *firstweekday* is 'sunday'
+- Fix bug in day selection when *firstweekday* is 'sunday' (`#28 <https://github.com/j4321/tkcalendar/issues/28>`_)
 
 tkcalendar 1.3.0
 ----------------
@@ -55,31 +55,31 @@ tkcalendar 1.3.0
 
 - Add possibility to display special events (like birthdays, ..) in the calendar.
   The events are displayed with colors defined by tags and the event description is displayed in a tooltip
-  (see :ref:`calevent`)
+  (see :ref:`calevent`) (`#19 <https://github.com/j4321/tkcalendar/issues/19>`_)
 
 .. rubric:: New options
 
-- *showwekknumbers*: show/hide week numbers
-- *firstweekday*: first week day ('monday' or 'sunday')
+- *showwekknumbers*: show/hide week numbers (`#18 <https://github.com/j4321/tkcalendar/issues/18>`_)
+- *firstweekday*: first week day ('monday' or 'sunday') (`#25 <https://github.com/j4321/tkcalendar/issues/25>`_)
 
 .. rubric:: Bug fixes
 
-- No longer set locale globally to avoid conflicts between several instances, use babel module instead
-- Make :class:`DateEntry` compatible with more ttk themes, especially OSX default theme
+- No longer set locale globally to avoid conflicts between several instances, use babel module instead (`#15 <https://github.com/j4321/tkcalendar/issues/15>`_)
+- Make :class:`DateEntry` compatible with more ttk themes, especially OSX default theme (`#16 <https://github.com/j4321/tkcalendar/issues/16>`_)
 
 tkcalendar 1.2.1
 ----------------
 
 .. rubric:: Bug fixes
 
-- Fix :obj:`ValueError` in :class:`DateEntry` with Python 3.6.5
+- Fix :obj:`ValueError` in :class:`DateEntry` with Python 3.6.5 (`#13 <https://github.com/j4321/tkcalendar/issues/13>`_)
 
 tkcalendar 1.2.0
 ----------------
 
 .. rubric:: New options
 
-- *textvariable*: connect the currently selected date to the given :class:`StringVar`
+- *textvariable*: connect the currently selected date to the given :class:`StringVar` (`#6 <https://github.com/j4321/tkcalendar/issues/6>`_)
 - *state*: 'normal' or 'disabled'
 - *disabledselectbackground*, *disabledselectforeground*,
   *disableddaybackground* and *disableddayforeground*: configure colors
@@ -95,7 +95,7 @@ tkcalendar 1.1.5
 
 .. rubric:: Bug fixes
 
-- Fix endless triggering of :obj:`\<\<ThemeChanged\>\>` event in :class:`DateEntry`
+- Fix endless triggering of :obj:`\<\<ThemeChanged\>\>` event in :class:`DateEntry` (`#9 <https://github.com/j4321/tkcalendar/issues/9>`_)
 
 tkcalendar 1.1.4
 ----------------
@@ -103,7 +103,7 @@ tkcalendar 1.1.4
 .. rubric:: Bug fixes
 
 - Fix error in January due to week 53
-- Fix :class:`DateEntry` for ttk themes other than 'clam'
+- Fix :class:`DateEntry` for ttk themes other than 'clam' (`#3 <https://github.com/j4321/tkcalendar/issues/3>`_)
 
 tkcalendar 1.1.3
 ----------------

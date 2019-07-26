@@ -388,25 +388,25 @@ Changelog
 
 - tkcalendar 1.3.1
 
-    * Fix bug in day selection when firstweekday is 'sunday'
+    * Fix bug in day selection when firstweekday is 'sunday' (`#28 <https://github.com/j4321/tkcalendar/issues/28>`_)
 
 - tkcalendar 1.3.0
 
-    * No longer set locale globally to avoid conflicts between several instances, use ``babel`` module instead
-    * Add *showwekknumbers* option to show/hide week numbers
-    * Add *firstweekday* option to choose first week day between 'monday' and 'sunday'
-    * Make ``DateEntry`` compatible with more ttk themes, especially OSX default theme
-    * Add possibility to display special events (like birthdays, ..) in the calendar.
+    * No longer set locale globally to avoid conflicts between several instances, use ``babel`` module instead (`#15 <https://github.com/j4321/tkcalendar/issues/15>`_)
+    * Add *showwekknumbers* option to show/hide week numbers (`#18 <https://github.com/j4321/tkcalendar/issues/18>`_)
+    * Add *firstweekday* option to choose first week day between 'monday' and 'sunday' (`#25 <https://github.com/j4321/tkcalendar/issues/25>`_)
+    * Make ``DateEntry`` compatible with more ttk themes, especially OSX default theme (`#16 <https://github.com/j4321/tkcalendar/issues/16>`_)
+    * Add possibility to display special events (like birthdays, ..) in the calendar
       The events are displayed with colors defined by tags and the event description is displayed in a tooltip
-      (see documentation).
+      (see documentation) (`#19 <https://github.com/j4321/tkcalendar/issues/19>`_)
 
 - tkcalendar 1.2.1
 
-    * Fix ``ValueError`` in ``DateEntry`` with Python 3.6.5
+    * Fix ``ValueError`` in ``DateEntry`` with Python 3.6.5 (`#13 <https://github.com/j4321/tkcalendar/issues/13>`_)
 
 - tkcalendar 1.2.0
 
-    * Add *textvariable* option to ``Calendar``
+    * Add *textvariable* option to ``Calendar`` (`#6 <https://github.com/j4321/tkcalendar/issues/6>`_)
     * Add *state* ('normal' or 'disabled') option to Calendar
     * Add *disabledselectbackground*, *disabledselectforeground*,
       *disableddaybackground* and *disableddayforeground* options to configure colors
@@ -416,12 +416,12 @@ Changelog
 
 - tkcalendar 1.1.5
 
-    * Fix endless triggering of ``<<ThemeChanged>>`` event in ``DateEntry``
+    * Fix endless triggering of ``<<ThemeChanged>>`` event in ``DateEntry`` (`#9 <https://github.com/j4321/tkcalendar/issues/9>`_)
 
 - tkcalendar 1.1.4
 
     * Fix error in January due to week 53
-    * Fix ``DateEntry`` for ttk themes other than 'clam'
+    * Fix ``DateEntry`` for ttk themes other than 'clam' (`#3 <https://github.com/j4321/tkcalendar/issues/3>`_)
 
 - tkcalendar 1.1.3
 
