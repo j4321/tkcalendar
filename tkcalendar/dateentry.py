@@ -338,6 +338,9 @@ class DateEntry(ttk.Entry):
             entry_kw['font'] = font
         ttk.Entry.configure(self, **entry_kw)
         self._calendar.configure(**kw)
+        if 'date_pattern' in kw:
+            self._validate_date()
+            self._set_text(self.format_date(self._date))
 
     config = configure
 

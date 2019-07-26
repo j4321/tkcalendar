@@ -421,7 +421,12 @@ class TestCalendar(BaseWidgetTest):
         with self.assertRaises(ValueError):
             widget.config(state="test")
         with self.assertRaises(AttributeError):
-            widget.config(locale="en_US.UTF-8")
+            widget.config(locale="en_US")
+        widget['date_pattern'] = 'MM/dd/yyyy'
+        self.window.update()
+        self.assertEqual(widget["date_pattern"], 'MM/dd/yyyy')
+        with self.assertRaises(ValueError):
+            widget.config(date_pattern="mm-dd-cc")
         with self.assertRaises(AttributeError):
             widget.config(test="test")
         dic = {op: "yellow" for op in options[12:-4]}
