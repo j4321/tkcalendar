@@ -90,22 +90,20 @@ class Calendar(ttk.Frame):
             locale to use, e.g. 'en_US'
 
         date_pattern : str
-            date pattern used to format the date as a string.
-
-            The default pattern used is babel's short date format in the
-            Calendar's locale.
+            date pattern used to format the date as a string. The default 
+            pattern used is babel's short date format in the Calendar's locale.
 
             A valid pattern is a combination of 'y', 'm' and 'd' separated by
-            non letter characters to indicate the way and order the year, month
-            and day should be displayed.
+            non letter characters to indicate how and in which order the 
+            year, month and day should be displayed.
 
-                y: 'yy' for the two last digits of the year, any other number of 'y's for
+                y: 'yy' for the last two digits of the year, any other number of 'y's for
                    the full year with an extra padding of zero if it has less
                    digits than the number of 'y's.
-                m: 'm' for the month number without padding, 'mm' for a two
-                   digits month
+                m: 'm' for the month number without padding, 'mm' for a 
+                   two-digit month
                 d: 'd' for the day of month number without padding, 'dd' for a
-                   two digits day
+                   two-digit day
 
             Examples for datetime.date(2019, 7, 1):
 
