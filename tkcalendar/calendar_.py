@@ -89,6 +89,27 @@ class Calendar(ttk.Frame):
         locale : str
             locale to use, e.g. 'en_US'
 
+        date_pattern : str
+            date pattern used to format the date as a string. The default 
+            pattern used is babel's short date format in the Calendar's locale.
+
+            A valid pattern is a combination of 'y', 'm' and 'd' separated by
+            non letter characters to indicate how and in which order the 
+            year, month and day should be displayed.
+
+                y: 'yy' for the last two digits of the year, any other number of 'y's for
+                   the full year with an extra padding of zero if it has less
+                   digits than the number of 'y's.
+                m: 'm' for the month number without padding, 'mm' for a 
+                   two-digit month
+                d: 'd' for the day of month number without padding, 'dd' for a
+                   two-digit day
+
+            Examples for datetime.date(2019, 7, 1):
+
+                'y-mm-dd' → '2019-07-01'
+                'm/d/yy' → '7/1/19'
+
         selectmode : "none" or "day" (default)
             whether the user can change the selected day with a mouse click.
 
@@ -236,6 +257,7 @@ class Calendar(ttk.Frame):
             locale = 'en'
         self._day_names = get_day_names('abbreviated', locale=locale)
         self._month_names = get_month_names('wide', locale=locale)
+        date_pattern = self._get_date_pattern(kw.pop("date_pattern", "short"), locale)
 
         # --- date
         today = self.date.today()
@@ -305,6 +327,7 @@ class Calendar(ttk.Frame):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'date_pattern',
                    'maxdate',
                    'mindate',
                    'showweeknumbers',
@@ -347,6 +370,7 @@ class Calendar(ttk.Frame):
                             "borderwidth": bd,
                             "state": state,
                             "locale": locale,
+                            "date_pattern": date_pattern,
                             "selectmode": selectmode,
                             'textvariable': self._textvariable,
                             'firstweekday': firstweekday,
@@ -492,8 +516,9 @@ class Calendar(ttk.Frame):
     def __setitem__(self, key, value):
         if key not in self._properties:
             raise AttributeError("Calendar object has no attribute %s." % key)
-        elif key == "locale":
-            raise AttributeError("This attribute cannot be modified.")
+        elif key == 'date_pattern':
+            date_pattern = self._get_date_pattern(value)
+            self._properties[key] = date_pattern
         else:
             if key == "selectmode":
                 if value == "none":
@@ -506,6 +531,13 @@ class Calendar(ttk.Frame):
                             day.bind("<1>", self._on_click)
                 else:
                     raise ValueError("'selectmode' option should be 'none' or 'day'.")
+            elif key == "locale":
+                self._day_names = get_day_names('abbreviated', locale=value)
+                self._month_names = get_month_names('wide', locale=value)
+                self._properties['date_pattern'] = self._get_date_pattern("short", value)
+                for i, l in enumerate(self._week_days):
+                    l.configure(text=self._day_names[i])
+                self._header_month.configure(text=self._month_names[self._date.month].title())
             elif key == 'textvariable':
                 try:
                     if self._textvariable is not None:
@@ -1147,18 +1179,40 @@ class Calendar(ttk.Frame):
                         self._textvariable.set(self.format_date(self._sel_date))
                     self.event_generate("<<CalendarSelected>>")
 
+    def _get_date_pattern(self, date_pattern, locale=None):
+        """
+        Return the babel pattern corresponding to date_pattern.
+
+        If date_pattern is "short", return the pattern correpsonding to the
+        locale, else return date_pattern if valid.
+
+        A valid pattern is a sequence of y, m and d
+        separated by non letter characters, e.g. yyyy-mm-dd or d/m/yy
+        """
+        if locale is None:
+            locale = self._properties["locale"]
+        if date_pattern == "short":
+            return get_date_format("short", locale).pattern
+        pattern = date_pattern.lower()
+        ymd = r"^y+[^a-zA-Z]*m{1,2}[^a-z]*d{1,2}[^mdy]*$"
+        mdy = r"^m{1,2}[^a-zA-Z]*d{1,2}[^a-z]*y+[^mdy]*$"
+        dmy = r"^d{1,2}[^a-zA-Z]*m{1,2}[^a-z]*y+[^mdy]*$"
+        res = ((re.search(ymd, pattern) is not None)
+               or (re.search(mdy, pattern) is not None)
+               or (re.search(dmy, pattern) is not None))
+        if res:
+            return pattern.replace('m', 'M')
+        raise ValueError("%r is not a valid date pattern" % date_pattern)
+
     def format_date(self, date=None):
-        """Convert date (datetime.date) to a string in the locale (short format)."""
-        return format_date(date, 'short', self._properties['locale'])
+        """Convert date (datetime.date) to a string in the locale."""
+        return format_date(date, self._properties['date_pattern'], self._properties['locale'])
 
     def parse_date(self, date):
         """Parse string date in the locale format and return the corresponding datetime.date."""
-        locale = self._properties['locale']
-        date_format = get_date_format(format='short', locale=locale).pattern.lower()
+        date_format = self._properties['date_pattern'].lower()
         year_idx = date_format.index('y')
         month_idx = date_format.index('m')
-        if month_idx < 0:
-            month_idx = date_format.index('l')
         day_idx = date_format.index('d')
 
         indexes = [(year_idx, 'Y'), (month_idx, 'M'), (day_idx, 'D')]
@@ -1235,7 +1289,7 @@ class Calendar(ttk.Frame):
                 else:
                     try:
                         self._sel_date = self.parse_date(date)
-                    except Exception:
+                    except Exception as e:
                         raise ValueError("%r is not a valid date." % date)
                 if self['mindate'] is not None and self._sel_date < self['mindate']:
                     self._sel_date = self['mindate']

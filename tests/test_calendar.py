@@ -23,6 +23,7 @@ Test
 from tests import BaseWidgetTest, TestEvent, tk, ttk, format_date
 from tkcalendar import Calendar
 from datetime import date, datetime
+from babel import UnknownLocaleError
 
 
 class TestCalendar(BaseWidgetTest):
@@ -265,6 +266,16 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget.get_date(), var2.get())
         self.assertEqual('', var.get())
 
+        widget.destroy()
+        widget = Calendar(self.window, selectmode='day', locale='en_US',
+                          textvariable=var)
+        widget.pack()
+        self.window.update()
+        widget.selection_set(date(2018, 1, 2))
+        self.assertEqual('1/2/18', widget.get_date())
+        widget['date_pattern'] = 'MM/dd/yyyy'
+        self.assertEqual('01/02/2018', widget.get_date())
+
     def test_calendar_get_set(self):
         widget = Calendar(self.window, foreground="red", year=2010, month=1, day=3)
         widget.pack()
@@ -277,6 +288,7 @@ class TestCalendar(BaseWidgetTest):
                    'selectmode',
                    'textvariable',
                    'locale',
+                   'date_pattern',
                    'mindate',
                    'maxdate',
                    'firstweekday',
@@ -318,7 +330,14 @@ class TestCalendar(BaseWidgetTest):
         widget["foreground"] = "blue"
         self.window.update()
         self.assertEqual(widget["foreground"], "blue")
-
+        widget.config(locale='fr_FR')
+        self.assertEqual(widget['locale'], 'fr_FR')
+        self.assertEqual(widget._week_days[0].cget('text'), 'lun.')
+        widget.config(locale='en_US')
+        self.assertEqual(widget['locale'], 'en_US')
+        self.assertEqual(widget._week_days[0].cget('text'), 'Mon')
+        with self.assertRaises(UnknownLocaleError):
+            widget.config(locale="jp")
         widget.config(cursor="watch")
         self.window.update()
         self.assertEqual(widget["cursor"], "watch")
@@ -409,8 +428,11 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual(widget.cget('state'), tk.NORMAL)
         with self.assertRaises(ValueError):
             widget.config(state="test")
-        with self.assertRaises(AttributeError):
-            widget.config(locale="en_US.UTF-8")
+        widget['date_pattern'] = 'MM/dd/yyyy'
+        self.window.update()
+        self.assertEqual(widget["date_pattern"], 'MM/dd/yyyy')
+        with self.assertRaises(ValueError):
+            widget.config(date_pattern="mm-dd-cc")
         with self.assertRaises(AttributeError):
             widget.config(test="test")
         dic = {op: "yellow" for op in options[12:-4]}

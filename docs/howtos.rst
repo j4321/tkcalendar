@@ -60,3 +60,30 @@ or by editing the *.spec* file:
 ::
 
     hiddenimports=["babel.numbers"]
+
+
+Custom date formatting 
+----------------------
+
+When using the "en_US" locale, the default date formatting in the :class:`~tkcalendar.DateEntry`, 
+or when getting the selected date from the :class:`~tkcalendar.Calendar` as a string 
+is :obj:`M/d/yy`, i.e. July 4, 2019 will give "7/4/19". 
+If you want to get "07/04/2019" instead, you can pass "MM/dd/yyyy" to 
+the *date_pattern* option of the :class:`~tkcalendar.Calendar` or :class:`~tkcalendar.DateEntry`.
+
+.. code:: python
+
+    try:
+        import tkinter as tk
+        from tkinter import ttk
+    except ImportError:
+        import Tkinter as tk
+        import ttk
+
+    from tkcalendar import DateEntry
+    
+    DateEntry(locale='en_US').pack()
+    DateEntry(locale='en_US', date_pattern='MM/dd/yyyy').pack()
+    
+    tk.mainloop()
+
