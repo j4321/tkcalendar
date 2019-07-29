@@ -23,6 +23,7 @@ tkcalendar 1.5.0
 - Fix :obj:`ValueError` when retrieving default locale
 - Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
 - Improve compliance with ttk themes by make the :class:`DateEntry` look like a :class:`ttk.Combobox` (`#42 <https://github.com/j4321/tkcalendar/issues/42>`_)
+- Fix high CPU issues in Windows (`#36 <https://github.com/j4321/tkcalendar/issues/36>`_)
 
 tkcalendar 1.4.0
 ----------------

@@ -378,7 +378,8 @@ Changelog
     * Fix ``ValueError`` when retrieving default locale
     * Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
     * Improve compliance with ttk themes by making the ``DateEntry`` look like a ``ttk.Combobox`` (`#42 <https://github.com/j4321/tkcalendar/issues/42>`_)
-
+    * Fix high CPU issues in Windows (`#36 <https://github.com/j4321/tkcalendar/issues/36>`_)
+    
 - tkcalendar 1.4.0
 
     * Add ``<<CalendarMonthChanged>>`` virtual event to the ``Calendar`` widget
