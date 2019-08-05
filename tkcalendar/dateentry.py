@@ -321,7 +321,7 @@ class DateEntry(ttk.Entry):
         else:
             return self._calendar.cget(key)
 
-    def configure(self, **kw):
+    def configure(self, cnf={}, **kw):
         """
         Configure resources of a widget.
 
@@ -329,16 +329,21 @@ class DateEntry(ttk.Entry):
         arguments. To get an overview about
         the allowed keyword arguments call the method keys.
         """
+        if not isinstance(cnf, dict):
+            raise TypeError("Expected a dictionary or keyword arguments.")
+        kwargs = cnf.copy()
+        kwargs.update(kw)
+
         entry_kw = {}
-        keys = list(kw.keys())
+        keys = list(kwargs.keys())
         for key in keys:
             if key in self.entry_kw:
-                entry_kw[key] = kw.pop(key)
-        font = kw.get('font', None)
+                entry_kw[key] = kwargs.pop(key)
+        font = kwargs.get('font', None)
         if font is not None:
             entry_kw['font'] = font
-        ttk.Entry.configure(self, **entry_kw)
-        self._calendar.configure(**kw)
+        ttk.Entry.configure(self, entry_kw)
+        self._calendar.configure(kwargs)
         if 'date_pattern' in kw or 'locale' in kw:
             self._set_text(self.format_date(self._date))
 
