@@ -393,6 +393,7 @@ Changelog
 - tkcalendar 1.5.1
 
     * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows
+    * Make ``Calendar.config()`` and ``DateEntry.config()`` accept a dictionary like standard tkinter widgets
 
 - tkcalendar 1.5.0
 

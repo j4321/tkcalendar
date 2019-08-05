@@ -9,6 +9,7 @@ tkcalendar 1.5.1
 .. rubric:: Bug fixes
 
 - Fix calendar drop-down not in front issue if window has the :obj:`-topmost` attribute in Windows
+- Make :meth:`Calendar.config` and :meth:`DateEntry.config` accept a dictionary like standard tkinter widgets
 
 
 tkcalendar 1.5.0
