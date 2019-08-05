@@ -1602,7 +1602,7 @@ class Calendar(ttk.Frame):
 
         The values for resources are specified as keyword
         arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
+        the allowed keyword arguments call the method :meth:`~Calendar.keys`.
         """
         if not isinstance(cnf, dict):
             raise TypeError("Expected a dictionary or keyword arguments.")
