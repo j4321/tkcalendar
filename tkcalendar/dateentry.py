@@ -91,6 +91,7 @@ class DateEntry(ttk.Entry):
         if platform == "linux":
             self._top_cal.attributes('-type', 'DROPDOWN_MENU')
         self._top_cal.overrideredirect(True)
+        self._top_cal.attributes('-topmost', True)
         self._calendar = Calendar(self._top_cal, **kw)
         self._calendar.pack()
 
