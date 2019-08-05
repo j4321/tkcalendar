@@ -390,6 +390,10 @@ Widget methods
 Changelog
 =========
 
+- tkcalendar 1.5.1
+
+    * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows
+
 - tkcalendar 1.5.0
 
     * Add *disabledforeground* and *disabledbackground* options to further customize

@@ -3,6 +3,14 @@ Changelog
 
 .. currentmodule:: tkcalendar
 
+tkcalendar 1.5.1
+----------------
+
+.. rubric:: Bug fixes
+
+- Fix calendar drop-down not in front issue if window has the :obj:`-topmost` attribute in Windows
+
+
 tkcalendar 1.5.0
 ----------------
 
