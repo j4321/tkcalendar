@@ -90,17 +90,17 @@ class Calendar(ttk.Frame):
             locale to use, e.g. 'en_US'
 
         date_pattern : str
-            date pattern used to format the date as a string. The default 
+            date pattern used to format the date as a string. The default
             pattern used is babel's short date format in the Calendar's locale.
 
             A valid pattern is a combination of 'y', 'm' and 'd' separated by
-            non letter characters to indicate how and in which order the 
+            non letter characters to indicate how and in which order the
             year, month and day should be displayed.
 
                 y: 'yy' for the last two digits of the year, any other number of 'y's for
                    the full year with an extra padding of zero if it has less
                    digits than the number of 'y's.
-                m: 'm' for the month number without padding, 'mm' for a 
+                m: 'm' for the month number without padding, 'mm' for a
                    two-digit month
                 d: 'd' for the day of month number without padding, 'dd' for a
                    two-digit day
@@ -1596,7 +1596,7 @@ class Calendar(ttk.Frame):
         """Return the resource value for a KEY given as string."""
         return self[key]
 
-    def configure(self, **kw):
+    def configure(self, cnf={}, **kw):
         """
         Configure resources of a widget.
 
@@ -1604,7 +1604,11 @@ class Calendar(ttk.Frame):
         arguments. To get an overview about
         the allowed keyword arguments call the method keys.
         """
-        for item, value in kw.items():
+        if not isinstance(cnf, dict):
+            raise TypeError("Expected a dictionary or keyword arguments.")
+        kwargs = cnf.copy()
+        kwargs.update(kw)
+        for item, value in kwargs.items():
             self[item] = value
 
     config = configure
