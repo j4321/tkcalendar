@@ -220,12 +220,7 @@ class DateEntry(ttk.Entry):
                 self._top_cal.withdraw()
                 self.state(['!pressed'])
         else:
-            x, y = self._top_cal.winfo_pointerxy()
-            xc = self._top_cal.winfo_rootx()
-            yc = self._top_cal.winfo_rooty()
-            w = self._top_cal.winfo_width()
-            h = self._top_cal.winfo_height()
-            if xc <= x <= xc + w and yc <= y <= yc + h:
+            if 'active' in self.state():
                 # re-focus calendar so that <FocusOut> will be triggered next time
                 self._calendar.focus_force()
             else:
