@@ -392,8 +392,9 @@ Changelog
 
 - tkcalendar 1.5.1
 
-    * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows
+    * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows (`#49 <https://github.com/j4321/tkcalendar/issues/49>`_)
     * Make ``Calendar.config()`` and ``DateEntry.config()`` accept a dictionary like standard tkinter widgets
+    * Fix calendar not hiding when clicking again on ``DateEntry`` drop-down button in Windows (`#51 <https://github.com/j4321/tkcalendar/issues/51>`_)
 
 - tkcalendar 1.5.0
 
