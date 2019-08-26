@@ -74,6 +74,17 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
         self.assertEqual(widget["borderwidth"], 5)
 
+        widget.configure({'foreground': 'cyan', 'font': 'FreeMono 10',
+                          'background': 'green'},
+                         background="blue", borderwidth=4,
+                         font="Arial 20 bold", justify='center')
+        self.window.update()
+        self.assertEqual(widget["foreground"], "cyan")
+        self.assertEqual(widget["background"], "blue")
+        self.assertEqual(widget["borderwidth"], 4)
+        self.assertEqual(widget["font"], "Arial 20 bold")
+        self.assertEqual(widget["justify"], "center")
+
         widget.config(font="Arial 20 bold")
         self.window.update()
         self.assertEqual(widget["font"], "Arial 20 bold")

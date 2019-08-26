@@ -325,11 +325,16 @@ class TestCalendar(BaseWidgetTest):
 
         with self.assertRaises(AttributeError):
             widget.cget("test")
-
         self.assertEqual(widget["foreground"], "red")
         widget["foreground"] = "blue"
         self.window.update()
         self.assertEqual(widget["foreground"], "blue")
+        widget.configure({'foreground': 'cyan', 'background': 'green'},
+                         background="blue", borderwidth=4)
+        self.window.update()
+        self.assertEqual(widget["foreground"], "cyan")
+        self.assertEqual(widget["background"], "blue")
+        self.assertEqual(widget["borderwidth"], 4)
         widget.config(locale='fr_FR')
         self.assertEqual(widget['locale'], 'fr_FR')
         self.assertEqual(widget._week_days[0].cget('text'), 'lun.')

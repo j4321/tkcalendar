@@ -91,6 +91,7 @@ class DateEntry(ttk.Entry):
         if platform == "linux":
             self._top_cal.attributes('-type', 'DROPDOWN_MENU')
         self._top_cal.overrideredirect(True)
+        self._top_cal.attributes('-topmost', True)
         self._calendar = Calendar(self._top_cal, **kw)
         self._calendar.pack()
 
@@ -219,12 +220,7 @@ class DateEntry(ttk.Entry):
                 self._top_cal.withdraw()
                 self.state(['!pressed'])
         else:
-            x, y = self._top_cal.winfo_pointerxy()
-            xc = self._top_cal.winfo_rootx()
-            yc = self._top_cal.winfo_rooty()
-            w = self._top_cal.winfo_width()
-            h = self._top_cal.winfo_height()
-            if xc <= x <= xc + w and yc <= y <= yc + h:
+            if 'active' in self.state():
                 # re-focus calendar so that <FocusOut> will be triggered next time
                 self._calendar.focus_force()
             else:
@@ -320,24 +316,29 @@ class DateEntry(ttk.Entry):
         else:
             return self._calendar.cget(key)
 
-    def configure(self, **kw):
+    def configure(self, cnf={}, **kw):
         """
         Configure resources of a widget.
 
         The values for resources are specified as keyword
         arguments. To get an overview about
-        the allowed keyword arguments call the method keys.
+        the allowed keyword arguments call the method :meth:`~DateEntry.keys`.
         """
+        if not isinstance(cnf, dict):
+            raise TypeError("Expected a dictionary or keyword arguments.")
+        kwargs = cnf.copy()
+        kwargs.update(kw)
+
         entry_kw = {}
-        keys = list(kw.keys())
+        keys = list(kwargs.keys())
         for key in keys:
             if key in self.entry_kw:
-                entry_kw[key] = kw.pop(key)
-        font = kw.get('font', None)
+                entry_kw[key] = kwargs.pop(key)
+        font = kwargs.get('font', None)
         if font is not None:
             entry_kw['font'] = font
-        ttk.Entry.configure(self, **entry_kw)
-        self._calendar.configure(**kw)
+        ttk.Entry.configure(self, entry_kw)
+        self._calendar.configure(kwargs)
         if 'date_pattern' in kw or 'locale' in kw:
             self._set_text(self.format_date(self._date))
 
