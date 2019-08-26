@@ -846,7 +846,7 @@ class Calendar(ttk.Frame):
         if maxdate is not None:
             mi, mj = self._get_day_coords(maxdate)
             if mi is not None:
-                for j in range(mj, 7):
+                for j in range(mj + 1, 7):
                     self._calendar[mi][j].state(['disabled'])
                 for i in range(mi + 1, 6):
                     for j in range(7):

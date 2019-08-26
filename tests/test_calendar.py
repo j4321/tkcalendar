@@ -390,6 +390,10 @@ class TestCalendar(BaseWidgetTest):
         self.assertNotIn('disabled', widget._calendar[i][j].state())
         self.assertIn('disabled', widget._l_month.state())
         self.assertIn('disabled', widget._l_year.state())
+        i, j = widget._get_day_coords(date(2018, 9, 10))
+        self.assertNotIn('disabled', widget._calendar[i][j].state())
+        i, j = widget._get_day_coords(date(2018, 9, 9))
+        self.assertIn('disabled', widget._calendar[i][j].state())
         with self.assertRaises(TypeError):
             widget.config(mindate="a")
         self.assertEqual(widget["mindate"], date(2018, 9, 10))
@@ -411,6 +415,10 @@ class TestCalendar(BaseWidgetTest):
         self.assertNotIn('disabled', widget._calendar[i][j].state())
         self.assertIn('disabled', widget._r_month.state())
         self.assertIn('disabled', widget._r_year.state())
+        i, j = widget._get_day_coords(date(2018, 9, 10))
+        self.assertNotIn('disabled', widget._calendar[i][j].state())
+        i, j = widget._get_day_coords(date(2018, 9, 11))
+        self.assertIn('disabled', widget._calendar[i][j].state())
         with self.assertRaises(TypeError):
             widget.config(maxdate="a")
         self.assertEqual(widget["maxdate"], date(2018, 9, 10))

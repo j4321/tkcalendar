@@ -91,7 +91,7 @@ Widget keyword options
 
     firstweekday : "monday" or "sunday"
         first day of the week
-        
+
     weekenddays : list
         days to be displayed as week-end days given as a list of integers corresponding to the number of the day in the week (e.g. [6, 7] for the last two days of the week).
 
@@ -109,13 +109,13 @@ Widget keyword options
 
     locale : str
         locale to use, e.g. 'en_US'
-        
+
     date_pattern : str
-        date pattern used to format the date as a string. The default pattern used 
+        date pattern used to format the date as a string. The default pattern used
         is ``babel``'s short date format in the calendar's locale.
 
         A valid pattern is a combination of 'd', 'm' and 'y' separated by
-        non letter characters to indicate how and in which order the 
+        non letter characters to indicate how and in which order the
         year, month and day should be displayed.
 
         =  =========================================================================
@@ -123,8 +123,8 @@ Widget keyword options
 
         m  'm' for the month number without padding, 'mm' for a two-digit month
 
-        y  'yy' for the two last digits of the year, any other number of 'y's for 
-           the full year with an extra padding of zero if it has less digits than 
+        y  'yy' for the two last digits of the year, any other number of 'y's for
+           the full year with an extra padding of zero if it has less digits than
            the number of 'y's.
         =  =========================================================================
 
@@ -395,6 +395,7 @@ Changelog
     * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows (`#49 <https://github.com/j4321/tkcalendar/issues/49>`_)
     * Make ``Calendar.config()`` and ``DateEntry.config()`` accept a dictionary like standard tkinter widgets
     * Fix calendar not hiding when clicking again on ``DateEntry`` drop-down button in Windows (`#51 <https://github.com/j4321/tkcalendar/issues/51>`_)
+    * Fix *maxdate* disabled while it sould be the latest allowed date (`#50 <https://github.com/j4321/tkcalendar/issues/50>`_)
 
 - tkcalendar 1.5.0
 
@@ -410,7 +411,7 @@ Changelog
     * Fix date parsing error in Swedish locale and some others (`#44 <https://github.com/j4321/tkcalendar/issues/44>`_)
     * Improve compliance with ttk themes by making the ``DateEntry`` look like a ``ttk.Combobox`` (`#42 <https://github.com/j4321/tkcalendar/issues/42>`_)
     * Fix high CPU issues in Windows (`#36 <https://github.com/j4321/tkcalendar/issues/36>`_)
-    
+
 - tkcalendar 1.4.0
 
     * Add ``<<CalendarMonthChanged>>`` virtual event to the ``Calendar`` widget
@@ -474,8 +475,8 @@ Changelog
     * Fix display of the first days of the next month
     * Increment year when going from December to January
     * Add widget ``DateEntry``: date selection entry with drop-down calendar
-    * Add *borderwidth*, *othermonthbackground*, *othermonthweforeground*, 
-      *othermonthwebackground* options to further customize the 
+    * Add *borderwidth*, *othermonthbackground*, *othermonthweforeground*,
+      *othermonthwebackground* options to further customize the
       appearance of the calendar
 
 - tkcalendar 1.0.0
