@@ -393,6 +393,11 @@ Widget methods
 Changelog
 =========
 
+- tkcalendar 1.6.0
+
+    * Fix ``DateEntry`` cursor customization which had no effect
+    * Add *calendar_cursor* option to change the cursor on the ``Calendar`` of the ``DateEntry`` (`#55 <https://github.com/j4321/tkcalendar/issues/55>`_)
+
 - tkcalendar 1.5.1
 
     * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows (`#49 <https://github.com/j4321/tkcalendar/issues/49>`_)

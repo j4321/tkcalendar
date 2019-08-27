@@ -3,6 +3,17 @@ Changelog
 
 .. currentmodule:: tkcalendar
 
+tkcalendar 1.6.0
+----------------
+
+.. rubric:: New options
+
+- *calendar_cursor*: change the cursor on the :class:`Calendar` of the :class:`DateEntry` (`#55 <https://github.com/j4321/tkcalendar/issues/55>`_)
+
+.. rubric:: Bug fixes
+
+- Fix :class:`DateEntry` cursor customization which had no effect
+
 tkcalendar 1.5.1
 ----------------
 
