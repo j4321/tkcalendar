@@ -56,6 +56,7 @@ class TestDateEntry(BaseWidgetTest):
                 'justify',
                 'show',
                 'cursor',
+                'calendar_cursor',
                 'style',
                 'state',
                 'takefocus',
