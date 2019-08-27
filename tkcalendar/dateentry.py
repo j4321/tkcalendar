@@ -83,6 +83,7 @@ class DateEntry(ttk.Entry):
         for key in self.entry_kw:
             entry_kw[key] = kw.pop(key, self.entry_kw[key])
         entry_kw['font'] = kw.get('font', None)
+        self._cursor = entry_kw['cursor']  # entry cursor
         kw['cursor'] = kw.pop('calendar_cursor', None)
 
         ttk.Entry.__init__(self, master, **entry_kw)
@@ -192,11 +193,10 @@ class DateEntry(ttk.Entry):
         if 'disabled' not in self.state():
             if self.identify(x, y) == self._downarrow_name:
                 self.state(['active'])
-                self.configure(cursor='arrow')
+                ttk.Entry.configure(self, cursor='arrow')
             else:
                 self.state(['!active'])
-                if 'readonly' not in self.state():
-                    self.configure(cursor='xterm')
+                ttk.Entry.configure(self, cursor=self._cursor)
 
     def _on_theme_change(self):
         theme = self.style.theme_use()
@@ -345,7 +345,12 @@ class DateEntry(ttk.Entry):
         font = kwargs.get('font', None)
         if font is not None:
             entry_kw['font'] = font
+        self._cursor = str(entry_kw.get('cursor', self._cursor))
+        if entry_kw.get('state') == 'readonly' and self._cursor == 'xterm' and 'cursor' not in entry_kw:
+            entry_kw['cursor'] = 'arrow'
+            self._cursor  = 'arrow'
         ttk.Entry.configure(self, entry_kw)
+
         kwargs['cursor'] = kwargs.pop('calendar_cursor', None)
         self._calendar.configure(kwargs)
         if 'date_pattern' in kwargs or 'locale' in kwargs:
