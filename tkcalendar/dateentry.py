@@ -246,6 +246,7 @@ class DateEntry(ttk.Entry):
         date = self._calendar.selection_get()
         if date is not None:
             self._set_text(self.format_date(date))
+            self._date = date
             self.event_generate('<<DateEntrySelected>>')
         self._top_cal.withdraw()
         if 'readonly' not in self.state():
