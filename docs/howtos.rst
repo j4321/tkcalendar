@@ -45,7 +45,7 @@ PyInstaller
 -----------
 
 When bundling an application with `PyInstaller <http://www.pyinstaller.org/>`_,
-there seem to be an issue (`#32 <https://github.com/j4321/tkcalendar/issues/32>`_)
+there is an issue (`#32 <https://github.com/j4321/tkcalendar/issues/32>`_)
 with the detection of the babel dependency of tkcalendar.
 This can be fixed by using the ``--hidden-import`` option:
 
