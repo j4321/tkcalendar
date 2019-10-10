@@ -3,6 +3,13 @@ Changelog
 
 .. currentmodule:: tkcalendar
 
+tkcalendar 1.5.2
+----------------
+
+.. rubric:: Bug fixes
+
+- Fix vanishing of the drop-down calendar on any click when grab_set is used 
+
 tkcalendar 1.5.1
 ----------------
 
