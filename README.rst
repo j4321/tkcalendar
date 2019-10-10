@@ -390,6 +390,9 @@ Widget methods
 Changelog
 =========
 
+- tkcalendar 1.5.2
+    * Fix vanishing of the drop-down calendar on any click when grab_set is used 
+
 - tkcalendar 1.5.1
 
     * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows (`#49 <https://github.com/j4321/tkcalendar/issues/49>`_)
