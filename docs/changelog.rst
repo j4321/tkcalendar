@@ -13,6 +13,7 @@ tkcalendar 1.6.0
 .. rubric:: Bug fixes
 
 - Fix :class:`DateEntry` cursor customization which had no effect
+- Fix vanishing of the drop-down calendar on any click when grab_set is used 
 
 tkcalendar 1.5.1
 ----------------

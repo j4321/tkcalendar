@@ -394,7 +394,8 @@ Changelog
 =========
 
 - tkcalendar 1.6.0
-
+    
+    * Fix vanishing of the drop-down calendar on any click when grab_set is used 
     * Fix ``DateEntry`` cursor customization which had no effect
     * Add *calendar_cursor* option to change the cursor on the ``Calendar`` of the ``DateEntry`` (`#55 <https://github.com/j4321/tkcalendar/issues/55>`_)
 
