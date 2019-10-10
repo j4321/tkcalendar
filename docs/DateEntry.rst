@@ -21,7 +21,9 @@ Class
        
            class, cursor, style, takefocus, xscrollcommand, exportselection, justify, show, state, textvariable, width.
            
-       - :class:`Calendar` options: see the :ref:`documentation <doc>`.
+       - :class:`Calendar` options: see the :ref:`documentation <doc>`. 
+       
+           The Calendar option *cursor* has been renamed *calendar_cursor* to avoid name clashes with the corresponding :class:`ttk.Entry` option.
 
 
 Virtual Events

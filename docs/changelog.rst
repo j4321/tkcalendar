@@ -3,11 +3,16 @@ Changelog
 
 .. currentmodule:: tkcalendar
 
-tkcalendar 1.5.2
+tkcalendar 1.6.0
 ----------------
+
+.. rubric:: New options
+
+- *calendar_cursor*: change the cursor on the :class:`Calendar` of the :class:`DateEntry` (`#55 <https://github.com/j4321/tkcalendar/issues/55>`_)
 
 .. rubric:: Bug fixes
 
+- Fix :class:`DateEntry` cursor customization which had no effect
 - Fix vanishing of the drop-down calendar on any click when grab_set is used 
 
 tkcalendar 1.5.1

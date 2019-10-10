@@ -62,7 +62,10 @@ class DateEntry(ttk.Entry):
         Keyword Options
         ---------------
 
-        usual ttk.Entry options and Calendar options
+        usual ttk.Entry options and Calendar options.
+        The Calendar option 'cursor' has been renamed
+        'calendar_cursor' to avoid name clashes with the
+        corresponding ttk.Entry option.
 
         Virtual event
         -------------
@@ -80,6 +83,8 @@ class DateEntry(ttk.Entry):
         for key in self.entry_kw:
             entry_kw[key] = kw.pop(key, self.entry_kw[key])
         entry_kw['font'] = kw.get('font', None)
+        self._cursor = entry_kw['cursor']  # entry cursor
+        kw['cursor'] = kw.pop('calendar_cursor', None)
 
         ttk.Entry.__init__(self, master, **entry_kw)
 
@@ -188,11 +193,10 @@ class DateEntry(ttk.Entry):
         if 'disabled' not in self.state():
             if self.identify(x, y) == self._downarrow_name:
                 self.state(['active'])
-                self.configure(cursor='arrow')
+                ttk.Entry.configure(self, cursor='arrow')
             else:
                 self.state(['!active'])
-                if 'readonly' not in self.state():
-                    self.configure(cursor='xterm')
+                ttk.Entry.configure(self, cursor=self._cursor)
 
     def _on_theme_change(self):
         theme = self.style.theme_use()
@@ -321,12 +325,15 @@ class DateEntry(ttk.Entry):
         """Return a list of all resource names of this widget."""
         keys = list(self.entry_kw)
         keys.extend(self._calendar.keys())
+        keys.append('calendar_cursor')
         return list(set(keys))
 
     def cget(self, key):
         """Return the resource value for a KEY given as string."""
         if key in self.entry_kw:
             return ttk.Entry.cget(self, key)
+        elif key == 'calendar_cursor':
+            return self._calendar.cget('cursor')
         else:
             return self._calendar.cget(key)
 
@@ -351,9 +358,15 @@ class DateEntry(ttk.Entry):
         font = kwargs.get('font', None)
         if font is not None:
             entry_kw['font'] = font
+        self._cursor = str(entry_kw.get('cursor', self._cursor))
+        if entry_kw.get('state') == 'readonly' and self._cursor == 'xterm' and 'cursor' not in entry_kw:
+            entry_kw['cursor'] = 'arrow'
+            self._cursor  = 'arrow'
         ttk.Entry.configure(self, entry_kw)
+
+        kwargs['cursor'] = kwargs.pop('calendar_cursor', None)
         self._calendar.configure(kwargs)
-        if 'date_pattern' in kw or 'locale' in kw:
+        if 'date_pattern' in kwargs or 'locale' in kwargs:
             self._set_text(self.format_date(self._date))
 
     config = configure

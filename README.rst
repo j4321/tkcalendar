@@ -346,6 +346,9 @@ Widget keyword options
 ~~~~~~~~~~~~~~~~~~~~~~
 
     * Keyword options of ``Calendar`` to configure the drop-down calendar
+    
+       The Calendar option *cursor* has been renamed *calendar_cursor* to 
+       avoid name clashes with the corresponding :class:`ttk.Entry` option.
 
     * Keyword options of ``ttk.Entry``
 
@@ -390,8 +393,11 @@ Widget methods
 Changelog
 =========
 
-- tkcalendar 1.5.2
+- tkcalendar 1.6.0
+    
     * Fix vanishing of the drop-down calendar on any click when grab_set is used 
+    * Fix ``DateEntry`` cursor customization which had no effect
+    * Add *calendar_cursor* option to change the cursor on the ``Calendar`` of the ``DateEntry`` (`#55 <https://github.com/j4321/tkcalendar/issues/55>`_)
 
 - tkcalendar 1.5.1
 
