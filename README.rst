@@ -389,6 +389,10 @@ Widget methods
             Set the value of the DateEntry to *date* where *date* can be either a ``datetime.date``
             instance or a string corresponding to the date format `"%x"` in the `Calendar` locale.
 
+HowTos
+======
+
+Widget styling, Pyinstaller, Custom date formatting: see https://tkcalendar.readthedocs.io/en/stable/howtos.html
 
 Changelog
 =========
