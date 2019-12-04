@@ -162,7 +162,16 @@ class DateEntry(ttk.Entry):
             self.style.configure('DateEntry', **conf)
         maps = self.style.map('TCombobox')
         if maps:
-            self.style.map('DateEntry', **maps)
+            try:
+                self.style.map('DateEntry', **maps)
+            except tk.TclError:
+                # temporary fix to issue #61: manually insert correct map
+                maps = {'focusfill': [('readonly', 'focus', 'SystemHighlight')],
+                        'foreground': [('disabled', 'SystemGrayText'),
+                                       ('readonly', 'focus', 'SystemHighlightText')],
+                        'selectforeground': [('!focus', 'SystemWindowText')],
+                        'selectbackground': [('!focus', 'SystemWindow')]}
+                self.style.map('DateEntry', **maps)
         try:
             self.after_cancel(self._determine_downarrow_name_after_id)
         except ValueError:
