@@ -4,10 +4,10 @@ matrix:
   include:
   - os: osx
     language: generic
-    env: INSTALL_TYPE=macpython VERSION=3.6 VENV=venv
+    env: INSTALL_TYPE=macpython VERSION=3.5 VENV=venv
   - os: osx
     language: generic
-    env: INSTALL_TYPE=macpython VERSION=3.7 VENV=venv
+    env: INSTALL_TYPE=macpython VERSION=3.6 VENV=venv
 required: sudo
 python:
   - "3.5"
