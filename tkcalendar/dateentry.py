@@ -34,6 +34,35 @@ except ImportError:
 
 from tkcalendar.calendar_ import Calendar
 
+# temporary fix for issue #61 and https://bugs.python.org/issue38661
+MAPS = {'winnative': {'focusfill': [('readonly', 'focus', 'SystemHighlight')],
+                      'foreground': [('disabled', 'SystemGrayText'),
+                                     ('readonly', 'focus', 'SystemHighlightText')],
+                      'selectforeground': [('!focus', 'SystemWindowText')],
+                      'fieldbackground': [('readonly', 'SystemButtonFace'),
+                                          ('disabled', 'SystemButtonFace')],
+                      'selectbackground': [('!focus', 'SystemWindow')]},
+        'clam': {'foreground': [('readonly', 'focus', '#ffffff')],
+                 'fieldbackground': [('readonly', 'focus', '#4a6984'), ('readonly', '#dcdad5')],
+                 'background': [('active', '#eeebe7'), ('pressed', '#eeebe7')],
+                 'arrowcolor': [('disabled', '#999999')]},
+        'alt': {'fieldbackground': [('readonly', '#d9d9d9'),
+                                    ('disabled', '#d9d9d9')],
+                'arrowcolor': [('disabled', '#a3a3a3')]},
+        'default': {'fieldbackground': [('readonly', '#d9d9d9'), ('disabled', '#d9d9d9')],
+                    'arrowcolor': [('disabled', '#a3a3a3')]},
+        'classic': {'fieldbackground': [('readonly', '#d9d9d9'), ('disabled', '#d9d9d9')]},
+        'vista': {'focusfill': [('readonly', 'focus', 'SystemHighlight')],
+                  'foreground': [('disabled', 'SystemGrayText'),
+                                 ('readonly', 'focus', 'SystemHighlightText')],
+                  'selectforeground': [('!focus', 'SystemWindowText')],
+                  'selectbackground': [('!focus', 'SystemWindow')]},
+        'xpnative': {'focusfill': [('readonly', 'focus', 'SystemHighlight')],
+                     'foreground': [('disabled', 'SystemGrayText'),
+                                    ('readonly', 'focus', 'SystemHighlightText')],
+                     'selectforeground': [('!focus', 'SystemWindowText')],
+                     'selectbackground': [('!focus', 'SystemWindow')]}}
+
 
 class DateEntry(ttk.Entry):
     """Date selection entry with drop-down calendar."""
@@ -162,7 +191,12 @@ class DateEntry(ttk.Entry):
             self.style.configure('DateEntry', **conf)
         maps = self.style.map('TCombobox')
         if maps:
-            self.style.map('DateEntry', **maps)
+            try:
+                self.style.map('DateEntry', **maps)
+            except tk.TclError:
+                # temporary fix for issue #61 and https://bugs.python.org/issue38661
+                maps = MAPS.get(self.style.theme_use(), MAPS['default'])
+                self.style.map('DateEntry', **maps)
         try:
             self.after_cancel(self._determine_downarrow_name_after_id)
         except ValueError:
