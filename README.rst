@@ -348,7 +348,7 @@ Widget keyword options
     * Keyword options of ``Calendar`` to configure the drop-down calendar
     
        The Calendar option *cursor* has been renamed *calendar_cursor* to 
-       avoid name clashes with the corresponding :class:`ttk.Entry` option.
+       avoid name clashes with the corresponding ``ttk.Entry`` option.
 
     * Keyword options of ``ttk.Entry``
 
