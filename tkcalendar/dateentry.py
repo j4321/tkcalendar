@@ -125,7 +125,6 @@ class DateEntry(ttk.Entry):
         if platform == "linux":
             self._top_cal.attributes('-type', 'DROPDOWN_MENU')
         self._top_cal.overrideredirect(True)
-        self._top_cal.attributes('-topmost', True)
         self._calendar = Calendar(self._top_cal, **kw)
         self._calendar.pack()
 
@@ -332,6 +331,10 @@ class DateEntry(ttk.Entry):
             date = self.parse_date(self.get())
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
+            if self.winfo_toplevel().attributes('-topmost', True):
+                self._top_cal.attributes('-topmost', True)
+            else:
+                self._top_cal.attributes('-topmost', False)
             self._top_cal.geometry('+%i+%i' % (x, y))
             self._top_cal.deiconify()
             self._calendar.focus_set()
