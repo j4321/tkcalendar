@@ -403,7 +403,8 @@ Changelog
     * Fix ``DateEntry`` cursor customization which had no effect
     * Temporarily fix `python issue 38661 <https://bugs.python.org/issue38661>`_ (`#61 <https://github.com/j4321/tkcalendar/issues/61>`_)
     * Add *calendar_cursor* option to change the cursor on the ``Calendar`` of the ``DateEntry`` (`#55 <https://github.com/j4321/tkcalendar/issues/55>`_)
-
+    * Fix always on top bug using resizable (`#62 <https://github.com/j4321/tkcalendar/issues/62>`_)
+    
 - tkcalendar 1.5.1
 
     * Fix calendar drop-down not in front issue if window has the ``-topmost`` attribute in Windows (`#49 <https://github.com/j4321/tkcalendar/issues/49>`_)

@@ -15,6 +15,7 @@ tkcalendar 1.6.0
 - Fix :class:`DateEntry` cursor customization which had no effect
 - Fix vanishing of the drop-down calendar on any click when grab_set is used 
 - Temporarily fix `python issue 38661 <https://bugs.python.org/issue38661>`_ (`#61 <https://github.com/j4321/tkcalendar/issues/61>`_)
+- Fix always on top bug using resizable (`#62 <https://github.com/j4321/tkcalendar/issues/62>`_)
 
 tkcalendar 1.5.1
 ----------------
