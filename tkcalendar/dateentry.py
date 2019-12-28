@@ -331,7 +331,7 @@ class DateEntry(ttk.Entry):
             date = self.parse_date(self.get())
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
-            if self.winfo_toplevel().attributes('-topmost', True):
+            if self.winfo_toplevel().attributes('-topmost'):
                 self._top_cal.attributes('-topmost', True)
             else:
                 self._top_cal.attributes('-topmost', False)
