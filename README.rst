@@ -18,7 +18,7 @@ Requirements
 ============
 
 - Linux, Windows, OSX
-- Python 2 or 3
+- Python 3
 
 And the python packages:
 
