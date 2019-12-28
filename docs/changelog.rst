@@ -3,6 +3,13 @@ Changelog
 
 .. currentmodule:: tkcalendar
 
+tkcalendar 1.6.1
+----------------
+
+.. rubric:: Bug fixes
+
+- Fix typo in :class:`DateEntry` that lead to position issues for the drop-down (`#66 <https://github.com/j4321/tkcalendar/issues/66>`_)
+
 tkcalendar 1.6.0
 ----------------
 
