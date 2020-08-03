@@ -329,8 +329,20 @@ class DateEntry(ttk.Entry):
         else:
             self._validate_date()
             date = self.parse_date(self.get())
+            h = self._top_cal.winfo_reqheight()
+            w = self._top_cal.winfo_reqwidth()
+            x_max = self.winfo_screenwidth()
+            y_max = self.winfo_screenheight()
+            # default: left-aligned drop-down below the entry
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
+
+            if x + w > x_max:  # the drop-down goes out of the screen
+                # right-align the drop-down
+                x += self.winfo_width() - w
+            if y + h > y_max:  # the drop-down goes out of the screen
+                # bottom-align the drop-down
+                y -= self.winfo_height() + h
             if self.winfo_toplevel().attributes('-topmost'):
                 self._top_cal.attributes('-topmost', True)
             else:
@@ -430,3 +442,4 @@ class DateEntry(ttk.Entry):
         """Return the content of the DateEntry as a datetime.date instance."""
         self._validate_date()
         return self.parse_date(self.get())
+

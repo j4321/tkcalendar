@@ -397,6 +397,10 @@ Widget styling, Pyinstaller, Custom date formatting: see https://tkcalendar.read
 Changelog
 =========
 
+- tkcalendar 1.6.2
+    
+    * Fix drop-down position to avoid the calendar to be out of screen
+
 - tkcalendar 1.6.1
 
     * Fix typo in ``DateEntry`` that lead to position issues for the drop-down (`#66 <https://github.com/j4321/tkcalendar/issues/66>`_)
