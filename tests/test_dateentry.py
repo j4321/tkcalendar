@@ -174,4 +174,3 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
         widget._select()
         self.assertIn('readonly', widget.state())
-
