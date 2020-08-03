@@ -43,6 +43,15 @@ class TestDateEntry(BaseWidgetTest):
                                            x='', y=''))
         self.window.update()
         self.assertFalse(widget._top_cal.winfo_ismapped())
+        self.assertTrue(widget._top_cal.winfo_rootx() >= widget.winfo_rootx())
+        self.assertTrue(widget._top_cal.winfo_rooty() > widget.winfo_rooty())
+        x = self.window.winfo_screenwidth() - self.window.winfo_width()
+        y = self.window.winfo_screenheight() - self.window.winfo_height()
+        self.window.geometry('+%i+%i' % (x, y))
+        self.window.update()
+        widget.drop_down()
+        self.assertTrue(widget._top_cal.winfo_rootx() < widget.winfo_rootx())
+        self.assertTrue(widget._top_cal.winfo_rooty() < widget.winfo_rooty())
 
     def test_dateentry_get_set(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
@@ -165,3 +174,4 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
         widget._select()
         self.assertIn('readonly', widget.state())
+
