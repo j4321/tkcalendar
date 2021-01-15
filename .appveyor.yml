@@ -1,18 +1,16 @@
 image: 
-  - Ubuntu
-  - Visual Studio 2019
   - macOS
+  - Visual Studio 2019
   
 environment:
   matrix:
-
-    - PYTHON_HOME: "C:\\Python36"
-      PYTHON_VERSION: '3.6'
-    - PYTHON_HOME: "C:\\Python36"
-      PYTHON_VERSION: '3.7'
-    - PYTHON_HOME: "C:\\Python36"
+    #~ - PYTHON_HOME: "C:\\Python36"
+      #~ PYTHON_VERSION: '3.6'
+    #~ - PYTHON_HOME: "C:\\Python37"
+      #~ PYTHON_VERSION: '3.7'
+    - PYTHON_HOME: "C:\\Python38"
       PYTHON_VERSION: '3.8'
-    - PYTHON_HOME: "C:\\Python36"
+    - PYTHON_HOME: "C:\\Python39"
       PYTHON_VERSION: '3.9'
 
 for:
@@ -31,18 +29,6 @@ for:
       - "echo %PATH%"
       - "python -m pip install --upgrade setuptools wheel"
       - "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
-  - 
-    matrix:
-      only:
-        - image: Ubuntu
-
-    install:
-      - sh: "source ${HOME}/venv${PYTHON_VERSION}/bin/activate"
-      - sh: "python --version"
-      - sh: "sudo apt-get -y install python3-tk"
-      - sh: "python -m pip install --upgrade setuptools wheel"
-      - sh: "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
-      - sh: "export DISPLAY=:99.0"
   - 
     matrix:
       only:
