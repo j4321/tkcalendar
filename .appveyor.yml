@@ -1,15 +1,29 @@
+image: 
+    - Visual Studio 2019
+  
 environment:
   matrix:
-    - PYTHON: "C:\\PYTHON34"
-    - PYTHON: "C:\\PYTHON35"
-    - PYTHON: "C:\\PYTHON36"
-    - PYTHON: "C:\\PYTHON37"
-    - PYTHON: "C:\\PYTHON38"
+    - PYTHON_HOME: "C:\\Python36"
+    - PYTHON_HOME: "C:\\Python37"
+    - PYTHON_HOME: "C:\\Python38"
+    - PYTHON_HOME: "C:\\Python39"
+
 install:
-  - "%PYTHON%\\python.exe -m pip install codecov coverage nose pillow pynput babel"
+    - "SET PATH=%PYTHON_HOME%;%PATH%"
+    - "echo %PYTHON_HOME%"
+    - "echo %PATH%"
+    - "python --version"
+    - "SET PATH=%PYTHON_HOME%;%PATH%"
+    - "echo %PYTHON_HOME%"
+    - "echo %PATH%"
+    - "python -m pip install --upgrade setuptools wheel pip"
+    - "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
+
 build: off
+
 test_script:
-  - "%PYTHON%\\python.exe -m pip install ."
-  - "%PYTHON%\\python.exe -m nose --with-coverage"
+    - "python -m pip install ."
+    - "python -m nose --with-coverage"
+    
 after_test:
-  - "%PYTHON%\\Scripts\\codecov.exe"
+    - "python -m codecov"
