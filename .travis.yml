@@ -4,16 +4,16 @@ matrix:
   include:
   - os: osx
     language: generic
-    env: INSTALL_TYPE=macpython VERSION=3.5 VENV=venv
+    env: INSTALL_TYPE=macpython VERSION=3.7 VENV=venv
   - os: osx
     language: generic
-    env: INSTALL_TYPE=macpython VERSION=3.6 VENV=venv
+    env: INSTALL_TYPE=macpython VERSION=3.8 VENV=venv
 required: sudo
 python:
-  - "3.5"
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then git clone https://github.com/MacPython/terryfy.git; source terryfy/travis_tools.sh; get_python_environment $INSTALL_TYPE $VERSION $VENV; fi
   - "export DISPLAY=:99.0"
