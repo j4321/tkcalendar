@@ -400,6 +400,7 @@ Changelog
 - tkcalendar 1.6.2
     
     * Fix drop-down position to avoid the calendar to be out of screen
+    * Fix issues when year has 53 weeks
 
 - tkcalendar 1.6.1
 

@@ -929,10 +929,8 @@ class Calendar(ttk.Frame):
                   next_m: '_om.%s.TLabel' % self._style_prefixe,
                   prev_m: '_om.%s.TLabel' % self._style_prefixe}
 
-        week_nb = cal[0][1].isocalendar()[1]
-        modulo = max(week_nb, 52)
         for i_week in range(6):
-            self._week_nbs[i_week].configure(text=str((week_nb + i_week - 1) % modulo + 1))
+            self._week_nbs[i_week].configure(text=str(cal[i_week][1].isocalendar()[1]))
             for i_day in range(7):
                 style = week_days[i_day] + months[cal[i_week][i_day].month]
                 label = self._calendar[i_week][i_day]
@@ -966,7 +964,13 @@ class Calendar(ttk.Frame):
             else:
                 d -= 1
             w -= wn
-            w %= max(52, wn)
+            if y1 - y2 == 1 and m1 == 1 and m2 == 12:  # check nb of weeks (may be 53)
+                wmax = self.datetime(y2, 12, 31).isocalendar()[1]
+                if wmax == 1:
+                    wmax = 52
+                w %= wmax
+            else:
+                w %= max(52, wn)
             if 0 <= w < 6:
                 return w, d
             else:
