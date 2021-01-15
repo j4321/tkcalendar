@@ -22,7 +22,7 @@ before_install:
 install:
   - python -m pip install -U pip
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install python-tk python3-tk; fi
-  - python -m pip install -U coverage codecov pillow pynput babel nose
+  - python -m pip install -U coverage codecov pillow pynput babel nose pytest
 script:
   - python -m pip install .
   - python -m nose
