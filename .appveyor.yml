@@ -1,54 +1,23 @@
 image: 
-    - macOS
     - Visual Studio 2019
   
 environment:
   matrix:
-    #~ - PYTHON_HOME: "C:\\Python36"
-      #~ PYTHON_VERSION: '3.6'
-    #~ - PYTHON_HOME: "C:\\Python37"
-      #~ PYTHON_VERSION: '3.7'
+    - PYTHON_HOME: "C:\\Python36"
+    - PYTHON_HOME: "C:\\Python37"
     - PYTHON_HOME: "C:\\Python38"
-      PYTHON_VERSION: '3.8.7'
     - PYTHON_HOME: "C:\\Python39"
-      PYTHON_VERSION: '3.9.1'
 
-for:
-    - 
-        matrix:
-            only:
-                - image: macOS
-
-        install:
-            - sh: "brew install tcl-tk"
-            - sh: "brew info tcl-tk"
-            #~ - sh: "export PATH='/usr/local/opt/tcl-tk/bin:$PATH'"
-            #~ - sh: "export LDFLAGS='-L/usr/local/opt/tcl-tk/lib'"
-            #~ - sh: "export CPPFLAGS='-I/usr/local/opt/tcl-tk/include'"
-            #~ - sh: "export PKG_CONFIG_PATH='/usr/local/opt/tcl-tk/lib/pkgconfig'"
-            - sh: "brew install pyenv"
-            - |-
-              env PATH="$(brew --prefix tcl-tk)/bin:$PATH" LDFLAGS="-L$(brew --prefix tcl-tk)/lib" CPPFLAGS="-I$(brew --prefix tcl-tk)/include" PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" CFLAGS="-I$(brew --prefix tcl-tk)/include" PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" pyenv install ${PYTHON_VERSION}
-            #~ - sh: "source ~/venv${PYTHON_VERSION}/bin/activate"
-            - sh: "pyenv global ${PYTHON_VERSION}"
-            - sh: "python --version"
-            - sh: "python -m pip install --upgrade setuptools wheel pip"
-            - sh: "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
-    - 
-        matrix:
-            only:
-                - image: Visual Studio 2019
-
-        install:
-            - "SET PATH=%PYTHON_HOME%;%PATH%"
-            - "echo %PYTHON_HOME%"
-            - "echo %PATH%"
-            - "python --version"
-            - "SET PATH=%PYTHON_HOME%;%PATH%"
-            - "echo %PYTHON_HOME%"
-            - "echo %PATH%"
-            - "python -m pip install --upgrade setuptools wheel pip"
-            - "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
+install:
+    - "SET PATH=%PYTHON_HOME%;%PATH%"
+    - "echo %PYTHON_HOME%"
+    - "echo %PATH%"
+    - "python --version"
+    - "SET PATH=%PYTHON_HOME%;%PATH%"
+    - "echo %PYTHON_HOME%"
+    - "echo %PATH%"
+    - "python -m pip install --upgrade setuptools wheel pip"
+    - "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
 
 build: off
 
