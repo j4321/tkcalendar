@@ -952,7 +952,7 @@ class Calendar(ttk.Frame):
     def _get_day_coords(self, date):
         y1, y2 = date.year, self._date.year
         m1, m2 = date.month, self._date.month
-        if y1 == y2 or (y1 - y2 == 1 and m1 == 1 and m2 == 12) or (y2 - y1 == 1 and m2 == 1 and m1 == 12):
+        if (y1 == y2 and abs(m1 - m2) < 2) or (y1 - y2 == 1 and m1 == 1 and m2 == 12) or (y2 - y1 == 1 and m2 == 1 and m1 == 12):
             _, w, d = date.isocalendar()
             _, wn, dn = self._date.isocalendar()
             if self['firstweekday'] == 'sunday':
