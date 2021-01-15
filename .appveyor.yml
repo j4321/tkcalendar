@@ -1,7 +1,7 @@
 image: 
-  - macOS
-  - Ubuntu
-  - Visual Studio 2019
+    - macOS
+    - Ubuntu
+    - Visual Studio 2019
   
 environment:
   matrix:
@@ -15,54 +15,56 @@ environment:
       PYTHON_VERSION: '3.9'
 
 for:
-  - 
-    matrix:
-      only:
-        - image: Visual Studio 2019
+    - 
+        matrix:
+            only:
+                - image: Visual Studio 2019
 
-    install:
-      - "SET PATH=%PYTHON_HOME%;%PATH%"
-      - "echo %PYTHON_HOME%"
-      - "echo %PATH%"
-      - "python --version"
-      - "SET PATH=%PYTHON_HOME%;%PATH%"
-      - "echo %PYTHON_HOME%"
-      - "echo %PATH%"
-      - "python -m pip install --upgrade setuptools wheel pip"
-      - "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
-  - 
-    matrix:
-      only:
-        - image: Ubuntu
+        install:
+            - "SET PATH=%PYTHON_HOME%;%PATH%"
+            - "echo %PYTHON_HOME%"
+            - "echo %PATH%"
+            - "python --version"
+            - "SET PATH=%PYTHON_HOME%;%PATH%"
+            - "echo %PYTHON_HOME%"
+            - "echo %PATH%"
+            - "python -m pip install --upgrade setuptools wheel pip"
+            - "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
+    - 
+        matrix:
+            only:
+                - image: Ubuntu
 
-    install:
-      - sh: "source ${HOME}/venv${PYTHON_VERSION}/bin/activate"
-      - sh: "python --version"
-      - sh: "sudo apt-get -y install python3-tk"
-      - sh: "python -m pip install --upgrade setuptools wheel pip"
-      - sh: "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
-      - sh: "export DISPLAY=:0"
+        install:
+            - sh: "source ${HOME}/venv${PYTHON_VERSION}/bin/activate"
+            - sh: "python --version"
+            - sh: "sudo apt-get -y install python3-tk"
+            - sh: "python -m pip install --upgrade setuptools wheel pip"
+            - sh: "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
+            - sh: "export DISPLAY=:0"
 
-  - 
-    matrix:
-      only:
-        - image: macOS
+    - 
+        matrix:
+            only:
+                - image: macOS
 
-    install:
-      - sh: "brew install tcl-tk"
-      - sh: "brew info tcl-tk"
-      - sh: "export PATH='/usr/local/opt/tcl-tk/bin:$PATH'"
-      - sh: "export LDFLAGS='-L/usr/local/opt/tcl-tk/lib'
-      - sh: "export CPPFLAGS='-I/usr/local/opt/tcl-tk/include'"
-      - sh: "export PKG_CONFIG_PATH='/usr/local/opt/tcl-tk/lib/pkgconfig'"
-      - sh: "source ~/venv${PYTHON_VERSION}/bin/activate"
-      - sh: "python --version"
-      - sh: "python -m pip install --upgrade setuptools wheel pip"
-      - sh: "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
+        install:
+            - sh: "brew install tcl-tk"
+            - sh: "brew info tcl-tk"
+            - sh: "export PATH='/usr/local/opt/tcl-tk/bin:$PATH'"
+            - sh: "export LDFLAGS='-L/usr/local/opt/tcl-tk/lib'
+            - sh: "export CPPFLAGS='-I/usr/local/opt/tcl-tk/include'"
+            - sh: "export PKG_CONFIG_PATH='/usr/local/opt/tcl-tk/lib/pkgconfig'"
+            - sh: "source ~/venv${PYTHON_VERSION}/bin/activate"
+            - sh: "python --version"
+            - sh: "python -m pip install --upgrade setuptools wheel pip"
+            - sh: "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
 
 build: off
+
 test_script:
     - "python -m pip install ."
     - "python -m nose --with-coverage"
+    
 after_test:
     - "python -m codecov"
