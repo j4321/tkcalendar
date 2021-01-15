@@ -29,11 +29,11 @@ for:
             - sh: "brew install pyenv"
             - |-
               env PATH="$(brew --prefix tcl-tk)/bin:$PATH" LDFLAGS="-L$(brew --prefix tcl-tk)/lib" CPPFLAGS="-I$(brew --prefix tcl-tk)/include" PKG_CONFIG_PATH="$(brew --prefix tcl-tk)/lib/pkgconfig" CFLAGS="-I$(brew --prefix tcl-tk)/include" PYTHON_CONFIGURE_OPTS="--with-tcltk-includes='-I$(brew --prefix tcl-tk)/include' --with-tcltk-libs='-L$(brew --prefix tcl-tk)/lib -ltcl8.6 -ltk8.6'" pyenv install ${PYTHON_VERSION}
-            - sh: "source ~/venv${PYTHON_VERSION}/bin/activate"
+            #~ - sh: "source ~/venv${PYTHON_VERSION}/bin/activate"
+            - sh: "pyenv global ${PYTHON_VERSION}"
             - sh: "python --version"
             - sh: "python -m pip install --upgrade setuptools wheel pip"
             - sh: "python -m pip install --upgrade codecov coverage nose pillow pynput babel pytest"
-            - sh: "pyenv global ${PYTHON_VERSION}"
     - 
         matrix:
             only:
