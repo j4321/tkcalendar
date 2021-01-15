@@ -9,9 +9,9 @@ environment:
     #~ - PYTHON_HOME: "C:\\Python37"
       #~ PYTHON_VERSION: '3.7'
     - PYTHON_HOME: "C:\\Python38"
-      PYTHON_VERSION: '3.8'
+      PYTHON_VERSION: '3.8.7'
     - PYTHON_HOME: "C:\\Python39"
-      PYTHON_VERSION: '3.9'
+      PYTHON_VERSION: '3.9.1'
 
 for:
     - 
