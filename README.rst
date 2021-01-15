@@ -401,6 +401,7 @@ Changelog
     
     * Fix drop-down position to avoid the calendar to be out of screen
     * Fix issues when year has 53 weeks
+    * Fix allowed date range display issue
 
 - tkcalendar 1.6.1
 
