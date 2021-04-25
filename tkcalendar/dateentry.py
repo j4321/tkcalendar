@@ -81,7 +81,7 @@ class DateEntry(ttk.Entry):
                 'width': 12,
                 'xscrollcommand': ''}
 
-    def __init__(self, master=None, **kw):
+    def __init__(self, master=None, allow_empty=False, **kw):
         """
         Create an entry with a drop-down calendar to select a date.
 
@@ -143,6 +143,7 @@ class DateEntry(ttk.Entry):
         validatecmd = self.register(self._validate_date)
         self.configure(validate='focusout',
                        validatecommand=validatecmd)
+        self._allow_empty = allow_empty  # defaults to False
 
         # initially selected date
         self._date = self._calendar.selection_get()
@@ -155,7 +156,8 @@ class DateEntry(ttk.Entry):
                 self._date = self._calendar.date(year, month, day)
             except ValueError:
                 self._date = today
-        self._set_text(self.format_date(self._date))
+        if not self._allow_empty:
+            self._set_text(self.format_date(self._date))
 
         # --- bindings
         # reconfigure style if theme changed
@@ -288,8 +290,11 @@ class DateEntry(ttk.Entry):
             else:
                 return True
         except (ValueError, IndexError):
-            self._set_text(self.format_date(self._date))
-            return False
+            if self._allow_empty and self.get().strip() == '':
+                return True 
+            else:
+                self._set_text(self.format_date(self._date))
+                return False
 
     def _select(self, event=None):
         """Display the selected date in the entry and hide the calendar."""
@@ -328,7 +333,6 @@ class DateEntry(ttk.Entry):
             self._top_cal.withdraw()
         else:
             self._validate_date()
-            date = self.parse_date(self.get())
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
             if self.winfo_toplevel().attributes('-topmost'):
@@ -338,7 +342,9 @@ class DateEntry(ttk.Entry):
             self._top_cal.geometry('+%i+%i' % (x, y))
             self._top_cal.deiconify()
             self._calendar.focus_set()
-            self._calendar.selection_set(date)
+            if self.get().strip() != '':
+                date = self.parse_date(self.get())
+                self._calendar.selection_set(date)
 
     def state(self, *args):
         """

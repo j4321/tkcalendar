@@ -165,3 +165,17 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
         widget._select()
         self.assertIn('readonly', widget.state())
+        
+    def test_dateentry_allow_empty(self):
+        widget = DateEntry(self.window, allow_empty=True)
+        widget.pack()
+        self.window.update()
+
+        self.assertTrue(widget._allow_empty)
+        self.assertEqual(widget.get(), '')  # should start with no value
+        widget.focus_set()
+        self.window.focus_set()
+        self.assertEqual(widget.get(), '')  # should not populate with a value
+        
+        self.assertRaises(IndexError, widget.get_date)
+        self.assertRaises(ValueError, widget.set_date, '')
