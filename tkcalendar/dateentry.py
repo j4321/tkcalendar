@@ -25,6 +25,7 @@ DateEntry widget
 
 
 from sys import platform
+from datetime import date as datetime_date
 try:
     import tkinter as tk
     from tkinter import ttk
@@ -426,7 +427,7 @@ class DateEntry(ttk.Entry):
         self._set_text(txt)
         self._validate_date()
 
-    def get_date(self):
+    def get_date(self) -> datetime_date:
         """Return the content of the DateEntry as a datetime.date instance."""
         self._validate_date()
         return self.parse_date(self.get())
