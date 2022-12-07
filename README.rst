@@ -103,7 +103,10 @@ Widget keyword options
 
     showweeknumbers : bool (default is True)
         whether to display week numbers.
-
+    
+    weeknumberoffset : int (default is 0)
+        to adjust the week numbers
+	    
     showothermonthdays : bool (default is True)
         whether to display the last days of the previous month and the first of the next month.
 
