@@ -83,6 +83,9 @@ class Calendar(ttk.Frame):
         showweeknumbers : bool (default is True)
             whether to display week numbers.
 
+        weeknumberoffset : int (default is 0)
+            to adjust the week numbers
+
         showothermonthdays : bool (default is True)
             whether to display the last days of the previous month and the first of the next month.
 
@@ -311,6 +314,7 @@ class Calendar(ttk.Frame):
             raise ValueError("'selectmode' option should be 'none' or 'day'.")
         # --- show week numbers
         showweeknumbers = kw.pop('showweeknumbers', True)
+        weeknumberoffset = kw.pop('weeknumberoffset', 0)
 
         # --- style
         self.style = ttk.Style(self)
@@ -331,6 +335,7 @@ class Calendar(ttk.Frame):
                    'maxdate',
                    'mindate',
                    'showweeknumbers',
+                   'weeknumberoffset',
                    'showothermonthdays',
                    'firstweekday',
                    'weekenddays',
@@ -378,6 +383,7 @@ class Calendar(ttk.Frame):
                             'mindate': mindate,
                             'maxdate': maxdate,
                             'showweeknumbers': showweeknumbers,
+                            'weeknumberoffset': weeknumberoffset,
                             'showothermonthdays': kw.pop('showothermonthdays', True),
                             'selectbackground': active_bg,
                             'selectforeground': 'white',
@@ -874,6 +880,7 @@ class Calendar(ttk.Frame):
         _, week_nb, d = self._date.isocalendar()
         if d == 7 and self['firstweekday'] == 'sunday':
             week_nb += 1
+        week_nb += self['weeknumberoffset']
         modulo = max(week_nb, 52)
         for i_week in range(6):
             if i_week == 0 or cal[i_week][0][0]:
