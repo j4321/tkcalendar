@@ -294,6 +294,7 @@ class TestCalendar(BaseWidgetTest):
                    'firstweekday',
                    'weekenddays',
                    'showweeknumbers',
+                   'weeknumberoffset',
                    'showothermonthdays',
                    'selectbackground',
                    'selectforeground',
