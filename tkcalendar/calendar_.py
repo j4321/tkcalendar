@@ -83,6 +83,9 @@ class Calendar(ttk.Frame):
         showweeknumbers : bool (default is True)
             whether to display week numbers.
 
+        weeknumberoffset : int (default is 0)
+            to adjust the week numbers
+
         showothermonthdays : bool (default is True)
             whether to display the last days of the previous month and the first of the next month.
 
@@ -182,6 +185,9 @@ class Calendar(ttk.Frame):
         disableddayforeground : str
             foreground color of days in disabled state
 
+        day_names : 'wide' or 'short' or 'abbreviated'or 'narrow' (default = 'abbreviated')
+            contorl the fromat of the day name.  Ex: 'Tuesday', 'Tu', 'Tue', 'T'
+
         Tooltip Options (for calevents)
         -------------------------------
 
@@ -255,14 +261,15 @@ class Calendar(ttk.Frame):
         locale = kw.pop("locale", default_locale())
         if locale is None:
             locale = 'en'
-        self._day_names = get_day_names('abbreviated', locale=locale)
+        day_names = kw.pop('day_names', 'abbreviated')
+        self._day_names = get_day_names(day_names, locale=locale)
         self._month_names = get_month_names('wide', locale=locale)
         date_pattern = self._get_date_pattern(kw.pop("date_pattern", "short"), locale)
 
         # --- date
         today = self.date.today()
 
-        if self._textvariable is not None:
+        if self._textvariable is not None and self._textvariable.get() != '':
             # the variable overrides day, month and year keywords
             try:
                 self._sel_date = parse_date(self._textvariable.get(), locale)
@@ -311,6 +318,7 @@ class Calendar(ttk.Frame):
             raise ValueError("'selectmode' option should be 'none' or 'day'.")
         # --- show week numbers
         showweeknumbers = kw.pop('showweeknumbers', True)
+        weeknumberoffset = kw.pop('weeknumberoffset', 0)
 
         # --- style
         self.style = ttk.Style(self)
@@ -331,6 +339,7 @@ class Calendar(ttk.Frame):
                    'maxdate',
                    'mindate',
                    'showweeknumbers',
+                   'weeknumberoffset',
                    'showothermonthdays',
                    'firstweekday',
                    'weekenddays',
@@ -355,6 +364,7 @@ class Calendar(ttk.Frame):
                    'headersforeground',
                    'disableddaybackground',
                    'disableddayforeground',
+                   'day_names',
                    'tooltipforeground',
                    'tooltipbackground',
                    'tooltipalpha',
@@ -378,6 +388,7 @@ class Calendar(ttk.Frame):
                             'mindate': mindate,
                             'maxdate': maxdate,
                             'showweeknumbers': showweeknumbers,
+                            'weeknumberoffset': weeknumberoffset,
                             'showothermonthdays': kw.pop('showothermonthdays', True),
                             'selectbackground': active_bg,
                             'selectforeground': 'white',
@@ -400,6 +411,7 @@ class Calendar(ttk.Frame):
                             'headersforeground': 'black',
                             'disableddaybackground': dis_bg,
                             'disableddayforeground': dis_fg,
+                            'day_names': day_names,
                             'tooltipforeground': 'gray90',
                             'tooltipbackground': 'black',
                             'tooltipalpha': 0.8,
@@ -874,6 +886,7 @@ class Calendar(ttk.Frame):
         _, week_nb, d = self._date.isocalendar()
         if d == 7 and self['firstweekday'] == 'sunday':
             week_nb += 1
+        week_nb += self['weeknumberoffset']
         modulo = max(week_nb, 52)
         for i_week in range(6):
             if i_week == 0 or cal[i_week][0][0]:

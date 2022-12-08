@@ -103,7 +103,10 @@ Widget keyword options
 
     showweeknumbers : bool (default is True)
         whether to display week numbers.
-
+    
+    weeknumberoffset : int (default is 0)
+        to adjust the week numbers
+	    
     showothermonthdays : bool (default is True)
         whether to display the last days of the previous month and the first of the next month.
 
@@ -217,6 +220,9 @@ Widget keyword options
 
     tooltipdelay : int
         delay in ms before displaying the tooltip
+
+    day_names : 'wide' or 'short' or 'abbreviated'or 'narrow' (default = 'abbreviated')
+        contorl the fromat of the day name.  Ex: 'Tuesday', 'Tu', 'Tue', 'T'
 
 Virtual Events
 ~~~~~~~~~~~~~~

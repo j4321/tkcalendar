@@ -229,7 +229,7 @@ class TestCalendar(BaseWidgetTest):
         widget.pack()
         self.window.update()
         self.assertEqual('', var.get())
-        self.assertEqual('', widget.get_date())
+        self.assertEqual('1/3/15', widget.get_date()) # if textvariable == '' then year/month/day should still be horner
         self.assertEqual(date(2015, 1, 1), widget._date)
         widget.selection_set(date(2018, 11, 21))
         self.window.update()
@@ -294,6 +294,7 @@ class TestCalendar(BaseWidgetTest):
                    'firstweekday',
                    'weekenddays',
                    'showweeknumbers',
+                   'weeknumberoffset',
                    'showothermonthdays',
                    'selectbackground',
                    'selectforeground',
@@ -316,6 +317,7 @@ class TestCalendar(BaseWidgetTest):
                    'headersforeground',
                    'disableddaybackground',
                    'disableddayforeground',
+                   'day_names',
                    'tooltipbackground',
                    'tooltipforeground',
                    'tooltipalpha',
