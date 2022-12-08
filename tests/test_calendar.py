@@ -317,6 +317,7 @@ class TestCalendar(BaseWidgetTest):
                    'headersforeground',
                    'disableddaybackground',
                    'disableddayforeground',
+                   'day_names',
                    'tooltipbackground',
                    'tooltipforeground',
                    'tooltipalpha',

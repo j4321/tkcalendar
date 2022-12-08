@@ -185,6 +185,9 @@ class Calendar(ttk.Frame):
         disableddayforeground : str
             foreground color of days in disabled state
 
+        day_names : 'wide' or 'short' or 'abbreviated'or 'narrow' (default = 'abbreviated')
+            contorl the fromat of the day name.  Ex: 'Tuesday', 'Tu', 'Tue', 'T'
+
         Tooltip Options (for calevents)
         -------------------------------
 
@@ -258,7 +261,8 @@ class Calendar(ttk.Frame):
         locale = kw.pop("locale", default_locale())
         if locale is None:
             locale = 'en'
-        self._day_names = get_day_names('abbreviated', locale=locale)
+        day_names = kw.pop('day_names', 'abbreviated')
+        self._day_names = get_day_names(day_names, locale=locale)
         self._month_names = get_month_names('wide', locale=locale)
         date_pattern = self._get_date_pattern(kw.pop("date_pattern", "short"), locale)
 
@@ -360,6 +364,7 @@ class Calendar(ttk.Frame):
                    'headersforeground',
                    'disableddaybackground',
                    'disableddayforeground',
+                   'day_names',
                    'tooltipforeground',
                    'tooltipbackground',
                    'tooltipalpha',
@@ -406,6 +411,7 @@ class Calendar(ttk.Frame):
                             'headersforeground': 'black',
                             'disableddaybackground': dis_bg,
                             'disableddayforeground': dis_fg,
+                            'day_names': day_names,
                             'tooltipforeground': 'gray90',
                             'tooltipbackground': 'black',
                             'tooltipalpha': 0.8,

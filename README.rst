@@ -221,6 +221,9 @@ Widget keyword options
     tooltipdelay : int
         delay in ms before displaying the tooltip
 
+    day_names : 'wide' or 'short' or 'abbreviated'or 'narrow' (default = 'abbreviated')
+        contorl the fromat of the day name.  Ex: 'Tuesday', 'Tu', 'Tue', 'T'
+
 Virtual Events
 ~~~~~~~~~~~~~~
 
