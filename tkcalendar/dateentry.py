@@ -331,6 +331,22 @@ class DateEntry(ttk.Entry):
             date = self.parse_date(self.get())
             x = self.winfo_rootx()
             y = self.winfo_rooty() + self.winfo_height()
+            
+            # Adjust position if calendar toplevel goes out of screen.
+            # The screen area occupied by the taskbar/dock 
+            # is currently not taken into account.
+            xmin = 0
+            xmax = self.winfo_screenwidth()
+            ymax = self.winfo_screenheight()
+            width = self._top_cal.winfo_width()
+            height = self._top_cal.winfo_height()
+            if y+height >= ymax:
+                y = self.winfo_rooty()-height;
+            if x+width >= xmax:
+                x = xmax-width;
+            elif x < xmin:
+                x = xmin
+            
             if self.winfo_toplevel().attributes('-topmost'):
                 self._top_cal.attributes('-topmost', True)
             else:
