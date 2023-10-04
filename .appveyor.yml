@@ -2,8 +2,6 @@ image:
   - Visual Studio 2022
 environment:
   matrix:
-    - PYTHON: "C:\\PYTHON34"
-    - PYTHON: "C:\\PYTHON35"
     - PYTHON: "C:\\PYTHON36"
     - PYTHON: "C:\\PYTHON37"
     - PYTHON: "C:\\PYTHON38"
@@ -11,8 +9,8 @@ environment:
     - PYTHON: "C:\\PYTHON310"
     - PYTHON: "C:\\PYTHON311"
 install:
-  - "%PYTHON%\\python.exe -m pip install --upgrade pip"
-  - "%PYTHON%\\python.exe -m pip install zlib codecov coverage nose pillow pynput babel"
+  - "%PYTHON%\\python.exe -m pip install --upgrade pip setuptools wheel"
+  - "%PYTHON%\\python.exe -m pip install codecov coverage nose pillow pynput babel"
 build: off
 test_script:
   - "%PYTHON%\\python.exe -m pip install ."
