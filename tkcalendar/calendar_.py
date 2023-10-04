@@ -963,6 +963,9 @@ class Calendar(ttk.Frame):
                     w += 1
                 if dn == 7:
                     wn += 1
+                if date.month == 1 and calendar.datetime.date(date.year,date.month,1).strftime("%A") == "Sunday":
+                    w = int(date.strftime("%U")) - 1
+                    wn = 0
             else:
                 d -= 1
             w -= wn
