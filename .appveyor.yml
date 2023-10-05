@@ -10,7 +10,7 @@ environment:
     - PYTHON: "C:\\PYTHON311"
 install:
   - "%PYTHON%\\python.exe -m pip install --upgrade pip setuptools wheel"
-  - "%PYTHON%\\python.exe -m pip install --upgrade Pillow"
+  - "%PYTHON%\\python.exe -m pip install --upgrade Pillow -C zlib=disable"
   - "%PYTHON%\\python.exe -m pip install codecov coverage nose pynput babel"
 build: off
 test_script:
