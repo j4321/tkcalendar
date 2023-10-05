@@ -265,6 +265,7 @@ class Calendar(ttk.Frame):
         if self._textvariable is not None:
             # the variable overrides day, month and year keywords
             try:
+                print(self._textvariable.get())
                 self._sel_date = parse_date(self._textvariable.get(), locale)
                 month = self._sel_date.month
                 year = self._sel_date.year
