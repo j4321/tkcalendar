@@ -12,7 +12,7 @@ install:
   - "%PYTHON%\\python.exe -m pip install --upgrade pip setuptools wheel"
   - "%PYTHON%\\python.exe -m pip install --upgrade Pillow"
   - "%PYTHON%\\python.exe -m pip install codecov coverage nose pynput babel"
-  - "%PYTHON%\\python.exe -c "import babel; print(babel.__version__)""
+  - "%PYTHON%\\python.exe -c 'import babel; print(babel.__version__)'"
 build: off
 test_script:
   - "%PYTHON%\\python.exe -m pip install ."
