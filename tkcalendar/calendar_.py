@@ -23,7 +23,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 Calendar widget
 """
 
-import sys
 import calendar
 try:
     from tkinter import ttk
@@ -265,7 +264,6 @@ class Calendar(ttk.Frame):
         if self._textvariable is not None:
             # the variable overrides day, month and year keywords
             try:
-                sys.stdout.write(self._textvariable.get())
                 self._sel_date = parse_date(self._textvariable.get(), locale)
                 month = self._sel_date.month
                 year = self._sel_date.year
