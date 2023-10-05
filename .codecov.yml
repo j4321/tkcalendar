@@ -9,8 +9,9 @@ coverage:
       default:
         target: '80'
   ignore:
-    - "babel"
-    - "ctypes"
-    - "pynput"
-    - "pytz"
+    - "**/babel/**/*"
+    - "**/ctypes/**/*"
+    - "**/pynput/**/*"
+    - "**/pytz/**/*"
+    - "**/tkinter/**/*"
 comment: false
