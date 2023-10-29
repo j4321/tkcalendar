@@ -14,6 +14,6 @@ install:
 build: off
 test_script:
   - "%PYTHON%\\python.exe -m pip install ."
-  - "%PYTHON%\\python.exe -m nose --with-coverage --exclude-dir=babel --exclude-dir=pytz --exclude-dir=tkinter"
+  - "%PYTHON%\\python.exe -m nose --with-coverage --exclude-dir=/projects/babel --exclude-dir=/projects/pytz --exclude-dir=/projects/tkinter"
 after_test:
   - "%PYTHON%\\Scripts\\codecov.exe"
