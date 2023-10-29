@@ -10,10 +10,10 @@ environment:
     - PYTHON: "C:\\PYTHON311-x64"
 install:
   - "%PYTHON%\\python.exe -m pip install --upgrade pip setuptools wheel"
-  - "%PYTHON%\\python.exe -m pip install codecov coverage nose pillow pynput babel"
+  - "%PYTHON%\\python.exe -m pip install codecov coverage nose nose-exclude pillow pynput babel"
 build: off
 test_script:
   - "%PYTHON%\\python.exe -m pip install ."
-  - "%PYTHON%\\python.exe -m nose --with-coverage"
+  - "%PYTHON%\\python.exe -m nose --with-coverage --exclude-dir=babel --exclude-dir=pytz --exclude-dir=tkinter"
 after_test:
   - "%PYTHON%\\Scripts\\codecov.exe"
