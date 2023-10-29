@@ -224,8 +224,7 @@ class TestCalendar(BaseWidgetTest):
 
     def test_calendar_textvariable(self):
         var = tk.StringVar(self.window)
-        widget = Calendar(self.window, selectmode='day',
-                          year=2015, month=1, day=3, textvariable=var)
+        widget = Calendar(self.window, selectmode='day', year=2015, month=1, day=3, textvariable=var)
         widget.pack()
         self.window.update()
         self.assertEqual('', var.get())
@@ -267,8 +266,7 @@ class TestCalendar(BaseWidgetTest):
         self.assertEqual('', var.get())
 
         widget.destroy()
-        widget = Calendar(self.window, selectmode='day', locale='en_US',
-                          textvariable=var)
+        widget = Calendar(self.window, selectmode='day', locale='en_US', textvariable=var)
         widget.pack()
         self.window.update()
         widget.selection_set(date(2018, 1, 2))
