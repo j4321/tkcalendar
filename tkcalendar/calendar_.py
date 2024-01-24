@@ -1094,7 +1094,7 @@ class Calendar(ttk.Frame):
                     self._r_year.state(['disabled'])
                 else:
                     self._r_year.state(['!disabled'])
-                    self._r_month.state(['!disabled'])
+                self._r_month.state(['!disabled'])
             else:  # dy > 1
                 self._r_year.state(['!disabled'])
                 self._r_month.state(['!disabled'])
@@ -1115,9 +1115,9 @@ class Calendar(ttk.Frame):
             elif dy == 1:
                 if self._date.month >= min_month:
                     self._l_year.state(['!disabled'])
-                    self._l_month.state(['!disabled'])
                 else:
                     self._l_year.state(['disabled'])
+                self._l_month.state(['!disabled'])
             else:  # dy > 1
                 self._l_year.state(['!disabled'])
                 self._l_month.state(['!disabled'])
