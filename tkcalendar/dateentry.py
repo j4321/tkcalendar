@@ -159,8 +159,8 @@ class DateEntry(ttk.Entry):
 
         # --- bindings
         # reconfigure style if theme changed
-        self.bind('<<ThemeChanged>>',
-                  lambda e: self.after(10, self._on_theme_change))
+        self.theme_change_cbid = None
+        self.bind('<<ThemeChanged>>', self.schedule_style_update)
         # determine new downarrow button bbox
         self.bind('<Configure>', self._determine_downarrow_name)
         self.bind('<Map>', self._determine_downarrow_name)
@@ -180,6 +180,10 @@ class DateEntry(ttk.Entry):
 
     def __setitem__(self, key, value):
         self.configure(**{key: value})
+
+    def schedule_style_update(self, event=None):
+        if self.theme_change_cbid is None:
+            self.theme_change_cbid = self.after(10, self._on_theme_change)
 
     def _setup_style(self, event=None):
         """Style configuration to make the DateEntry look like a Combobbox."""
@@ -202,6 +206,7 @@ class DateEntry(ttk.Entry):
             # nothing to cancel
             pass
         self._determine_downarrow_name_after_id = self.after(10, self._determine_downarrow_name)
+        self._theme_name = self.style.theme_use()
 
     def _determine_downarrow_name(self, event=None):
         """Determine downarrow button name."""
@@ -237,6 +242,7 @@ class DateEntry(ttk.Entry):
             # the theme has changed, update the DateEntry style to look like a combobox
             self._theme_name = theme
             self._setup_style()
+        self.theme_change_cbid = None
 
     def _on_b1_press(self, event):
         """Trigger self.drop_down on downarrow button press and set widget state to ['pressed', 'active']."""

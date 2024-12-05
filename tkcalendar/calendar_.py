@@ -492,10 +492,13 @@ class Calendar(ttk.Frame):
 
         self.config(state=state)
 
-        # --- bindings
-        self.bind('<<ThemeChanged>>', self._setup_style)
-
+        self._theme_name = None
         self._setup_style()
+
+        # --- bindings
+        self.theme_change_cbid = None
+        self.bind('<<ThemeChanged>>', self.schedule_style_update)
+
         self._display_calendar()
         self._btns_date_range()
         self._check_sel_date()
@@ -746,6 +749,18 @@ class Calendar(ttk.Frame):
                     self._display_calendar()
                     self._display_selection()
 
+    def schedule_style_update(self, event=None):
+        if self.theme_change_cbid is None:
+            self.theme_change_cbid = self.after(10, self._on_theme_change)
+
+    def _on_theme_change(self):
+        theme = self.style.theme_use()
+        if self._theme_name != theme:
+            # the theme has changed, update the DateEntry style to look like a combobox
+            self._theme_name = theme
+            self._setup_style()
+        self.theme_change_cbid = None
+
     def _setup_style(self, event=None):
         """Configure style."""
         self.style.layout('L.%s.TButton' % self._style_prefixe,
@@ -819,6 +834,7 @@ class Calendar(ttk.Frame):
         self.style.map(self._style_prefixe + '.TLabel',
                        background=[('disabled', dis_day_bg)],
                        foreground=[('disabled', dis_day_fg)])
+        self._theme_name = self.style.theme_use()
 
     # --- display
     def _display_calendar(self):
