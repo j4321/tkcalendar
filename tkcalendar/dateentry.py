@@ -117,6 +117,8 @@ class DateEntry(ttk.Entry):
 
         ttk.Entry.__init__(self, master, **entry_kw)
 
+        self._downarrow_name = ''
+        self._downarrow_name2 = ''
         self._determine_downarrow_name_after_id = ''
 
         # drop-down calendar
@@ -212,19 +214,25 @@ class DateEntry(ttk.Entry):
             pass
         if self.winfo_ismapped():
             self.update_idletasks()
-            y = self.winfo_height() // 2
-            x = self.winfo_width() - 10
+            w, h = self.winfo_width(), self.winfo_height()
+            x, y = w - 10, h // 2
             name = self.identify(x, y)
+            # determine secondary downarrow name when used with ttk
+            x2, y2 = w - 1, h - 1
+            name2 = self.identify(x2, y2)
             if name:
                 self._downarrow_name = name
             else:
                 self._determine_downarrow_name_after_id = self.after(10, self._determine_downarrow_name)
+            if name2:
+                self._downarrow_name2 = name2
 
     def _on_motion(self, event):
         """Set widget state depending on mouse position to mimic Combobox behavior."""
         x, y = event.x, event.y
         if 'disabled' not in self.state():
-            if self.identify(x, y) == self._downarrow_name:
+            name = self.identify(x, y)
+            if name == self._downarrow_name or name == self._downarrow_name2:
                 self.state(['active'])
                 ttk.Entry.configure(self, cursor='arrow')
             else:
@@ -241,21 +249,28 @@ class DateEntry(ttk.Entry):
     def _on_b1_press(self, event):
         """Trigger self.drop_down on downarrow button press and set widget state to ['pressed', 'active']."""
         x, y = event.x, event.y
-        if (('disabled' not in self.state()) and self.identify(x, y) == self._downarrow_name):
-            self.state(['pressed'])
+        name = self.identify(x, y)
+        if (('disabled' not in self.state()) and (name == self._downarrow_name or name == self._downarrow_name2)):
             self.drop_down()
 
     def _on_focus_out_cal(self, event):
         """Withdraw drop-down calendar when it looses focus."""
         if self.focus_get() is not None:
-            if self.focus_get() == self:
+            focus = self.focus_get()
+            if focus == self:
                 x, y = event.x, event.y
-                if (type(x) != int or type(y) != int or self.identify(x, y) != self._downarrow_name):
+                if (type(x) != int or type(y) != int or (self.identify(x, y) != self._downarrow_name and self.identify(x, y) != self.self._downarrow_name2)):
                     self._top_cal.withdraw()
                     self.state(['!pressed'])
             else:
-                self._top_cal.withdraw()
-                self.state(['!pressed'])
+                # do not withdraw if calendar element is focused
+                while focus is not None:
+                    if focus == self._calendar:
+                        break
+                    focus = focus.master
+                else:
+                    self._top_cal.withdraw()
+                    self.state(['!pressed'])
         elif self.grab_current():
             # 'active' won't be in state because of the grab
             x, y = self._top_cal.winfo_pointerxy()
@@ -326,6 +341,7 @@ class DateEntry(ttk.Entry):
         """Display or withdraw the drop-down calendar depending on its current state."""
         if self._calendar.winfo_ismapped():
             self._top_cal.withdraw()
+            self.state(['!pressed'])
         else:
             self._validate_date()
             date = self.parse_date(self.get())
@@ -339,6 +355,8 @@ class DateEntry(ttk.Entry):
             self._top_cal.deiconify()
             self._calendar.focus_set()
             self._calendar.selection_set(date)
+            self.state(['pressed'])
+            self.after(10, self._calendar.focus_force)
 
     def state(self, *args):
         """
