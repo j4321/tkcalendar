@@ -33,7 +33,7 @@ except ImportError:
     from tkFont import Font
 
 from babel import default_locale
-from babel.dates import format_date, parse_date, get_day_names, get_month_names, get_date_format
+from babel.dates import format_date, parse_date, get_day_names, get_month_names, get_date_format, ParseError
 from tkcalendar.tooltip import TooltipWrapper
 import re
 
@@ -268,7 +268,7 @@ class Calendar(ttk.Frame):
                 self._sel_date = parse_date(self._textvariable.get(), locale)
                 month = self._sel_date.month
                 year = self._sel_date.year
-            except IndexError:
+            except (IndexError, ParseError):
                 self._sel_date = None
                 self._textvariable.set('')
                 month = kw.pop("month", today.month)
