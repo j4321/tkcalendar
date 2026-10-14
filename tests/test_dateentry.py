@@ -44,6 +44,44 @@ class TestDateEntry(BaseWidgetTest):
         self.window.update()
         self.assertFalse(widget._top_cal.winfo_ismapped())
 
+    def test_dateentry_calendar_month_arrows_keep_open(self):
+        """Check that using month calendar navigation arrows keeps drop-down open."""
+        widget = DateEntry(self.window)
+        widget.pack()
+        self.window.update()
+
+        widget.drop_down()
+        self.window.update()
+        self.assertTrue(widget._top_cal.winfo_ismapped())
+
+        # Simulate using navigation arrows (next and previous month)
+        widget._calendar._r_month.invoke()  # next month
+        self.window.update()
+        self.assertTrue(widget._top_cal.winfo_ismapped())
+
+        widget._calendar._l_month.invoke()  # previous month
+        self.window.update()
+        self.assertTrue(widget._top_cal.winfo_ismapped())
+
+    def test_dateentry_calendar_year_arrows_keep_open(self):
+        """Check that using year navigation arrows keeps drop-down open."""
+        widget = DateEntry(self.window)
+        widget.pack()
+        self.window.update()
+
+        widget.drop_down()
+        self.window.update()
+        self.assertTrue(widget._top_cal.winfo_ismapped())
+
+        # Simulate using navigation arrows (next and previous year)
+        widget._calendar._r_year.invoke()  # next year
+        self.window.update()
+        self.assertTrue(widget._top_cal.winfo_ismapped())
+
+        widget._calendar._l_year.invoke()  # previous year
+        self.window.update()
+        self.assertTrue(widget._top_cal.winfo_ismapped())
+
     def test_dateentry_get_set(self):
         widget = DateEntry(self.window, width=12, background='darkblue',
                            locale='en_US', foreground='white', borderwidth=2,

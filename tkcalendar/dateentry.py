@@ -33,6 +33,7 @@ except ImportError:
     import ttk
 
 from tkcalendar.calendar_ import Calendar
+from babel.dates import ParseError
 
 # temporary fix for issue #61 and https://bugs.python.org/issue38661
 MAPS = {'winnative': {'focusfill': [('readonly', 'focus', 'SystemHighlight')],
@@ -248,11 +249,15 @@ class DateEntry(ttk.Entry):
     def _on_focus_out_cal(self, event):
         """Withdraw drop-down calendar when it looses focus."""
         if self.focus_get() is not None:
-            if self.focus_get() == self:
+            widget = self.focus_get()
+            if widget == self:
                 x, y = event.x, event.y
                 if (type(x) != int or type(y) != int or self.identify(x, y) != self._downarrow_name):
                     self._top_cal.withdraw()
                     self.state(['!pressed'])
+            elif widget.winfo_toplevel() == self._top_cal:
+                # focus moved to a widget inside the drop-down calendar; keep it open
+                self._calendar.focus_force()
             else:
                 self._top_cal.withdraw()
                 self.state(['!pressed'])
@@ -287,7 +292,7 @@ class DateEntry(ttk.Entry):
                 return False
             else:
                 return True
-        except (ValueError, IndexError):
+        except (ValueError, IndexError, ParseError):
             self._set_text(self.format_date(self._date))
             return False
 
